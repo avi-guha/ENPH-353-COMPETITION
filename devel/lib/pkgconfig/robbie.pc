@@ -1,0 +1,8 @@
+prefix=/home/fizzer/ENPH-353-COMPETITION/devel
+
+Name: robbie
+Description: Description of robbie
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
