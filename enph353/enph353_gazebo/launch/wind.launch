@@ -1,0 +1,8 @@
+<launch>
+   <!-- My Package launch file -->
+   <node pkg="enph353_gazebo"
+         type="blow_wind.py"
+         name="gust" 
+         output="screen">
+   </node>
+</launch>

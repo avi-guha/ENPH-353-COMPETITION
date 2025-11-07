@@ -1,0 +1,12 @@
+material tunnel{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture brick.png
+            }
+        }   
+    }
+}

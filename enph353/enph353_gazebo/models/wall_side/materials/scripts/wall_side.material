@@ -1,0 +1,13 @@
+material wall_side{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture extended_forest.png
+                scale 0.5 1
+            }
+        }   
+    }
+}

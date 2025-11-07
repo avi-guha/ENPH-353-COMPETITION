@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<sdf version='1.4'>
+  <model name="wall_sides">
+  <link name='wall_sides'>
+    <pose>0 0 0 0 0 0</pose>
+    <inertial>
+      <inertia>
+        <ixx>1e-6</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>1e-6</iyy>
+        <iyz>0</iyz>
+        <izz>1e-6</izz>
+      </inertia>
+      <mass>1e-6</mass>
+    </inertial>
+    <collision name='collision'>
+      <pose>0 0 0 0 0 0</pose>
+      <geometry>
+        <box>
+          <size>12 1e-6 0.5</size>
+        </box>
+      </geometry>
+    </collision>
+    <visual name='visual'>
+      <geometry>
+        <box>
+          <size>12 1e-6 0.5</size>
+        </box>
+      </geometry>
+      <material>
+        <script>
+          <uri>model://wall_side/materials/scripts</uri>
+          <uri>model://wall_side/materials/textures</uri>
+          <name>wall_side</name>
+        </script>
+      </material>
+    </visual>
+  </link>
+</model>
+</sdf>

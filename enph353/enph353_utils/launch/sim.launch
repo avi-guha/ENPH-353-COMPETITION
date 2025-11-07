@@ -1,0 +1,29 @@
+<launch>
+	<param name="/use_sim_time" value="true" />
+	<arg name="spawn_pedestrians" default="false"/>
+	<arg name="spawn_vehicles" default="false"/>
+	<arg name="wind_blowing" default="false"/>
+
+	<!-- Spawn the competition world -->
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<env name="GAZEBO_RESOURCE_PATH" value="$(find enph353_gazebo)"/>
+		<env name="GAZEBO_MODEL_PATH" value="$(find enph353_gazebo)/models"/>
+		<arg name="world_name" value="$(find enph353_gazebo)/worlds/353.world"/>
+		<arg name="gui" value="true"/>
+	</include>
+
+	<!-- Spawn the robot -->
+	<include file="$(find enph353_utils)/launch/robots.launch"/>
+
+	<!-- Spawn the NPCs -->
+	<include file="$(find enph353_utils)/launch/npcs.launch">
+		<arg name="spawn_pedestrians" value="$(arg spawn_pedestrians)"/>
+		<arg name="spawn_vehicles" value="$(arg spawn_vehicles)"/>
+	</include>
+
+	<!-- Start blowing some wind -->
+	<group if="$(arg wind_blowing)">
+		<include file="$(find enph353_gazebo)/launch/wind.launch"/>
+	</group>
+
+</launch>

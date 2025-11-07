@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="radio_tower">
+    <static>true</static>
+    <link name="link">
+      <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.0385483333333</ixx>
+            <ixy>000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>0.107087533333</iyy>
+            <iyz>0.000000</iyz>
+            <izz>0.1243542</izz>
+          </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://radio_tower/meshes/radio_tower.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://radio_tower/meshes/radio_tower.dae</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>
