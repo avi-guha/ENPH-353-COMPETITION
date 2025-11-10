@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Launch file for RL line following training -->
+  
+  <!-- Arguments -->
+  <arg name="robot_name" default="R1"/>
+  <arg name="init_x" default="-5.0"/>
+  <arg name="init_y" default="0.0"/>
+  <arg name="init_z" default="0.15"/>
+  <arg name="init_yaw" default="0.0"/>
+  
+  <!-- Spawn robot with collision detection -->
+  <include file="$(find robbie)/launch/robbie.launch">
+    <arg name="robot_name" value="$(arg robot_name)"/>
+    <arg name="init_pose" value="-x $(arg init_x) -y $(arg init_y) -z $(arg init_z) -Y $(arg init_yaw)"/>
+  </include>
+  
+  <!-- Load collision detection plugin for world -->
+  <node name="collision_monitor" pkg="enph353_gazebo" type="collision_plugin" output="screen">
+    <param name="collision_object" value="$(arg robot_name)"/>
+    <param name="pub_topic" value="isHit"/>
+  </node>
+  
+</launch>

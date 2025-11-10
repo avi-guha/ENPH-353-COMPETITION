@@ -17,6 +17,15 @@
   <xacro:include filename="$(find robbie)/urdf/macros.xacro"/>
   <xacro:include filename="$(find robbie)/urdf/materials.xacro"/>
 
+  <!-- Base link for the robot -->
+  <link name="base_link"/>
+  
+  <joint name="base_to_chassis" type="fixed">
+    <parent link="base_link"/>
+    <child link="chassis"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
   <link name='chassis'>
     <xacro:box_inertial name="chassis" m="${chassis_mass}" x="${chassis_length}" y="${chassis_width}" z="${chassis_height}"/>
     <collision name='chassis_collision'>
@@ -192,11 +201,37 @@
     </plugin>
   </gazebo>
 
+  <!-- Collision detection for bumper sensors -->
+  <link name="bumper_link">
+    <collision name="bumper_collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.22 0.16 0.06"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="bumper_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="bumper_link"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+
+  <gazebo reference="bumper_link">
+    <sensor name="bumper_sensor" type="contact">
+      <always_on>true</always_on>
+      <update_rate>10.0</update_rate>
+      <contact>
+        <collision>bumper_collision</collision>
+      </contact>
+    </sensor>
+  </gazebo>
+
   <gazebo reference="camera_link">
     <sensor type="camera" name="camera1">
       <update_rate>30.0</update_rate>
       <camera name="head">
-        <horizontal_fov>1.3962634</horizontal_fov>
+        <horizontal_fov>1.9198622</horizontal_fov>
         <image>
           <width>800</width>
           <height>800</height>
