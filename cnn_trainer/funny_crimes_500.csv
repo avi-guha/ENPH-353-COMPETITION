@@ -1,0 +1,501 @@
+SIZE,VICTIM,CRIME,TIME,PLACE,MOTIVE,WEAPON,BANDIT
+5,Nervous Pigs,Sock Swap,Sunrise,Sand Pit,Cold Feet,Sticky Net,Kid Scout
+2,Lazy Cows,Leaf Scam,Evening,Mud Field,New Trend,Cheese Ray,Chef Floof
+4,Sleepy Bees,Quack Fraud,Nap Time,Pond Bank,Bored,Soda Spray,Bear Hug
+5,Chill Frogs,Moo Theft,Midnight,Pond Bank,Cold Feet,Melon Wand,Nurse Bee
+2,Worried Fish,Mud Trick,Twilight,Sand Pit,Felt Blue,Melon Wand,Farmer Zoom
+1,Angry Duck,Quack Fraud,Nap Time,Sand Pit,Cold Feet,Feather Pen,Nurse Bee
+3,Bored Dogs,Corn Con,Twilight,Mud Field,Felt Blue,Taco Blade,Kid Scout
+1,Lazy Cows,Quack Fraud,Dawn,Picnic Rug,Needed Milk,Banana Mic,Sir Bark
+4,Angry Duck,Sock Swap,Dawn,Ocean Bed,Hungry,Soda Spray,Sir Bark
+5,Chill Frogs,Moo Theft,Noon,Ocean Bed,Bored,Soda Spray,Kid Scout
+5,Lazy Cows,Corn Con,Noon,Forest Den,Felt Blue,Cheese Ray,Bear Hug
+3,Happy Goats,Moo Theft,Tea Time,Cloud City,Wanted Fame,Feather Pen,Agent Leaf
+2,Nervous Pigs,Quack Fraud,Twilight,Pond Bank,Lost Bet,Fork Dart,Chef Floof
+5,Sleepy Bees,Crumb Raid,Tea Time,Pond Bank,New Trend,Bubble Gun,Count Cluck
+1,Chill Frogs,Sock Swap,Noon,Alley Jam,Curious,Fork Dart,Agent Leaf
+3,Chill Frogs,Leaf Scam,Dawn,Sand Pit,Cold Feet,Fork Dart,DJ Whisker
+1,Worried Fish,Moo Theft,Tea Time,Flower Lot,Lost Bet,Banana Mic,Queen Antsy
+5,Lazy Cows,Mud Trick,Snack Time,Mud Field,Needed Milk,Taco Blade,Kid Scout
+1,Worried Fish,Honey Heist,Snack Time,Ocean Bed,Needed Milk,Cheese Ray,Count Cluck
+3,Lazy Cows,Moo Theft,Midnight,Flower Lot,Felt Blue,Taco Blade,Queen Antsy
+1,Nervous Pigs,Sock Swap,Twilight,Ocean Bed,Too Sweet,Melon Wand,Agent Leaf
+5,Happy Goats,Leaf Scam,Sunrise,Barn Roof,Hungry,Fork Dart,Count Cluck
+4,Happy Goats,Moo Theft,Snack Time,Pond Bank,Bored,Fork Dart,Agent Leaf
+4,Cool Cats,Honey Heist,Snack Time,Mud Field,Bored,Feather Pen,Nurse Bee
+4,Angry Duck,Honey Heist,Evening,Ocean Bed,Wanted Fame,Fork Dart,Queen Antsy
+4,Chill Frogs,Quack Fraud,Lunch,Alley Jam,Lost Bet,Fork Dart,Agent Leaf
+4,Nervous Pigs,Crumb Raid,Noon,Pond Bank,Lost Bet,Melon Wand,Count Cluck
+2,Cool Cats,Corn Con,Dawn,Cloud City,Curious,Feather Pen,Farmer Zoom
+2,Chill Frogs,Honey Heist,Midnight,Flower Lot,Felt Blue,Melon Wand,Kid Scout
+2,Sleepy Bees,Honey Heist,Noon,Picnic Rug,Wanted Fame,Melon Wand,Queen Antsy
+3,Angry Duck,Jazz Theft,Sunrise,Picnic Rug,Bored,Taco Blade,Kid Scout
+5,Bored Dogs,Leaf Scam,Evening,Forest Den,Bored,Cheese Ray,Queen Antsy
+2,Cool Cats,Leaf Scam,Dawn,Alley Jam,Curious,Feather Pen,Kid Scout
+4,Angry Duck,Honey Heist,Twilight,Pond Bank,Curious,Bread Bomb,Count Cluck
+2,Happy Goats,Corn Con,Evening,Sand Pit,Wanted Fame,Taco Blade,Queen Antsy
+5,Angry Duck,Pie Theft,Lunch,Picnic Rug,New Trend,Soda Spray,Kid Scout
+2,Nervous Pigs,Moo Theft,Nap Time,Alley Jam,Hungry,Fork Dart,Bear Hug
+4,Chill Frogs,Sock Swap,Sunrise,Picnic Rug,Lost Bet,Feather Pen,Chef Floof
+2,Chill Frogs,Pie Theft,Snack Time,Sand Pit,Felt Blue,Bubble Gun,Sir Bark
+2,Angry Duck,Moo Theft,Noon,Ocean Bed,Curious,Taco Blade,Agent Leaf
+2,Cool Cats,Jazz Theft,Evening,Ocean Bed,Too Sweet,Fork Dart,Sir Bark
+1,Drunk Ants,Sock Swap,Twilight,Pond Bank,Hungry,Cheese Ray,Bear Hug
+3,Bored Dogs,Sock Swap,Snack Time,Flower Lot,Wanted Fame,Fork Dart,DJ Whisker
+1,Cool Cats,Corn Con,Snack Time,Alley Jam,Curious,Cheese Ray,Sir Bark
+4,Sleepy Bees,Corn Con,Sunrise,Alley Jam,Lost Bet,Taco Blade,Sir Bark
+1,Sleepy Bees,Jazz Theft,Evening,Mud Field,Too Sweet,Sticky Net,Farmer Zoom
+1,Cool Cats,Sock Swap,Sunrise,Forest Den,Bored,Fork Dart,Nurse Bee
+1,Nervous Pigs,Sock Swap,Evening,Flower Lot,Felt Blue,Bubble Gun,Queen Antsy
+2,Lazy Cows,Leaf Scam,Lunch,Mud Field,Bored,Bread Bomb,Count Cluck
+3,Lazy Cows,Leaf Scam,Nap Time,Cloud City,Bored,Sticky Net,Bear Hug
+5,Nervous Pigs,Moo Theft,Noon,Sand Pit,Wanted Fame,Fork Dart,Bear Hug
+3,Worried Fish,Mud Trick,Tea Time,Picnic Rug,Too Sweet,Melon Wand,Queen Antsy
+4,Chill Frogs,Mud Trick,Tea Time,Forest Den,Curious,Bubble Gun,Queen Antsy
+1,Cool Cats,Crumb Raid,Midnight,Barn Roof,Hungry,Taco Blade,Agent Leaf
+4,Nervous Pigs,Moo Theft,Snack Time,Flower Lot,Hungry,Fork Dart,Kid Scout
+3,Sleepy Bees,Corn Con,Tea Time,Flower Lot,Too Sweet,Taco Blade,Kid Scout
+2,Cool Cats,Crumb Raid,Twilight,Flower Lot,Hungry,Cheese Ray,DJ Whisker
+3,Angry Duck,Moo Theft,Midnight,Pond Bank,Felt Blue,Feather Pen,Kid Scout
+2,Drunk Ants,Crumb Raid,Midnight,Cloud City,Wanted Fame,Bread Bomb,Queen Antsy
+1,Bored Dogs,Sock Swap,Noon,Picnic Rug,Hungry,Taco Blade,Kid Scout
+2,Cool Cats,Jazz Theft,Tea Time,Barn Roof,Lost Bet,Cheese Ray,Count Cluck
+2,Sleepy Bees,Sock Swap,Snack Time,Alley Jam,Hungry,Bread Bomb,Farmer Zoom
+4,Lazy Cows,Corn Con,Evening,Forest Den,Felt Blue,Fork Dart,Bear Hug
+4,Lazy Cows,Leaf Scam,Snack Time,Alley Jam,Bored,Sticky Net,Nurse Bee
+1,Angry Duck,Mud Trick,Midnight,Flower Lot,New Trend,Cheese Ray,Bear Hug
+5,Cool Cats,Corn Con,Twilight,Flower Lot,Lost Bet,Banana Mic,Chef Floof
+2,Worried Fish,Pie Theft,Lunch,Ocean Bed,Felt Blue,Bubble Gun,Kid Scout
+2,Angry Duck,Leaf Scam,Lunch,Forest Den,Hungry,Bread Bomb,Nurse Bee
+5,Lazy Cows,Leaf Scam,Snack Time,Flower Lot,Lost Bet,Sticky Net,Bear Hug
+3,Drunk Ants,Moo Theft,Noon,Alley Jam,Hungry,Sticky Net,Bear Hug
+4,Bored Dogs,Crumb Raid,Midnight,Pond Bank,Hungry,Sticky Net,Nurse Bee
+5,Lazy Cows,Crumb Raid,Dawn,Flower Lot,Bored,Banana Mic,Queen Antsy
+2,Drunk Ants,Honey Heist,Dawn,Sand Pit,Curious,Taco Blade,Bear Hug
+1,Cool Cats,Pie Theft,Tea Time,Flower Lot,Felt Blue,Bread Bomb,Farmer Zoom
+2,Cool Cats,Crumb Raid,Noon,Barn Roof,Bored,Melon Wand,Nurse Bee
+3,Chill Frogs,Jazz Theft,Midnight,Ocean Bed,Too Sweet,Sticky Net,Kid Scout
+2,Lazy Cows,Honey Heist,Tea Time,Alley Jam,Felt Blue,Bread Bomb,DJ Whisker
+3,Drunk Ants,Sock Swap,Midnight,Forest Den,Too Sweet,Banana Mic,DJ Whisker
+2,Nervous Pigs,Sock Swap,Evening,Pond Bank,Felt Blue,Banana Mic,Queen Antsy
+4,Lazy Cows,Sock Swap,Evening,Cloud City,Felt Blue,Bread Bomb,Chef Floof
+5,Worried Fish,Leaf Scam,Lunch,Forest Den,New Trend,Melon Wand,Farmer Zoom
+2,Sleepy Bees,Quack Fraud,Dawn,Ocean Bed,Cold Feet,Fork Dart,Sir Bark
+1,Nervous Pigs,Moo Theft,Twilight,Cloud City,Curious,Taco Blade,Queen Antsy
+5,Chill Frogs,Leaf Scam,Lunch,Sand Pit,Felt Blue,Cheese Ray,Farmer Zoom
+5,Cool Cats,Sock Swap,Tea Time,Flower Lot,Too Sweet,Bread Bomb,Bear Hug
+2,Nervous Pigs,Mud Trick,Midnight,Picnic Rug,Wanted Fame,Bubble Gun,Kid Scout
+5,Drunk Ants,Quack Fraud,Tea Time,Sand Pit,Too Sweet,Feather Pen,Chef Floof
+3,Nervous Pigs,Mud Trick,Dawn,Alley Jam,New Trend,Fork Dart,Count Cluck
+3,Worried Fish,Corn Con,Snack Time,Mud Field,Curious,Fork Dart,Bear Hug
+5,Happy Goats,Pie Theft,Evening,Picnic Rug,Bored,Sticky Net,Count Cluck
+5,Lazy Cows,Crumb Raid,Sunrise,Ocean Bed,Felt Blue,Taco Blade,Queen Antsy
+2,Nervous Pigs,Leaf Scam,Snack Time,Mud Field,Curious,Fork Dart,Farmer Zoom
+5,Cool Cats,Crumb Raid,Lunch,Ocean Bed,New Trend,Melon Wand,DJ Whisker
+4,Angry Duck,Moo Theft,Noon,Sand Pit,Bored,Bubble Gun,Agent Leaf
+4,Nervous Pigs,Quack Fraud,Lunch,Barn Roof,New Trend,Cheese Ray,Nurse Bee
+3,Chill Frogs,Jazz Theft,Midnight,Ocean Bed,Wanted Fame,Bubble Gun,Nurse Bee
+5,Angry Duck,Quack Fraud,Lunch,Cloud City,Curious,Sticky Net,DJ Whisker
+5,Cool Cats,Quack Fraud,Nap Time,Pond Bank,Needed Milk,Fork Dart,Bear Hug
+2,Worried Fish,Honey Heist,Noon,Ocean Bed,Wanted Fame,Banana Mic,Nurse Bee
+3,Nervous Pigs,Pie Theft,Snack Time,Forest Den,Curious,Cheese Ray,Agent Leaf
+4,Cool Cats,Crumb Raid,Dawn,Picnic Rug,New Trend,Bubble Gun,Chef Floof
+1,Worried Fish,Quack Fraud,Snack Time,Mud Field,Needed Milk,Taco Blade,Chef Floof
+3,Bored Dogs,Leaf Scam,Tea Time,Barn Roof,New Trend,Feather Pen,Chef Floof
+3,Happy Goats,Mud Trick,Noon,Barn Roof,New Trend,Bread Bomb,DJ Whisker
+3,Sleepy Bees,Crumb Raid,Tea Time,Barn Roof,Wanted Fame,Bread Bomb,Count Cluck
+1,Drunk Ants,Sock Swap,Tea Time,Mud Field,Hungry,Feather Pen,Agent Leaf
+3,Happy Goats,Honey Heist,Sunrise,Barn Roof,Curious,Feather Pen,Sir Bark
+1,Happy Goats,Corn Con,Noon,Cloud City,Needed Milk,Taco Blade,Kid Scout
+3,Sleepy Bees,Honey Heist,Sunrise,Barn Roof,Cold Feet,Bread Bomb,Bear Hug
+4,Lazy Cows,Honey Heist,Sunrise,Barn Roof,New Trend,Bubble Gun,Count Cluck
+4,Angry Duck,Leaf Scam,Nap Time,Forest Den,Wanted Fame,Bread Bomb,Nurse Bee
+1,Sleepy Bees,Pie Theft,Twilight,Sand Pit,New Trend,Melon Wand,Farmer Zoom
+1,Worried Fish,Honey Heist,Evening,Picnic Rug,Lost Bet,Soda Spray,Farmer Zoom
+3,Lazy Cows,Leaf Scam,Tea Time,Flower Lot,Wanted Fame,Feather Pen,Queen Antsy
+2,Drunk Ants,Pie Theft,Midnight,Alley Jam,Wanted Fame,Cheese Ray,Queen Antsy
+3,Chill Frogs,Jazz Theft,Twilight,Cloud City,Curious,Cheese Ray,Queen Antsy
+1,Worried Fish,Quack Fraud,Nap Time,Sand Pit,Too Sweet,Cheese Ray,Sir Bark
+3,Angry Duck,Mud Trick,Noon,Mud Field,New Trend,Cheese Ray,Bear Hug
+2,Angry Duck,Quack Fraud,Lunch,Forest Den,New Trend,Feather Pen,Chef Floof
+5,Drunk Ants,Sock Swap,Twilight,Ocean Bed,Hungry,Bubble Gun,Nurse Bee
+2,Cool Cats,Moo Theft,Lunch,Flower Lot,Felt Blue,Cheese Ray,Agent Leaf
+3,Lazy Cows,Sock Swap,Noon,Ocean Bed,Felt Blue,Taco Blade,Nurse Bee
+5,Chill Frogs,Quack Fraud,Evening,Alley Jam,Wanted Fame,Feather Pen,Count Cluck
+1,Worried Fish,Sock Swap,Dawn,Barn Roof,Lost Bet,Fork Dart,Agent Leaf
+4,Drunk Ants,Mud Trick,Noon,Picnic Rug,Bored,Sticky Net,Farmer Zoom
+3,Drunk Ants,Pie Theft,Evening,Ocean Bed,Bored,Banana Mic,Kid Scout
+5,Chill Frogs,Pie Theft,Noon,Forest Den,Bored,Fork Dart,Agent Leaf
+2,Lazy Cows,Leaf Scam,Noon,Picnic Rug,Needed Milk,Bread Bomb,Farmer Zoom
+2,Chill Frogs,Sock Swap,Twilight,Forest Den,Wanted Fame,Feather Pen,Agent Leaf
+3,Nervous Pigs,Jazz Theft,Twilight,Picnic Rug,New Trend,Banana Mic,Queen Antsy
+3,Cool Cats,Corn Con,Sunrise,Ocean Bed,Felt Blue,Sticky Net,Farmer Zoom
+1,Cool Cats,Leaf Scam,Tea Time,Barn Roof,Bored,Bread Bomb,Farmer Zoom
+4,Cool Cats,Jazz Theft,Midnight,Ocean Bed,Wanted Fame,Banana Mic,Count Cluck
+4,Lazy Cows,Leaf Scam,Twilight,Pond Bank,Felt Blue,Bubble Gun,Chef Floof
+3,Sleepy Bees,Leaf Scam,Midnight,Pond Bank,Too Sweet,Bread Bomb,DJ Whisker
+2,Angry Duck,Sock Swap,Twilight,Pond Bank,Needed Milk,Sticky Net,Bear Hug
+2,Cool Cats,Honey Heist,Twilight,Cloud City,Too Sweet,Bread Bomb,Farmer Zoom
+4,Angry Duck,Jazz Theft,Noon,Picnic Rug,Hungry,Taco Blade,Nurse Bee
+2,Sleepy Bees,Quack Fraud,Tea Time,Forest Den,Lost Bet,Bubble Gun,DJ Whisker
+1,Cool Cats,Mud Trick,Lunch,Pond Bank,Needed Milk,Cheese Ray,Nurse Bee
+4,Bored Dogs,Honey Heist,Midnight,Picnic Rug,Cold Feet,Feather Pen,Farmer Zoom
+1,Sleepy Bees,Sock Swap,Dawn,Ocean Bed,Wanted Fame,Bread Bomb,Farmer Zoom
+5,Lazy Cows,Corn Con,Sunrise,Sand Pit,Lost Bet,Melon Wand,Agent Leaf
+4,Lazy Cows,Honey Heist,Tea Time,Forest Den,Too Sweet,Melon Wand,Count Cluck
+2,Cool Cats,Quack Fraud,Lunch,Ocean Bed,Felt Blue,Fork Dart,Queen Antsy
+3,Cool Cats,Mud Trick,Lunch,Picnic Rug,Wanted Fame,Melon Wand,Queen Antsy
+2,Lazy Cows,Corn Con,Nap Time,Alley Jam,Wanted Fame,Melon Wand,Farmer Zoom
+2,Drunk Ants,Quack Fraud,Snack Time,Flower Lot,Lost Bet,Taco Blade,Queen Antsy
+3,Angry Duck,Honey Heist,Nap Time,Pond Bank,Felt Blue,Bubble Gun,Chef Floof
+4,Angry Duck,Sock Swap,Snack Time,Barn Roof,Too Sweet,Feather Pen,Queen Antsy
+3,Bored Dogs,Honey Heist,Tea Time,Barn Roof,Lost Bet,Bread Bomb,Count Cluck
+3,Bored Dogs,Honey Heist,Snack Time,Forest Den,Cold Feet,Bubble Gun,Nurse Bee
+2,Worried Fish,Leaf Scam,Noon,Pond Bank,Lost Bet,Feather Pen,Queen Antsy
+3,Angry Duck,Sock Swap,Dawn,Barn Roof,Hungry,Fork Dart,DJ Whisker
+5,Chill Frogs,Corn Con,Sunrise,Flower Lot,Curious,Taco Blade,DJ Whisker
+2,Chill Frogs,Moo Theft,Noon,Alley Jam,Wanted Fame,Soda Spray,Sir Bark
+4,Lazy Cows,Sock Swap,Snack Time,Flower Lot,Lost Bet,Taco Blade,Farmer Zoom
+1,Angry Duck,Jazz Theft,Dawn,Ocean Bed,Too Sweet,Fork Dart,Nurse Bee
+4,Bored Dogs,Corn Con,Nap Time,Picnic Rug,Wanted Fame,Fork Dart,DJ Whisker
+1,Sleepy Bees,Moo Theft,Nap Time,Sand Pit,Wanted Fame,Cheese Ray,Nurse Bee
+4,Worried Fish,Corn Con,Twilight,Forest Den,Cold Feet,Taco Blade,Sir Bark
+5,Nervous Pigs,Mud Trick,Dawn,Sand Pit,Too Sweet,Soda Spray,DJ Whisker
+2,Cool Cats,Honey Heist,Lunch,Cloud City,Cold Feet,Soda Spray,Sir Bark
+1,Drunk Ants,Pie Theft,Dawn,Forest Den,Lost Bet,Soda Spray,Kid Scout
+5,Worried Fish,Crumb Raid,Snack Time,Sand Pit,Wanted Fame,Feather Pen,Kid Scout
+5,Worried Fish,Mud Trick,Midnight,Ocean Bed,Felt Blue,Sticky Net,Queen Antsy
+2,Drunk Ants,Crumb Raid,Sunrise,Picnic Rug,Curious,Feather Pen,DJ Whisker
+1,Chill Frogs,Moo Theft,Sunrise,Pond Bank,Bored,Taco Blade,Count Cluck
+5,Sleepy Bees,Corn Con,Noon,Ocean Bed,Too Sweet,Bread Bomb,Kid Scout
+4,Drunk Ants,Honey Heist,Noon,Barn Roof,Bored,Bread Bomb,Sir Bark
+4,Nervous Pigs,Moo Theft,Lunch,Ocean Bed,Cold Feet,Sticky Net,Queen Antsy
+3,Cool Cats,Honey Heist,Lunch,Flower Lot,Cold Feet,Melon Wand,Sir Bark
+4,Drunk Ants,Sock Swap,Twilight,Flower Lot,New Trend,Bubble Gun,Kid Scout
+3,Angry Duck,Sock Swap,Sunrise,Mud Field,Curious,Banana Mic,Sir Bark
+2,Cool Cats,Leaf Scam,Snack Time,Cloud City,Bored,Soda Spray,Sir Bark
+2,Chill Frogs,Corn Con,Tea Time,Sand Pit,Wanted Fame,Bubble Gun,Sir Bark
+5,Lazy Cows,Crumb Raid,Sunrise,Barn Roof,Bored,Banana Mic,Kid Scout
+2,Chill Frogs,Honey Heist,Dawn,Flower Lot,Cold Feet,Bubble Gun,Sir Bark
+5,Cool Cats,Quack Fraud,Nap Time,Pond Bank,Felt Blue,Bubble Gun,Count Cluck
+3,Happy Goats,Leaf Scam,Snack Time,Forest Den,Wanted Fame,Bubble Gun,Agent Leaf
+2,Angry Duck,Quack Fraud,Evening,Sand Pit,Curious,Banana Mic,Nurse Bee
+1,Cool Cats,Pie Theft,Snack Time,Cloud City,Hungry,Taco Blade,Farmer Zoom
+4,Lazy Cows,Leaf Scam,Noon,Ocean Bed,Wanted Fame,Taco Blade,Count Cluck
+1,Angry Duck,Jazz Theft,Evening,Pond Bank,Wanted Fame,Fork Dart,Sir Bark
+5,Lazy Cows,Jazz Theft,Nap Time,Sand Pit,Too Sweet,Melon Wand,Nurse Bee
+1,Worried Fish,Mud Trick,Lunch,Ocean Bed,Curious,Taco Blade,Agent Leaf
+4,Lazy Cows,Crumb Raid,Twilight,Ocean Bed,Felt Blue,Banana Mic,DJ Whisker
+4,Nervous Pigs,Moo Theft,Twilight,Picnic Rug,Curious,Fork Dart,Sir Bark
+1,Cool Cats,Mud Trick,Sunrise,Mud Field,Cold Feet,Cheese Ray,Nurse Bee
+2,Happy Goats,Mud Trick,Tea Time,Alley Jam,New Trend,Feather Pen,Sir Bark
+4,Sleepy Bees,Crumb Raid,Snack Time,Mud Field,New Trend,Sticky Net,Farmer Zoom
+2,Worried Fish,Mud Trick,Sunrise,Mud Field,New Trend,Soda Spray,Kid Scout
+5,Lazy Cows,Mud Trick,Nap Time,Ocean Bed,Lost Bet,Banana Mic,Chef Floof
+3,Angry Duck,Quack Fraud,Sunrise,Cloud City,Bored,Banana Mic,Agent Leaf
+3,Chill Frogs,Leaf Scam,Snack Time,Mud Field,Wanted Fame,Soda Spray,Nurse Bee
+1,Cool Cats,Mud Trick,Nap Time,Cloud City,Needed Milk,Feather Pen,DJ Whisker
+1,Lazy Cows,Crumb Raid,Noon,Alley Jam,Lost Bet,Taco Blade,DJ Whisker
+3,Cool Cats,Pie Theft,Snack Time,Flower Lot,Lost Bet,Soda Spray,Nurse Bee
+2,Chill Frogs,Jazz Theft,Snack Time,Sand Pit,Bored,Bread Bomb,Bear Hug
+4,Bored Dogs,Corn Con,Noon,Picnic Rug,Bored,Bubble Gun,Nurse Bee
+4,Sleepy Bees,Honey Heist,Tea Time,Cloud City,Too Sweet,Melon Wand,Nurse Bee
+4,Nervous Pigs,Quack Fraud,Midnight,Cloud City,Cold Feet,Taco Blade,Sir Bark
+4,Sleepy Bees,Moo Theft,Nap Time,Flower Lot,Bored,Banana Mic,DJ Whisker
+3,Bored Dogs,Crumb Raid,Evening,Forest Den,Lost Bet,Banana Mic,Kid Scout
+5,Chill Frogs,Leaf Scam,Twilight,Barn Roof,Too Sweet,Melon Wand,Kid Scout
+1,Chill Frogs,Sock Swap,Noon,Mud Field,Too Sweet,Feather Pen,DJ Whisker
+5,Drunk Ants,Jazz Theft,Evening,Cloud City,Lost Bet,Melon Wand,DJ Whisker
+1,Angry Duck,Corn Con,Lunch,Ocean Bed,Curious,Melon Wand,Farmer Zoom
+2,Nervous Pigs,Pie Theft,Nap Time,Alley Jam,Too Sweet,Sticky Net,Bear Hug
+5,Lazy Cows,Honey Heist,Snack Time,Ocean Bed,Curious,Fork Dart,Farmer Zoom
+4,Cool Cats,Jazz Theft,Snack Time,Forest Den,Felt Blue,Banana Mic,DJ Whisker
+4,Cool Cats,Leaf Scam,Tea Time,Alley Jam,Curious,Feather Pen,Count Cluck
+2,Cool Cats,Pie Theft,Twilight,Ocean Bed,New Trend,Soda Spray,DJ Whisker
+5,Drunk Ants,Quack Fraud,Nap Time,Picnic Rug,Too Sweet,Banana Mic,Kid Scout
+4,Happy Goats,Honey Heist,Midnight,Flower Lot,Bored,Melon Wand,Bear Hug
+1,Angry Duck,Honey Heist,Nap Time,Picnic Rug,Bored,Bubble Gun,Nurse Bee
+2,Sleepy Bees,Quack Fraud,Snack Time,Flower Lot,Bored,Feather Pen,Farmer Zoom
+5,Sleepy Bees,Moo Theft,Sunrise,Pond Bank,Felt Blue,Melon Wand,Kid Scout
+5,Lazy Cows,Mud Trick,Nap Time,Pond Bank,Bored,Fork Dart,Kid Scout
+4,Nervous Pigs,Sock Swap,Twilight,Sand Pit,Too Sweet,Feather Pen,Bear Hug
+2,Chill Frogs,Corn Con,Noon,Picnic Rug,Curious,Banana Mic,Kid Scout
+2,Drunk Ants,Crumb Raid,Lunch,Barn Roof,New Trend,Fork Dart,DJ Whisker
+5,Cool Cats,Honey Heist,Midnight,Pond Bank,Wanted Fame,Fork Dart,Farmer Zoom
+4,Happy Goats,Moo Theft,Twilight,Mud Field,Curious,Fork Dart,Bear Hug
+1,Worried Fish,Jazz Theft,Evening,Ocean Bed,Bored,Cheese Ray,Chef Floof
+3,Lazy Cows,Honey Heist,Sunrise,Flower Lot,New Trend,Bubble Gun,Farmer Zoom
+5,Sleepy Bees,Corn Con,Evening,Alley Jam,Cold Feet,Sticky Net,Farmer Zoom
+1,Nervous Pigs,Pie Theft,Lunch,Sand Pit,Lost Bet,Cheese Ray,Sir Bark
+3,Bored Dogs,Honey Heist,Lunch,Mud Field,Bored,Fork Dart,DJ Whisker
+5,Worried Fish,Quack Fraud,Lunch,Alley Jam,Too Sweet,Cheese Ray,Farmer Zoom
+5,Lazy Cows,Pie Theft,Snack Time,Barn Roof,Cold Feet,Melon Wand,Nurse Bee
+4,Happy Goats,Quack Fraud,Snack Time,Barn Roof,Hungry,Fork Dart,Sir Bark
+3,Worried Fish,Honey Heist,Snack Time,Alley Jam,Cold Feet,Bread Bomb,Chef Floof
+5,Cool Cats,Mud Trick,Tea Time,Picnic Rug,Cold Feet,Feather Pen,Nurse Bee
+5,Happy Goats,Honey Heist,Dawn,Mud Field,Hungry,Soda Spray,Queen Antsy
+1,Worried Fish,Jazz Theft,Noon,Picnic Rug,Too Sweet,Bread Bomb,Farmer Zoom
+5,Chill Frogs,Pie Theft,Midnight,Mud Field,Needed Milk,Taco Blade,DJ Whisker
+1,Drunk Ants,Crumb Raid,Lunch,Mud Field,Curious,Soda Spray,Sir Bark
+3,Lazy Cows,Corn Con,Snack Time,Pond Bank,Needed Milk,Bread Bomb,Bear Hug
+4,Drunk Ants,Sock Swap,Tea Time,Alley Jam,Cold Feet,Feather Pen,Agent Leaf
+2,Sleepy Bees,Corn Con,Nap Time,Forest Den,Curious,Banana Mic,Queen Antsy
+3,Lazy Cows,Jazz Theft,Twilight,Alley Jam,Felt Blue,Melon Wand,Count Cluck
+4,Chill Frogs,Quack Fraud,Tea Time,Sand Pit,Needed Milk,Melon Wand,Count Cluck
+1,Angry Duck,Crumb Raid,Lunch,Alley Jam,Too Sweet,Sticky Net,Chef Floof
+5,Worried Fish,Mud Trick,Snack Time,Picnic Rug,Felt Blue,Banana Mic,Sir Bark
+3,Cool Cats,Moo Theft,Nap Time,Mud Field,Curious,Taco Blade,Farmer Zoom
+4,Sleepy Bees,Honey Heist,Evening,Flower Lot,Lost Bet,Bubble Gun,Count Cluck
+5,Happy Goats,Quack Fraud,Midnight,Picnic Rug,Too Sweet,Bread Bomb,Bear Hug
+4,Angry Duck,Jazz Theft,Snack Time,Alley Jam,New Trend,Bread Bomb,Queen Antsy
+5,Nervous Pigs,Mud Trick,Twilight,Cloud City,New Trend,Bread Bomb,Bear Hug
+5,Cool Cats,Jazz Theft,Midnight,Flower Lot,Felt Blue,Bread Bomb,Chef Floof
+1,Sleepy Bees,Moo Theft,Tea Time,Picnic Rug,Lost Bet,Fork Dart,Chef Floof
+3,Sleepy Bees,Honey Heist,Nap Time,Pond Bank,Too Sweet,Soda Spray,Chef Floof
+5,Angry Duck,Leaf Scam,Noon,Pond Bank,Wanted Fame,Taco Blade,DJ Whisker
+2,Angry Duck,Pie Theft,Noon,Ocean Bed,Cold Feet,Melon Wand,Chef Floof
+5,Chill Frogs,Honey Heist,Tea Time,Sand Pit,Wanted Fame,Fork Dart,Farmer Zoom
+4,Chill Frogs,Sock Swap,Noon,Ocean Bed,Wanted Fame,Banana Mic,Sir Bark
+1,Chill Frogs,Corn Con,Nap Time,Mud Field,Bored,Bread Bomb,Nurse Bee
+1,Cool Cats,Honey Heist,Twilight,Mud Field,Hungry,Cheese Ray,Nurse Bee
+3,Chill Frogs,Jazz Theft,Lunch,Forest Den,Felt Blue,Banana Mic,Agent Leaf
+3,Nervous Pigs,Jazz Theft,Nap Time,Pond Bank,Too Sweet,Feather Pen,Count Cluck
+2,Angry Duck,Sock Swap,Dawn,Barn Roof,Too Sweet,Taco Blade,Count Cluck
+2,Cool Cats,Moo Theft,Tea Time,Cloud City,Felt Blue,Taco Blade,Nurse Bee
+4,Happy Goats,Crumb Raid,Sunrise,Forest Den,Needed Milk,Cheese Ray,Bear Hug
+5,Angry Duck,Crumb Raid,Midnight,Sand Pit,Curious,Fork Dart,Chef Floof
+3,Angry Duck,Jazz Theft,Sunrise,Barn Roof,Wanted Fame,Fork Dart,Farmer Zoom
+5,Happy Goats,Mud Trick,Sunrise,Pond Bank,Needed Milk,Soda Spray,DJ Whisker
+5,Happy Goats,Mud Trick,Snack Time,Pond Bank,Lost Bet,Soda Spray,Bear Hug
+2,Angry Duck,Corn Con,Midnight,Flower Lot,Lost Bet,Sticky Net,Count Cluck
+5,Angry Duck,Mud Trick,Noon,Flower Lot,Bored,Fork Dart,Sir Bark
+4,Chill Frogs,Mud Trick,Noon,Cloud City,Felt Blue,Banana Mic,Queen Antsy
+3,Angry Duck,Moo Theft,Dawn,Flower Lot,New Trend,Bubble Gun,Kid Scout
+5,Worried Fish,Sock Swap,Midnight,Barn Roof,Felt Blue,Bread Bomb,Farmer Zoom
+3,Cool Cats,Crumb Raid,Snack Time,Alley Jam,Too Sweet,Banana Mic,Bear Hug
+2,Cool Cats,Leaf Scam,Sunrise,Mud Field,Lost Bet,Soda Spray,Farmer Zoom
+4,Lazy Cows,Quack Fraud,Evening,Flower Lot,Wanted Fame,Feather Pen,Agent Leaf
+4,Sleepy Bees,Honey Heist,Snack Time,Pond Bank,Hungry,Soda Spray,Nurse Bee
+1,Bored Dogs,Crumb Raid,Dawn,Forest Den,Lost Bet,Bubble Gun,Farmer Zoom
+2,Nervous Pigs,Corn Con,Lunch,Picnic Rug,Curious,Feather Pen,Farmer Zoom
+3,Worried Fish,Quack Fraud,Snack Time,Forest Den,Lost Bet,Sticky Net,Sir Bark
+2,Happy Goats,Pie Theft,Sunrise,Pond Bank,Too Sweet,Cheese Ray,DJ Whisker
+4,Cool Cats,Moo Theft,Nap Time,Forest Den,Wanted Fame,Feather Pen,Queen Antsy
+2,Bored Dogs,Mud Trick,Tea Time,Picnic Rug,Bored,Fork Dart,Agent Leaf
+1,Lazy Cows,Sock Swap,Midnight,Flower Lot,Too Sweet,Banana Mic,Nurse Bee
+1,Worried Fish,Corn Con,Twilight,Ocean Bed,Too Sweet,Melon Wand,Sir Bark
+5,Chill Frogs,Leaf Scam,Sunrise,Alley Jam,Wanted Fame,Bread Bomb,Sir Bark
+2,Angry Duck,Jazz Theft,Noon,Picnic Rug,Cold Feet,Cheese Ray,Nurse Bee
+5,Happy Goats,Pie Theft,Snack Time,Forest Den,Too Sweet,Feather Pen,Chef Floof
+3,Bored Dogs,Quack Fraud,Nap Time,Ocean Bed,Wanted Fame,Bubble Gun,Queen Antsy
+1,Lazy Cows,Pie Theft,Midnight,Pond Bank,Wanted Fame,Soda Spray,Agent Leaf
+3,Cool Cats,Leaf Scam,Snack Time,Ocean Bed,Lost Bet,Taco Blade,Sir Bark
+3,Drunk Ants,Moo Theft,Lunch,Picnic Rug,Needed Milk,Melon Wand,Nurse Bee
+3,Nervous Pigs,Mud Trick,Lunch,Forest Den,Felt Blue,Sticky Net,Count Cluck
+4,Happy Goats,Quack Fraud,Evening,Pond Bank,Felt Blue,Banana Mic,Farmer Zoom
+4,Angry Duck,Mud Trick,Midnight,Sand Pit,Wanted Fame,Bread Bomb,Nurse Bee
+4,Sleepy Bees,Quack Fraud,Nap Time,Flower Lot,Lost Bet,Melon Wand,Sir Bark
+3,Sleepy Bees,Jazz Theft,Midnight,Picnic Rug,Too Sweet,Sticky Net,Farmer Zoom
+3,Worried Fish,Jazz Theft,Sunrise,Pond Bank,Needed Milk,Bubble Gun,Farmer Zoom
+5,Worried Fish,Jazz Theft,Dawn,Picnic Rug,Felt Blue,Melon Wand,Count Cluck
+1,Worried Fish,Honey Heist,Tea Time,Forest Den,Cold Feet,Banana Mic,Farmer Zoom
+5,Angry Duck,Crumb Raid,Nap Time,Picnic Rug,Bored,Bread Bomb,Farmer Zoom
+3,Worried Fish,Mud Trick,Sunrise,Picnic Rug,Hungry,Bread Bomb,DJ Whisker
+5,Sleepy Bees,Moo Theft,Tea Time,Alley Jam,Needed Milk,Bubble Gun,Count Cluck
+4,Angry Duck,Corn Con,Dawn,Ocean Bed,New Trend,Bread Bomb,Nurse Bee
+4,Angry Duck,Sock Swap,Tea Time,Picnic Rug,Cold Feet,Melon Wand,Bear Hug
+5,Angry Duck,Honey Heist,Nap Time,Flower Lot,Too Sweet,Soda Spray,DJ Whisker
+5,Chill Frogs,Crumb Raid,Noon,Barn Roof,Wanted Fame,Soda Spray,Chef Floof
+2,Nervous Pigs,Moo Theft,Lunch,Barn Roof,Too Sweet,Bread Bomb,Count Cluck
+2,Nervous Pigs,Jazz Theft,Twilight,Sand Pit,Too Sweet,Soda Spray,Sir Bark
+2,Bored Dogs,Mud Trick,Nap Time,Sand Pit,New Trend,Sticky Net,Chef Floof
+1,Sleepy Bees,Crumb Raid,Sunrise,Picnic Rug,Needed Milk,Bubble Gun,Chef Floof
+2,Bored Dogs,Jazz Theft,Lunch,Flower Lot,Bored,Soda Spray,Bear Hug
+5,Chill Frogs,Crumb Raid,Evening,Sand Pit,Lost Bet,Sticky Net,Chef Floof
+5,Nervous Pigs,Corn Con,Midnight,Cloud City,Bored,Bubble Gun,Sir Bark
+1,Worried Fish,Pie Theft,Sunrise,Pond Bank,Curious,Fork Dart,Queen Antsy
+3,Drunk Ants,Leaf Scam,Sunrise,Forest Den,Felt Blue,Banana Mic,Farmer Zoom
+4,Drunk Ants,Pie Theft,Snack Time,Ocean Bed,Hungry,Soda Spray,Sir Bark
+4,Lazy Cows,Mud Trick,Lunch,Flower Lot,Wanted Fame,Fork Dart,Sir Bark
+4,Sleepy Bees,Quack Fraud,Tea Time,Cloud City,Felt Blue,Sticky Net,Bear Hug
+1,Angry Duck,Mud Trick,Twilight,Flower Lot,Hungry,Sticky Net,Agent Leaf
+1,Chill Frogs,Moo Theft,Midnight,Picnic Rug,Curious,Fork Dart,Farmer Zoom
+3,Lazy Cows,Sock Swap,Snack Time,Ocean Bed,Bored,Sticky Net,Chef Floof
+5,Happy Goats,Jazz Theft,Dawn,Forest Den,New Trend,Banana Mic,DJ Whisker
+1,Cool Cats,Quack Fraud,Twilight,Pond Bank,Bored,Sticky Net,Sir Bark
+4,Lazy Cows,Leaf Scam,Evening,Mud Field,Curious,Soda Spray,Queen Antsy
+3,Lazy Cows,Quack Fraud,Sunrise,Flower Lot,Bored,Bread Bomb,DJ Whisker
+3,Worried Fish,Moo Theft,Tea Time,Picnic Rug,Needed Milk,Feather Pen,Bear Hug
+5,Nervous Pigs,Crumb Raid,Evening,Sand Pit,Bored,Soda Spray,Farmer Zoom
+2,Nervous Pigs,Crumb Raid,Noon,Alley Jam,Wanted Fame,Cheese Ray,Count Cluck
+4,Lazy Cows,Pie Theft,Lunch,Forest Den,Too Sweet,Bread Bomb,Kid Scout
+3,Chill Frogs,Jazz Theft,Tea Time,Alley Jam,Needed Milk,Soda Spray,Kid Scout
+5,Chill Frogs,Quack Fraud,Lunch,Forest Den,Cold Feet,Melon Wand,Sir Bark
+4,Bored Dogs,Quack Fraud,Tea Time,Barn Roof,Cold Feet,Sticky Net,Nurse Bee
+2,Nervous Pigs,Moo Theft,Noon,Barn Roof,Lost Bet,Banana Mic,Kid Scout
+5,Worried Fish,Jazz Theft,Noon,Pond Bank,Bored,Soda Spray,Bear Hug
+5,Bored Dogs,Moo Theft,Midnight,Cloud City,Curious,Banana Mic,Chef Floof
+5,Nervous Pigs,Mud Trick,Sunrise,Barn Roof,Curious,Sticky Net,Queen Antsy
+3,Nervous Pigs,Moo Theft,Twilight,Barn Roof,Needed Milk,Banana Mic,Count Cluck
+4,Worried Fish,Mud Trick,Nap Time,Flower Lot,Lost Bet,Bread Bomb,Count Cluck
+5,Chill Frogs,Jazz Theft,Snack Time,Cloud City,Bored,Banana Mic,Count Cluck
+5,Lazy Cows,Crumb Raid,Noon,Barn Roof,Wanted Fame,Taco Blade,Agent Leaf
+2,Bored Dogs,Pie Theft,Midnight,Sand Pit,Felt Blue,Soda Spray,Farmer Zoom
+3,Bored Dogs,Corn Con,Snack Time,Sand Pit,Wanted Fame,Cheese Ray,Chef Floof
+3,Bored Dogs,Pie Theft,Evening,Cloud City,Needed Milk,Bread Bomb,Chef Floof
+5,Lazy Cows,Mud Trick,Tea Time,Pond Bank,Hungry,Feather Pen,Agent Leaf
+1,Drunk Ants,Mud Trick,Dawn,Alley Jam,Felt Blue,Soda Spray,Chef Floof
+5,Angry Duck,Quack Fraud,Dawn,Ocean Bed,Wanted Fame,Sticky Net,Queen Antsy
+2,Chill Frogs,Jazz Theft,Dawn,Cloud City,Felt Blue,Cheese Ray,Kid Scout
+1,Angry Duck,Moo Theft,Lunch,Sand Pit,Wanted Fame,Taco Blade,Count Cluck
+3,Sleepy Bees,Honey Heist,Evening,Cloud City,Needed Milk,Sticky Net,Kid Scout
+4,Worried Fish,Leaf Scam,Tea Time,Ocean Bed,Too Sweet,Cheese Ray,DJ Whisker
+3,Chill Frogs,Leaf Scam,Lunch,Ocean Bed,Wanted Fame,Soda Spray,Bear Hug
+5,Happy Goats,Pie Theft,Evening,Cloud City,Felt Blue,Fork Dart,Agent Leaf
+5,Lazy Cows,Leaf Scam,Midnight,Picnic Rug,Felt Blue,Bread Bomb,Sir Bark
+4,Angry Duck,Quack Fraud,Tea Time,Picnic Rug,Lost Bet,Taco Blade,Sir Bark
+1,Lazy Cows,Leaf Scam,Lunch,Barn Roof,New Trend,Cheese Ray,Farmer Zoom
+3,Angry Duck,Sock Swap,Nap Time,Forest Den,Lost Bet,Bubble Gun,Count Cluck
+3,Bored Dogs,Quack Fraud,Tea Time,Mud Field,Needed Milk,Bread Bomb,DJ Whisker
+1,Bored Dogs,Leaf Scam,Sunrise,Cloud City,Wanted Fame,Bubble Gun,Count Cluck
+3,Worried Fish,Jazz Theft,Lunch,Forest Den,Felt Blue,Bubble Gun,Queen Antsy
+1,Lazy Cows,Honey Heist,Lunch,Flower Lot,Bored,Bread Bomb,Kid Scout
+3,Worried Fish,Pie Theft,Noon,Cloud City,Wanted Fame,Taco Blade,Kid Scout
+2,Happy Goats,Mud Trick,Tea Time,Alley Jam,Hungry,Sticky Net,Queen Antsy
+2,Lazy Cows,Mud Trick,Noon,Forest Den,New Trend,Cheese Ray,DJ Whisker
+3,Nervous Pigs,Mud Trick,Midnight,Flower Lot,Lost Bet,Taco Blade,Agent Leaf
+2,Worried Fish,Moo Theft,Lunch,Alley Jam,Cold Feet,Bread Bomb,Queen Antsy
+3,Happy Goats,Mud Trick,Sunrise,Ocean Bed,Hungry,Melon Wand,Count Cluck
+2,Sleepy Bees,Corn Con,Nap Time,Mud Field,Curious,Melon Wand,Nurse Bee
+4,Cool Cats,Jazz Theft,Evening,Alley Jam,Curious,Fork Dart,Kid Scout
+3,Lazy Cows,Moo Theft,Snack Time,Cloud City,Lost Bet,Taco Blade,Nurse Bee
+3,Cool Cats,Leaf Scam,Tea Time,Pond Bank,Cold Feet,Soda Spray,Kid Scout
+5,Worried Fish,Pie Theft,Evening,Alley Jam,Lost Bet,Soda Spray,Nurse Bee
+1,Happy Goats,Honey Heist,Twilight,Pond Bank,Felt Blue,Bread Bomb,Bear Hug
+5,Nervous Pigs,Leaf Scam,Lunch,Cloud City,Curious,Taco Blade,Nurse Bee
+3,Nervous Pigs,Crumb Raid,Dawn,Flower Lot,New Trend,Soda Spray,Agent Leaf
+1,Sleepy Bees,Honey Heist,Nap Time,Forest Den,Too Sweet,Melon Wand,Queen Antsy
+3,Angry Duck,Mud Trick,Noon,Sand Pit,Lost Bet,Cheese Ray,Kid Scout
+3,Drunk Ants,Corn Con,Sunrise,Forest Den,Wanted Fame,Fork Dart,Chef Floof
+4,Cool Cats,Honey Heist,Midnight,Barn Roof,Lost Bet,Feather Pen,Sir Bark
+5,Chill Frogs,Quack Fraud,Snack Time,Ocean Bed,Lost Bet,Feather Pen,Sir Bark
+4,Bored Dogs,Leaf Scam,Midnight,Cloud City,Cold Feet,Taco Blade,Queen Antsy
+4,Cool Cats,Mud Trick,Nap Time,Ocean Bed,Wanted Fame,Banana Mic,Bear Hug
+4,Angry Duck,Pie Theft,Evening,Barn Roof,Felt Blue,Banana Mic,Queen Antsy
+1,Lazy Cows,Leaf Scam,Sunrise,Pond Bank,Needed Milk,Fork Dart,DJ Whisker
+1,Nervous Pigs,Moo Theft,Dawn,Alley Jam,Lost Bet,Taco Blade,Farmer Zoom
+1,Chill Frogs,Honey Heist,Sunrise,Alley Jam,Lost Bet,Banana Mic,Farmer Zoom
+4,Angry Duck,Pie Theft,Noon,Flower Lot,Too Sweet,Soda Spray,Agent Leaf
+1,Chill Frogs,Mud Trick,Lunch,Mud Field,Hungry,Fork Dart,Farmer Zoom
+2,Happy Goats,Quack Fraud,Tea Time,Sand Pit,Felt Blue,Cheese Ray,Bear Hug
+3,Chill Frogs,Corn Con,Twilight,Barn Roof,Bored,Fork Dart,Farmer Zoom
+4,Worried Fish,Corn Con,Snack Time,Flower Lot,Too Sweet,Melon Wand,Bear Hug
+2,Bored Dogs,Leaf Scam,Evening,Pond Bank,Bored,Taco Blade,DJ Whisker
+5,Sleepy Bees,Moo Theft,Noon,Sand Pit,Needed Milk,Cheese Ray,Agent Leaf
+2,Cool Cats,Pie Theft,Twilight,Flower Lot,Too Sweet,Melon Wand,DJ Whisker
+3,Drunk Ants,Corn Con,Lunch,Sand Pit,Lost Bet,Melon Wand,Nurse Bee
+2,Happy Goats,Moo Theft,Nap Time,Barn Roof,Needed Milk,Feather Pen,Count Cluck
+4,Lazy Cows,Pie Theft,Sunrise,Picnic Rug,Hungry,Fork Dart,Chef Floof
+3,Worried Fish,Corn Con,Nap Time,Alley Jam,Lost Bet,Sticky Net,DJ Whisker
+5,Chill Frogs,Mud Trick,Sunrise,Mud Field,New Trend,Cheese Ray,DJ Whisker
+3,Nervous Pigs,Crumb Raid,Sunrise,Cloud City,New Trend,Sticky Net,Farmer Zoom
+1,Sleepy Bees,Jazz Theft,Lunch,Forest Den,Felt Blue,Bubble Gun,Agent Leaf
+5,Lazy Cows,Honey Heist,Evening,Mud Field,Felt Blue,Melon Wand,DJ Whisker
+5,Sleepy Bees,Leaf Scam,Lunch,Cloud City,New Trend,Taco Blade,Nurse Bee
+3,Happy Goats,Pie Theft,Sunrise,Pond Bank,Needed Milk,Melon Wand,Count Cluck
+2,Sleepy Bees,Moo Theft,Tea Time,Picnic Rug,New Trend,Melon Wand,Sir Bark
+5,Angry Duck,Honey Heist,Nap Time,Pond Bank,Needed Milk,Feather Pen,Kid Scout
+5,Bored Dogs,Moo Theft,Dawn,Picnic Rug,New Trend,Soda Spray,Queen Antsy
+5,Lazy Cows,Pie Theft,Dawn,Forest Den,Hungry,Feather Pen,Bear Hug
+1,Angry Duck,Leaf Scam,Tea Time,Pond Bank,Lost Bet,Taco Blade,Kid Scout
+1,Cool Cats,Pie Theft,Noon,Cloud City,New Trend,Fork Dart,Nurse Bee
+2,Worried Fish,Jazz Theft,Snack Time,Cloud City,Hungry,Sticky Net,Kid Scout
+2,Chill Frogs,Crumb Raid,Dawn,Cloud City,Too Sweet,Soda Spray,DJ Whisker
+5,Nervous Pigs,Quack Fraud,Lunch,Picnic Rug,Hungry,Bubble Gun,Kid Scout
+1,Sleepy Bees,Crumb Raid,Midnight,Barn Roof,Wanted Fame,Soda Spray,DJ Whisker
+3,Worried Fish,Jazz Theft,Sunrise,Mud Field,Too Sweet,Bread Bomb,Queen Antsy
+3,Drunk Ants,Crumb Raid,Twilight,Pond Bank,Wanted Fame,Fork Dart,Kid Scout
+1,Sleepy Bees,Moo Theft,Evening,Picnic Rug,Too Sweet,Cheese Ray,Queen Antsy
+1,Bored Dogs,Quack Fraud,Sunrise,Cloud City,Felt Blue,Banana Mic,Count Cluck
+3,Chill Frogs,Crumb Raid,Noon,Alley Jam,Bored,Melon Wand,Count Cluck
+1,Cool Cats,Honey Heist,Snack Time,Ocean Bed,Felt Blue,Taco Blade,Queen Antsy
+2,Worried Fish,Corn Con,Dawn,Forest Den,Wanted Fame,Soda Spray,Agent Leaf
+3,Cool Cats,Sock Swap,Nap Time,Cloud City,Lost Bet,Taco Blade,Nurse Bee
+4,Happy Goats,Corn Con,Dawn,Picnic Rug,Too Sweet,Soda Spray,Chef Floof
+2,Lazy Cows,Honey Heist,Noon,Picnic Rug,Needed Milk,Banana Mic,DJ Whisker
+4,Chill Frogs,Quack Fraud,Tea Time,Flower Lot,Needed Milk,Banana Mic,DJ Whisker
+4,Happy Goats,Moo Theft,Midnight,Pond Bank,Hungry,Bread Bomb,Chef Floof
+3,Worried Fish,Honey Heist,Evening,Picnic Rug,Needed Milk,Sticky Net,Agent Leaf
+3,Angry Duck,Corn Con,Sunrise,Sand Pit,Wanted Fame,Bread Bomb,Sir Bark
+3,Lazy Cows,Jazz Theft,Snack Time,Pond Bank,Felt Blue,Fork Dart,Sir Bark
+1,Bored Dogs,Honey Heist,Dawn,Flower Lot,New Trend,Bread Bomb,Kid Scout
+3,Lazy Cows,Mud Trick,Snack Time,Flower Lot,Wanted Fame,Soda Spray,Bear Hug
+4,Drunk Ants,Jazz Theft,Midnight,Forest Den,Wanted Fame,Soda Spray,Queen Antsy
+1,Angry Duck,Pie Theft,Sunrise,Sand Pit,Wanted Fame,Bread Bomb,Chef Floof
+3,Cool Cats,Crumb Raid,Tea Time,Picnic Rug,Lost Bet,Sticky Net,Chef Floof
+5,Lazy Cows,Corn Con,Noon,Barn Roof,Cold Feet,Banana Mic,Bear Hug
+2,Worried Fish,Leaf Scam,Sunrise,Picnic Rug,Wanted Fame,Bread Bomb,Chef Floof
+5,Happy Goats,Pie Theft,Nap Time,Barn Roof,Bored,Melon Wand,Count Cluck
+3,Nervous Pigs,Honey Heist,Midnight,Cloud City,Curious,Sticky Net,Kid Scout
+3,Sleepy Bees,Corn Con,Snack Time,Ocean Bed,Curious,Bread Bomb,Sir Bark
+5,Bored Dogs,Sock Swap,Lunch,Sand Pit,Wanted Fame,Cheese Ray,Count Cluck
+4,Bored Dogs,Mud Trick,Snack Time,Flower Lot,Hungry,Bread Bomb,Bear Hug
+5,Drunk Ants,Mud Trick,Tea Time,Barn Roof,Cold Feet,Feather Pen,Chef Floof
+1,Bored Dogs,Leaf Scam,Noon,Cloud City,New Trend,Melon Wand,Chef Floof
+1,Bored Dogs,Jazz Theft,Dawn,Picnic Rug,Lost Bet,Fork Dart,Chef Floof
+2,Angry Duck,Pie Theft,Noon,Alley Jam,Needed Milk,Fork Dart,Chef Floof
+1,Nervous Pigs,Mud Trick,Noon,Barn Roof,Curious,Bubble Gun,Queen Antsy
+2,Chill Frogs,Moo Theft,Evening,Ocean Bed,Hungry,Taco Blade,Queen Antsy
+1,Cool Cats,Corn Con,Dawn,Mud Field,Curious,Fork Dart,Kid Scout
+4,Drunk Ants,Sock Swap,Twilight,Picnic Rug,Wanted Fame,Cheese Ray,Chef Floof
+5,Cool Cats,Honey Heist,Evening,Alley Jam,Cold Feet,Melon Wand,Kid Scout
+1,Nervous Pigs,Pie Theft,Lunch,Forest Den,Bored,Bubble Gun,Kid Scout
+1,Angry Duck,Quack Fraud,Evening,Forest Den,Curious,Taco Blade,Nurse Bee
+1,Chill Frogs,Moo Theft,Snack Time,Pond Bank,Cold Feet,Soda Spray,Kid Scout
+2,Lazy Cows,Pie Theft,Lunch,Sand Pit,Felt Blue,Melon Wand,Queen Antsy
+2,Chill Frogs,Crumb Raid,Noon,Barn Roof,Wanted Fame,Soda Spray,Kid Scout
+4,Cool Cats,Pie Theft,Twilight,Cloud City,Wanted Fame,Taco Blade,Chef Floof
+2,Sleepy Bees,Pie Theft,Twilight,Alley Jam,Cold Feet,Melon Wand,Farmer Zoom
+1,Lazy Cows,Corn Con,Noon,Flower Lot,Needed Milk,Fork Dart,Sir Bark
+3,Happy Goats,Moo Theft,Tea Time,Alley Jam,New Trend,Taco Blade,Kid Scout
+2,Drunk Ants,Pie Theft,Tea Time,Barn Roof,Bored,Bubble Gun,Count Cluck
+3,Bored Dogs,Honey Heist,Noon,Flower Lot,Bored,Sticky Net,Farmer Zoom
+5,Lazy Cows,Sock Swap,Noon,Forest Den,Bored,Melon Wand,Bear Hug
+3,Happy Goats,Crumb Raid,Dawn,Ocean Bed,Needed Milk,Taco Blade,Nurse Bee
+3,Chill Frogs,Sock Swap,Midnight,Picnic Rug,Lost Bet,Melon Wand,Sir Bark
+5,Chill Frogs,Quack Fraud,Tea Time,Forest Den,Hungry,Fork Dart,Nurse Bee
+2,Sleepy Bees,Quack Fraud,Midnight,Forest Den,Felt Blue,Soda Spray,Kid Scout
+4,Nervous Pigs,Crumb Raid,Midnight,Ocean Bed,Felt Blue,Soda Spray,Nurse Bee
+2,Chill Frogs,Quack Fraud,Sunrise,Pond Bank,Curious,Fork Dart,DJ Whisker
+5,Cool Cats,Crumb Raid,Snack Time,Pond Bank,Too Sweet,Banana Mic,Agent Leaf
+3,Sleepy Bees,Moo Theft,Evening,Flower Lot,Bored,Feather Pen,Chef Floof
+1,Worried Fish,Pie Theft,Nap Time,Mud Field,Curious,Fork Dart,Nurse Bee
+5,Cool Cats,Honey Heist,Lunch,Mud Field,Bored,Bread Bomb,Count Cluck
+5,Cool Cats,Sock Swap,Evening,Barn Roof,Hungry,Banana Mic,Farmer Zoom
+5,Worried Fish,Pie Theft,Noon,Alley Jam,Cold Feet,Soda Spray,DJ Whisker
+2,Worried Fish,Quack Fraud,Tea Time,Pond Bank,Cold Feet,Banana Mic,Nurse Bee
+2,Angry Duck,Quack Fraud,Noon,Ocean Bed,Felt Blue,Feather Pen,Bear Hug
+4,Nervous Pigs,Sock Swap,Twilight,Cloud City,Lost Bet,Cheese Ray,Count Cluck
+2,Drunk Ants,Quack Fraud,Twilight,Flower Lot,Wanted Fame,Fork Dart,Agent Leaf
+4,Angry Duck,Mud Trick,Sunrise,Mud Field,New Trend,Sticky Net,Chef Floof
+4,Worried Fish,Leaf Scam,Snack Time,Forest Den,Hungry,Fork Dart,Queen Antsy
+1,Chill Frogs,Jazz Theft,Noon,Barn Roof,Wanted Fame,Melon Wand,Sir Bark
+1,Nervous Pigs,Jazz Theft,Nap Time,Pond Bank,Felt Blue,Taco Blade,DJ Whisker
+4,Drunk Ants,Mud Trick,Noon,Ocean Bed,Cold Feet,Melon Wand,Farmer Zoom
+4,Sleepy Bees,Mud Trick,Dawn,Ocean Bed,New Trend,Fork Dart,DJ Whisker
+3,Happy Goats,Jazz Theft,Twilight,Barn Roof,Felt Blue,Melon Wand,DJ Whisker
+2,Cool Cats,Honey Heist,Midnight,Forest Den,Cold Feet,Fork Dart,DJ Whisker
+2,Drunk Ants,Honey Heist,Nap Time,Cloud City,New Trend,Feather Pen,Kid Scout
+4,Sleepy Bees,Jazz Theft,Dawn,Pond Bank,Hungry,Fork Dart,Agent Leaf
+3,Angry Duck,Leaf Scam,Lunch,Pond Bank,Felt Blue,Soda Spray,Chef Floof
+2,Happy Goats,Quack Fraud,Evening,Barn Roof,Felt Blue,Sticky Net,Agent Leaf
+3,Chill Frogs,Honey Heist,Dawn,Flower Lot,Needed Milk,Feather Pen,Farmer Zoom
+1,Drunk Ants,Sock Swap,Sunrise,Alley Jam,Wanted Fame,Taco Blade,Sir Bark
+1,Nervous Pigs,Corn Con,Twilight,Alley Jam,Hungry,Fork Dart,DJ Whisker
+3,Chill Frogs,Quack Fraud,Snack Time,Mud Field,Needed Milk,Melon Wand,Queen Antsy
+3,Nervous Pigs,Quack Fraud,Evening,Forest Den,Needed Milk,Fork Dart,Count Cluck
+1,Drunk Ants,Jazz Theft,Dawn,Alley Jam,Too Sweet,Feather Pen,Chef Floof
+5,Chill Frogs,Crumb Raid,Midnight,Flower Lot,Lost Bet,Melon Wand,Agent Leaf
+4,Angry Duck,Leaf Scam,Twilight,Mud Field,Hungry,Feather Pen,Chef Floof
+3,Lazy Cows,Crumb Raid,Evening,Ocean Bed,Hungry,Fork Dart,Nurse Bee
+2,Lazy Cows,Corn Con,Noon,Picnic Rug,Felt Blue x,Soda Spray,Sir Bark
