@@ -1,0 +1,8 @@
+prefix=/home/fizzer/ENPH-353-COMPETITION/install
+
+Name: time_trials
+Description: Description of time_trials
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
