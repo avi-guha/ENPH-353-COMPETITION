@@ -1,0 +1,24 @@
+14:31:24.904: Clue SIZE: UNKNOWN
+14:31:24.904: Clue VICTIM: MAGIC MIKE
+14:31:24.904: Clue CRIME: DISAPPEAR
+14:31:24.905: Clue TIME: CIRCUS
+14:31:24.905: Clue PLACE: WORMHOLE
+14:31:24.905: Clue MOTIVE: STARDOM
+14:31:24.905: Clue WEAPON: QUANTUM WAND
+14:31:24.905: Clue BANDIT: CLOWN CLAUDE
+14:31:33.558: Message received: team, pass, 0, whatever
+14:31:33.559: Plate location is not a number.
+14:31:43.604: Message received: team, pass, -1, whatever
+14:31:43.605: Plate location is not a number.
+14:32:05.737: Bonus completed: +5 points
+14:32:05.738: Team total: 5 pts
+14:32:07.729: Bonus completed already awarded points.
+14:32:16.963: Penalties total: -5 pts
+14:32:16.964: Team total: 0 pts
+14:32:16.965: Penalty: collision: -5 pts
+14:32:17.870: Penalties total: -7 pts
+14:32:17.871: Team total: -2 pts
+14:32:17.872: Penalty: respawn: -2 pts
+14:32:18.403: Penalties total: -9 pts
+14:32:18.403: Team total: -4 pts
+14:32:18.403: Penalty: off road: -2 pts

@@ -818,6 +818,9 @@ collision_plugin_LIB_DEPENDS:STATIC=general;/opt/ros/noetic/lib/libgazebo_ros_ap
 //The directory containing a CMake configuration file for cpp_common.
 cpp_common_DIR:PATH=/opt/ros/noetic/share/cpp_common/cmake
 
+//The directory containing a CMake configuration file for cv_bridge.
+cv_bridge_DIR:PATH=/opt/ros/noetic/share/cv_bridge/cmake
+
 //The directory containing a CMake configuration file for dynamic_reconfigure.
 dynamic_reconfigure_DIR:PATH=/opt/ros/noetic/share/dynamic_reconfigure/cmake
 
@@ -1023,6 +1026,12 @@ robbie_BINARY_DIR:STATIC=/home/fizzer/ENPH-353-COMPETITION/build/robbie
 //Value Computed by CMake
 robbie_SOURCE_DIR:STATIC=/home/fizzer/ENPH-353-COMPETITION/src/robbie
 
+//Value Computed by CMake
+robot_vision_BINARY_DIR:STATIC=/home/fizzer/ENPH-353-COMPETITION/build/clue_board_vision
+
+//Value Computed by CMake
+robot_vision_SOURCE_DIR:STATIC=/home/fizzer/ENPH-353-COMPETITION/src/clue_board_vision
+
 //The directory containing a CMake configuration file for rosconsole.
 rosconsole_DIR:PATH=/opt/ros/noetic/share/rosconsole/cmake
 
@@ -1079,6 +1088,12 @@ tf2_ros_DIR:PATH=/opt/ros/noetic/share/tf2_ros/cmake
 
 //The directory containing a CMake configuration file for tf.
 tf_DIR:PATH=/opt/ros/noetic/share/tf/cmake
+
+//Value Computed by CMake
+time_trials_BINARY_DIR:STATIC=/home/fizzer/ENPH-353-COMPETITION/build/time_trials
+
+//Value Computed by CMake
+time_trials_SOURCE_DIR:STATIC=/home/fizzer/ENPH-353-COMPETITION/src/time_trials
 
 //The directory containing a CMake configuration file for trajectory_msgs.
 trajectory_msgs_DIR:PATH=/opt/ros/noetic/share/trajectory_msgs/cmake
@@ -1274,7 +1289,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=11
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=13
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

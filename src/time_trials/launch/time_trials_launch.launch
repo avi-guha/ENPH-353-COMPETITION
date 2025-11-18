@@ -1,0 +1,8 @@
+<launch>
+   <!-- My Package launch file -->
+   <node pkg="time_trials"
+         type="my_controller.py"
+         name="topic_publisher" 
+         output="screen">
+   </node>
+</launch>
