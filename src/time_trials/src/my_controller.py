@@ -24,8 +24,8 @@ stop_mov.angular.z = 0.0
 rospy.sleep(1)
 
 # CHANGE THESE LOOK AT COMP NOTES FOR WHAT SPECS YOU NEED TO WRITE / PUBLISH
-start_timer = String('team, pass, 0, whatever')
-stop_timer = String('team, pass, -1, whatever')
+start_timer = String('TeamEllaAvi, password, 0, NA')
+stop_timer = String('TeamEllaAvi, password, -1, NA')
 
 rospy.sleep(1)
 
