@@ -158,7 +158,7 @@
   <joint name="camera_joint" type="fixed">
     <parent link="chassis"/>
     <child link="camera_link"/>
-    <origin xyz="${chassis_length/2} 0 ${chassis_height/2+camera_height/2}"/>
+    <origin xyz="${chassis_length/2} 0 ${chassis_height/2+camera_height/2}" rpy="0 1.2 0"/> <!-- ~69 degree downward tilt - road view only -->
   </joint>
 
   <gazebo reference="chassis">
@@ -231,7 +231,7 @@
     <sensor type="camera" name="camera1">
       <update_rate>30.0</update_rate>
       <camera name="head">
-        <horizontal_fov>1.9198622</horizontal_fov>
+        <horizontal_fov>2.9</horizontal_fov> <!-- ~170 degrees -->
         <image>
           <width>800</width>
           <height>800</height>
