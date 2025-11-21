@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-
 import rospy
 import cv2
 import os
 import csv
 import message_filters
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, LaserScan
 from geometry_msgs.msg import Twist
 from cv_bridge import CvBridge, CvBridgeError
 import datetime
@@ -17,6 +15,7 @@ class DataCollector:
         # Parameters
         self.image_topic = rospy.get_param('~image_topic', '/rrbot/camera1/image_raw')
         self.cmd_vel_topic = rospy.get_param('~cmd_vel_topic', '/cmd_vel')
+        self.scan_topic = rospy.get_param('~scan_topic', '/scan')
         self.data_dir = rospy.get_param('~data_dir', 'data')
 
         # Create data directory
@@ -30,7 +29,7 @@ class DataCollector:
         if not os.path.exists(self.csv_file_path):
             with open(self.csv_file_path, 'w', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow(['image_path', 'v', 'w'])
+                writer.writerow(['image_path', 'v', 'w', 'scan'])
 
         self.bridge = CvBridge()
         self.count = 0
@@ -38,16 +37,17 @@ class DataCollector:
         # Subscribers
         self.image_sub = message_filters.Subscriber(self.image_topic, Image)
         self.cmd_vel_sub = message_filters.Subscriber(self.cmd_vel_topic, Twist)
+        self.scan_sub = message_filters.Subscriber(self.scan_topic, LaserScan)
 
         # Synchronizer
         # Slop allows for slight timing differences
-        self.ts = message_filters.ApproximateTimeSynchronizer([self.image_sub, self.cmd_vel_sub], queue_size=10, slop=0.1)
+        self.ts = message_filters.ApproximateTimeSynchronizer([self.image_sub, self.cmd_vel_sub, self.scan_sub], queue_size=10, slop=0.1)
         self.ts.registerCallback(self.callback)
 
         rospy.loginfo(f"Data Collector started. Saving to {self.data_dir}")
-        rospy.loginfo(f"Subscribed to {self.image_topic} and {self.cmd_vel_topic}")
+        rospy.loginfo(f"Subscribed to {self.image_topic}, {self.cmd_vel_topic}, and {self.scan_topic}")
 
-    def callback(self, image_msg, twist_msg):
+    def callback(self, image_msg, twist_msg, scan_msg):
         try:
             cv_image = self.bridge.imgmsg_to_cv2(image_msg, "bgr8")
         except CvBridgeError as e:
@@ -63,21 +63,21 @@ class DataCollector:
         cv2.imwrite(image_path, cv_image)
 
         # Save to CSV
-        # We store the relative path or filename. Storing filename is usually enough if in same dir structure.
-        # Let's store relative path from data_dir
         rel_image_path = os.path.join('images', image_filename)
         
         v = twist_msg.linear.x
         w = twist_msg.angular.z
-
-        # Only save if moving? Or save everything? 
-        # User said: "90% of driving is usually 'go straight'. If you train on this, your robot will never turn."
-        # But for data collection, we just record what the user does.
-        # We can filter later or user can drive carefully.
         
+        # Process Scan: Take min range or a subset, or save raw
+        # Saving raw ranges as a string to be parsed later
+        # We replace 'inf' with a large number
+        scan_ranges = list(scan_msg.ranges)
+        scan_ranges = [30.0 if x == float('inf') else x for x in scan_ranges]
+        scan_str = str(scan_ranges)
+
         with open(self.csv_file_path, 'a', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow([rel_image_path, v, w])
+            writer.writerow([rel_image_path, v, w, scan_str])
 
         self.count += 1
         if self.count % 50 == 0:

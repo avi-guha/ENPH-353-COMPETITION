@@ -6,6 +6,7 @@ import pandas as pd
 import cv2
 import os
 import numpy as np
+import ast
 from model import PilotNet
 
 class DrivingDataset(Dataset):
@@ -33,8 +34,13 @@ class DrivingDataset(Dataset):
         v = self.annotations.iloc[index, 1]
         w = self.annotations.iloc[index, 2]
         label = torch.tensor([v, w], dtype=torch.float32)
+        
+        # LIDAR
+        scan_str = self.annotations.iloc[index, 3]
+        scan = ast.literal_eval(scan_str)
+        scan = torch.tensor(scan, dtype=torch.float32)
 
-        return image, label
+        return image, scan, label
 
 def train():
     # Hyperparameters
@@ -74,11 +80,13 @@ def train():
     for epoch in range(EPOCHS):
         model.train()
         running_loss = 0.0
-        for images, labels in train_loader:
-            images, labels = images.to(device), labels.to(device)
+        for images, scans, labels in train_loader:
+            images = images.to(device)
+            scans = scans.to(device)
+            labels = labels.to(device)
 
             optimizer.zero_grad()
-            outputs = model(images)
+            outputs = model(images, scans)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
@@ -92,9 +100,12 @@ def train():
             model.eval()
             val_loss = 0.0
             with torch.no_grad():
-                for images, labels in val_loader:
-                    images, labels = images.to(device), labels.to(device)
-                    outputs = model(images)
+                for images, scans, labels in val_loader:
+                    images = images.to(device)
+                    scans = scans.to(device)
+                    labels = labels.to(device)
+                    
+                    outputs = model(images, scans)
                     loss = criterion(outputs, labels)
                     val_loss += loss.item()
             

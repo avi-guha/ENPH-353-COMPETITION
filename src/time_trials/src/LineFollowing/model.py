@@ -4,8 +4,9 @@ import torch.nn as nn
 class PilotNet(nn.Module):
     def __init__(self):
         super(PilotNet, self).__init__()
+        
+        # Image Branch
         self.features = nn.Sequential(
-            # Normalization is usually done in dataset or preprocessing
             # Input: 66x200x3 (YUV or RGB)
             nn.Conv2d(3, 24, kernel_size=5, stride=2),
             nn.ReLU(),
@@ -20,25 +21,21 @@ class PilotNet(nn.Module):
             nn.Flatten()
         )
         
-        # Calculate input size for fully connected layer
-        # 200x66 -> 98x31 -> 47x14 -> 22x5 -> 20x3 -> 18x1
-        # Wait, let's calculate carefully or use a dummy input.
-        # 200 (width) / 2 = 99 (kernel 5) -> 98?
-        # (200 - 5) / 2 + 1 = 98.5 -> 98
-        # (98 - 5) / 2 + 1 = 47.5 -> 47
-        # (47 - 5) / 2 + 1 = 22
-        # (22 - 3) / 1 + 1 = 20
-        # (20 - 3) / 1 + 1 = 18
-        # Height:
-        # (66 - 5) / 2 + 1 = 31.5 -> 31
-        # (31 - 5) / 2 + 1 = 14
-        # (14 - 5) / 2 + 1 = 5.5 -> 5
-        # (5 - 3) / 1 + 1 = 3
-        # (3 - 3) / 1 + 1 = 1
-        # So 64 * 18 * 1 = 1152
+        # Image output size: 1152
         
+        # LIDAR Branch
+        # Input: 720 ranges
+        self.lidar_branch = nn.Sequential(
+            nn.Linear(720, 128),
+            nn.ReLU(),
+            nn.Linear(128, 64),
+            nn.ReLU()
+        )
+        
+        # Fusion
+        # 1152 (Image) + 64 (LIDAR) = 1216
         self.classifier = nn.Sequential(
-            nn.Linear(1152, 100),
+            nn.Linear(1216, 100),
             nn.ReLU(),
             nn.Linear(100, 50),
             nn.ReLU(),
@@ -47,7 +44,12 @@ class PilotNet(nn.Module):
             nn.Linear(10, 2) # v, w
         )
 
-    def forward(self, x):
-        x = self.features(x)
-        x = self.classifier(x)
-        return x
+    def forward(self, x_img, x_lidar):
+        img_out = self.features(x_img)
+        lidar_out = self.lidar_branch(x_lidar)
+        
+        # Concatenate
+        combined = torch.cat((img_out, lidar_out), dim=1)
+        
+        output = self.classifier(combined)
+        return output
