@@ -158,7 +158,7 @@
   <joint name="camera_joint" type="fixed">
     <parent link="chassis"/>
     <child link="camera_link"/>
-    <origin xyz="0.095 0 -0.01" rpy="0 0 0"/> <!-- Moved slightly forward, no pitch -->
+    <origin xyz="0.095 0 0.2" rpy="0 0.2 0"/> <!-- Raised up, pitched down -->
   </joint>
 
   <gazebo reference="chassis">
@@ -231,7 +231,7 @@
     <sensor type="camera" name="camera1">
       <update_rate>30.0</update_rate>
       <camera name="head">
-        <horizontal_fov>2.094</horizontal_fov> <!-- 120 degrees -->
+        <horizontal_fov>1.396</horizontal_fov> <!-- 80 degrees -->
         <image>
           <width>800</width>
           <height>800</height>
