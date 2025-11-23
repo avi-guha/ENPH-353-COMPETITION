@@ -5,6 +5,8 @@ sleep 5
 
 # Launch PS4 Teleop (and disable default controller via launch file)
 roslaunch time_trials time_trials_launch.launch &
+sleep 3
 
+# Launch camera viewer
 cd /home/fizzer/ENPH-353-COMPETITION/src/time_trials/src/LineFollowing
-python3 ImageProcessing.py
+python3 camera_viewer.py

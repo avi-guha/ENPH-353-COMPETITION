@@ -12,13 +12,13 @@ class PS4Teleop:
         self.linear_scale = rospy.get_param('~linear_scale', 0.5)
         self.angular_scale = rospy.get_param('~angular_scale', 1.0)
 
-        # Publishers
+        # Publishers and subscribers (use absolute topics to be robust)
         self.pub_vel = rospy.Publisher('/B1/cmd_vel', Twist, queue_size=1)
-
-        # Subscribers
         rospy.Subscriber('/joy', Joy, self.joy_callback)
 
         rospy.loginfo("PS4 Teleop Node Started")
+        rospy.loginfo("Publishing to: /B1/cmd_vel")
+        rospy.loginfo("Subscribing to: /joy")
 
     def joy_callback(self, data):
         twist = Twist()
@@ -26,6 +26,9 @@ class PS4Teleop:
         # PS4 Controller mapping - LEFT STICK ONLY
         # Left stick vertical (axis 1) -> Linear X
         # Left stick horizontal (axis 0) -> Angular Z
+        
+        # Log received data for debugging
+        rospy.loginfo_throttle(2.0, f"Joy received: {len(data.axes)} axes, values: {data.axes[:4] if len(data.axes) >= 4 else data.axes}")
         
         # Check if we have enough axes
         if len(data.axes) < 2:
@@ -36,14 +39,12 @@ class PS4Teleop:
         twist.linear.x = data.axes[1] * self.linear_scale
         # Left/right turn on left stick
         twist.angular.z = data.axes[0] * self.angular_scale
-        ller
-        # Only publish if there's actual movement to reduce spam
+    
+        # Always publish (to ensure robot stops when sticks centered)
         if abs(twist.linear.x) > 0.01 or abs(twist.angular.z) > 0.01:
             rospy.loginfo(f"Publishing: v={twist.linear.x:.2f}, w={twist.angular.z:.2f}")
-            self.pub_vel.publish(twist)
-        else:
-            # Still publish to stop the robot
-            self.pub_vel.publish(twist)
+        
+        self.pub_vel.publish(twist)
 
 if __name__ == '__main__':
     try:
