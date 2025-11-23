@@ -17,7 +17,7 @@
     <node pkg="time_trials" type="data_collector.py" name="data_collector" output="screen">
         <param name="data_dir" value="$(find time_trials)/data" />
         <param name="image_topic" value="/B1/rrbot/camera1/image_raw" />
-        <param name="scan_topic" value="/B1/scan" />
+        <param name="scan_topic" value="/scan" />
         <param name="cmd_vel_topic" value="/B1/cmd_vel" />
     </node>
 </launch>
