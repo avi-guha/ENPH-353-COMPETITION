@@ -3,7 +3,7 @@ import cv2
 import os
 import csv
 import message_filters
-from sensor_msgs.msg import Image, LaserScan
+from sensor_msgs.msg import Image, LaserScan, Joy
 from geometry_msgs.msg import Twist
 from cv_bridge import CvBridge, CvBridgeError
 import datetime
@@ -19,6 +19,9 @@ class DataCollector:
         self.data_dir = rospy.get_param('~data_dir', 'data')
 
         # Create data directory
+        if not os.path.exists(self.data_dir):
+            os.makedirs(self.data_dir)
+
         self.images_dir = os.path.join(self.data_dir, 'images')
         if not os.path.exists(self.images_dir):
             os.makedirs(self.images_dir)
@@ -33,21 +36,41 @@ class DataCollector:
 
         self.bridge = CvBridge()
         self.count = 0
+        self.recording = False
+        self.last_button_state = 0
 
         # Subscribers
         self.image_sub = message_filters.Subscriber(self.image_topic, Image)
         self.cmd_vel_sub = message_filters.Subscriber(self.cmd_vel_topic, Twist)
         self.scan_sub = message_filters.Subscriber(self.scan_topic, LaserScan)
+        self.joy_sub = rospy.Subscriber('/joy', Joy, self.joy_callback)
 
         # Synchronizer
         # Slop allows for slight timing differences
         self.ts = message_filters.ApproximateTimeSynchronizer([self.image_sub, self.cmd_vel_sub, self.scan_sub], queue_size=10, slop=0.1)
         self.ts.registerCallback(self.callback)
 
-        rospy.loginfo(f"Data Collector started. Saving to {self.data_dir}")
-        rospy.loginfo(f"Subscribed to {self.image_topic}, {self.cmd_vel_topic}, and {self.scan_topic}")
+        rospy.loginfo(f"Data Collector ready. Saving to {self.data_dir}")
+        rospy.loginfo("Press TRIANGLE (Button 2) to start/stop recording.")
+        rospy.loginfo("Recording is currently: PAUSED")
+
+    def joy_callback(self, data):
+        # Triangle button is usually index 2 (check your controller mapping)
+        # We want to toggle on press (0 -> 1 transition)
+        try:
+            button_state = data.buttons[2]
+            if button_state == 1 and self.last_button_state == 0:
+                self.recording = not self.recording
+                status = "STARTED" if self.recording else "PAUSED"
+                rospy.loginfo(f"Recording {status}")
+            self.last_button_state = button_state
+        except IndexError:
+            pass
 
     def callback(self, image_msg, twist_msg, scan_msg):
+        if not self.recording:
+            return
+
         try:
             cv_image = self.bridge.imgmsg_to_cv2(image_msg, "bgr8")
         except CvBridgeError as e:

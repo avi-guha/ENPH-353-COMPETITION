@@ -8,7 +8,18 @@
 
     <!-- Teleop Node -->
     <node pkg="time_trials" type="teleop_ps4.py" name="teleop_ps4" output="screen">
-        <param name="linear_scale" value="2.0" />
-        <param name="angular_scale" value="3.0" />
+        <param name="linear_scale" value="4.0" />
+        <param name="angular_scale" value="4.0" />
+    </node>
+
+    <!-- Camera View -->
+    <node pkg="rqt_image_view" type="rqt_image_view" name="image_view" args="/rrbot/camera1/image_raw" />
+
+    <!-- Data Collector -->
+    <node pkg="time_trials" type="data_collector.py" name="data_collector" output="screen">
+        <param name="data_dir" value="$(find time_trials)/data" />
+        <param name="image_topic" value="/rrbot/camera1/image_raw" />
+        <param name="scan_topic" value="/scan" />
+        <param name="cmd_vel_topic" value="/B1/cmd_vel" />
     </node>
 </launch>

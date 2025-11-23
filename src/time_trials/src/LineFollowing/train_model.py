@@ -47,7 +47,7 @@ def train():
     BATCH_SIZE = 32
     LEARNING_RATE = 1e-4 # Lower learning rate for stability
     EPOCHS = 50
-    DATA_DIR = 'data' # Assumes data is in a 'data' folder relative to this script
+    DATA_DIR = '../../data' # Data is in time_trials/data, script is in time_trials/src/LineFollowing
     CSV_FILE = os.path.join(DATA_DIR, 'log.csv')
 
     if not os.path.exists(CSV_FILE):
