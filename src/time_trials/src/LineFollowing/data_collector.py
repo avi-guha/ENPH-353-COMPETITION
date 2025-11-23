@@ -12,10 +12,10 @@ class DataCollector:
     def __init__(self):
         rospy.init_node('data_collector', anonymous=True)
 
-        # Parameters
-        self.image_topic = rospy.get_param('~image_topic', '/rrbot/camera1/image_raw')
-        self.cmd_vel_topic = rospy.get_param('~cmd_vel_topic', '/cmd_vel')
-        self.scan_topic = rospy.get_param('~scan_topic', '/scan')
+        # Parameters - Fixed topic names to match robot namespacing
+        self.image_topic = rospy.get_param('~image_topic', '/B1/rrbot/camera1/image_raw')
+        self.cmd_vel_topic = rospy.get_param('~cmd_vel_topic', '/B1/cmd_vel')
+        self.scan_topic = rospy.get_param('~scan_topic', '/B1/scan')
         self.data_dir = rospy.get_param('~data_dir', 'data')
 
         # Create data directory
@@ -46,11 +46,21 @@ class DataCollector:
         self.joy_sub = rospy.Subscriber('/joy', Joy, self.joy_callback)
 
         # Synchronizer
-        # Slop allows for slight timing differences
-        self.ts = message_filters.ApproximateTimeSynchronizer([self.image_sub, self.cmd_vel_sub, self.scan_sub], queue_size=10, slop=0.1)
+        # Slop allows for slight timing differences - increased for better sync
+        # allow_headerless=True for Twist messages which don't have timestamps
+        self.ts = message_filters.ApproximateTimeSynchronizer(
+            [self.image_sub, self.cmd_vel_sub, self.scan_sub], 
+            queue_size=50, 
+            slop=0.2,
+            allow_headerless=True
+        )
         self.ts.registerCallback(self.callback)
 
         rospy.loginfo(f"Data Collector ready. Saving to {self.data_dir}")
+        rospy.loginfo(f"Subscribed to:")
+        rospy.loginfo(f"  Image: {self.image_topic}")
+        rospy.loginfo(f"  Cmd_vel: {self.cmd_vel_topic}")
+        rospy.loginfo(f"  Scan: {self.scan_topic}")
         rospy.loginfo("Press TRIANGLE (Button 2) to start/stop recording.")
         rospy.loginfo("Recording is currently: PAUSED")
 
@@ -74,7 +84,7 @@ class DataCollector:
         try:
             cv_image = self.bridge.imgmsg_to_cv2(image_msg, "bgr8")
         except CvBridgeError as e:
-            rospy.logerr(e)
+            rospy.logerr(f"Image conversion error: {e}")
             return
 
         # Generate filename based on timestamp
@@ -83,7 +93,10 @@ class DataCollector:
         image_path = os.path.join(self.images_dir, image_filename)
 
         # Save image
-        cv2.imwrite(image_path, cv_image)
+        success = cv2.imwrite(image_path, cv_image)
+        if not success:
+            rospy.logerr(f"Failed to write image to {image_path}")
+            return
 
         # Save to CSV
         rel_image_path = os.path.join('images', image_filename)
@@ -98,13 +111,17 @@ class DataCollector:
         scan_ranges = [30.0 if x == float('inf') else x for x in scan_ranges]
         scan_str = str(scan_ranges)
 
-        with open(self.csv_file_path, 'a', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow([rel_image_path, v, w, scan_str])
+        try:
+            with open(self.csv_file_path, 'a', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow([rel_image_path, v, w, scan_str])
+        except Exception as e:
+            rospy.logerr(f"Failed to write to CSV: {e}")
+            return
 
         self.count += 1
-        if self.count % 50 == 0:
-            rospy.loginfo(f"Collected {self.count} samples")
+        if self.count % 10 == 0:
+            rospy.loginfo(f"Collected {self.count} samples (v={v:.2f}, w={w:.2f})")
 
 if __name__ == '__main__':
     try:

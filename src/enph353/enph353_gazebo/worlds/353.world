@@ -258,11 +258,11 @@
         increasing it increases RTF but simulation accuracy is
         degraded
     -->
-    <!-- Increase simulation speed. Keep max_step_size=0.001 to maintain same quality -->
+    <!-- Forced realtime factor to 0.4 for slow-motion effect -->
     <physics type='ode'>
-      <max_step_size>0.002</max_step_size>
-      <real_time_factor>10.0</real_time_factor>
-      <real_time_update_rate>500.0</real_time_update_rate>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>0.75</real_time_factor>
+      <real_time_update_rate>1000.0</real_time_update_rate>
     </physics> 
 
     <!-- Add collision plugin for robots -->

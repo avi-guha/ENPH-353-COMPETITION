@@ -273,13 +273,13 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.1 0.1 0.1"/>
+        <box size="0.03 0.03 0.03"/>
       </geometry>
     </collision>
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.1 0.1 0.1"/>
+        <box size="0.03 0.03 0.03"/>
       </geometry>
       <material name="hokuyo_material">
         <color rgba="0.1 0.1 0.1 1"/>
