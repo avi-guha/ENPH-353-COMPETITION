@@ -1,7 +1,8 @@
 <launch>
     <!-- Joy Node -->
+    <arg name="joy_dev" default="/dev/input/js0" />
     <node pkg="joy" type="joy_node" name="joy_node">
-        <param name="dev" value="/dev/input/js0" />
+        <param name="dev" value="$(arg joy_dev)" />
         <param name="deadzone" value="0.05" />
         <param name="autorepeat_rate" value="20" />
     </node>
