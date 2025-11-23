@@ -8,7 +8,7 @@
 
     <!-- Teleop Node -->
     <node pkg="time_trials" type="teleop_ps4.py" name="teleop_ps4" output="screen">
-        <param name="linear_scale" value="1.0" />
-        <param name="angular_scale" value="2.0" />
+        <param name="linear_scale" value="2.0" />
+        <param name="angular_scale" value="3.0" />
     </node>
 </launch>

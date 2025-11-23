@@ -23,19 +23,27 @@ class PS4Teleop:
     def joy_callback(self, data):
         twist = Twist()
         
-        # PS4 Controller mapping
+        # PS4 Controller mapping - LEFT STICK ONLY
         # Left stick vertical (axis 1) -> Linear X
         # Left stick horizontal (axis 0) -> Angular Z
         
-        # Debug logging
-        rospy.loginfo(f"Joy axes: {data.axes}")
-
+        # Check if we have enough axes
+        if len(data.axes) < 2:
+            rospy.logwarn(f"Not enough axes! Got {len(data.axes)}, need at least 2")
+            return
+        
+        # Forward/backward on left stick
         twist.linear.x = data.axes[1] * self.linear_scale
+        # Left/right turn on left stick
         twist.angular.z = data.axes[0] * self.angular_scale
-
-        rospy.loginfo(f"Publishing: v={twist.linear.x}, w={twist.angular.z}")
-
-        self.pub_vel.publish(twist)
+        ller
+        # Only publish if there's actual movement to reduce spam
+        if abs(twist.linear.x) > 0.01 or abs(twist.angular.z) > 0.01:
+            rospy.loginfo(f"Publishing: v={twist.linear.x:.2f}, w={twist.angular.z:.2f}")
+            self.pub_vel.publish(twist)
+        else:
+            # Still publish to stop the robot
+            self.pub_vel.publish(twist)
 
 if __name__ == '__main__':
     try:
