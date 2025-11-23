@@ -6,8 +6,6 @@
   <xacro:property name="camera_length" value="0.02"/>
   <xacro:property name="camera_height" value="0.01"/>
   <xacro:property name="camera_mass" value="0.01"/>
-  <!-- Side length for new cube camera link -->
-  <xacro:property name="camera_side_length" value="0.02"/>
   <xacro:property name="chassis_width" value="0.15"/>
   <xacro:property name="chassis_length" value="0.2"/>
   <xacro:property name="chassis_height" value="0.05"/>
@@ -110,18 +108,17 @@
     </visual>
   </link>
 
-  <!-- Cube camera link replacement -->
-  <link name='cameraBox'>
-    <xacro:box_inertial name="cameraBox" m="${camera_mass}" x="${camera_side_length}" y="${camera_side_length}" z="${camera_side_length}"/>
-    <collision name='cameraBox_collision'>
+  <link name='camera_link'>
+    <xacro:box_inertial name="camera_link" m="${camera_mass}" x="${camera_width}" y="${camera_length}" z="${camera_height}"/>
+    <collision name='camera_link_collision'>
       <geometry>
-        <box size="${camera_side_length} ${camera_side_length} ${camera_side_length}"/>
+        <box size="${camera_length} ${camera_width} ${camera_height}"/>
       </geometry>
     </collision>
-    <visual name='cameraBox_visual'>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+    <visual name='camera_link_visual'>
+      <origin xyz="0 0 0" rpy=" 0 0 0"/>
       <geometry>
-        <box size="${camera_side_length} ${camera_side_length} ${camera_side_length}"/>
+        <box size="${camera_length} ${camera_width} ${camera_height}"/>
       </geometry>
     </visual>
   </link>
@@ -160,15 +157,15 @@
 
   <joint name="camera_joint" type="fixed">
     <parent link="chassis"/>
-    <child link="cameraBox"/>
-    <origin xyz="0.085 0 0.005" rpy="0 0.3 0"/> <!-- Above chassis center, increased downward pitch to clear interior -->
+    <child link="camera_link"/>
+    <origin xyz="0.095 0 0.2" rpy="0 0.2 0"/> <!-- Raised up, pitched down -->
   </joint>
 
   <gazebo reference="chassis">
     <material>Gazebo/Orange</material>
   </gazebo>
 
-  <gazebo reference="cameraBox">
+  <gazebo reference="camera_link">
     <material>Gazebo/Blue</material>
   </gazebo>
 
@@ -230,18 +227,18 @@
     </sensor>
   </gazebo>
 
-  <gazebo reference="cameraBox">
+  <gazebo reference="camera_link">
     <sensor type="camera" name="camera1">
       <update_rate>30.0</update_rate>
       <camera name="head">
-        <horizontal_fov>2.4</horizontal_fov> <!-- 180 degrees wide FOV -->
+        <horizontal_fov>1.396</horizontal_fov> <!-- 80 degrees -->
         <image>
           <width>800</width>
           <height>800</height>
           <format>R8G8B8</format>
         </image>
         <clip>
-          <near>0.005</near> <!-- Reduced near clip to minimize interior artifact -->
+          <near>0.02</near>
           <far>300</far>
         </clip>
         <noise>
@@ -259,7 +256,7 @@
         <cameraName>rrbot/camera1</cameraName>
         <imageTopicName>image_raw</imageTopicName>
         <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-        <frameName>cameraBox</frameName>
+        <frameName>camera_link</frameName>
         <hackBaseline>0.07</hackBaseline>
         <distortionK1>0.0</distortionK1>
         <distortionK2>0.0</distortionK2>
@@ -270,5 +267,68 @@
     </sensor>
   </gazebo>
 
+
+  <!-- LIDAR Link -->
+  <link name="hokuyo_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+      <material name="hokuyo_material">
+        <color rgba="0.1 0.1 0.1 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="hokuyo_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="0.05 0 0.1" rpy="0 0 0"/> <!-- Placed on top of chassis -->
+    <parent link="chassis"/>
+    <child link="hokuyo_link"/>
+  </joint>
+
+  <gazebo reference="hokuyo_link">
+    <sensor type="ray" name="head_hokuyo_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.570796</min_angle>
+            <max_angle>1.570796</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.10</min>
+          <max>30.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+        <topicName>/scan</topicName>
+        <frameName>hokuyo_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
 
 </robot>

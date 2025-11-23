@@ -2,5 +2,9 @@ source devel/setup.bash
 cd src/enph353/enph353_utils/scripts
 ./run_sim.sh -vpgw &
 sleep 5
+
+# Launch PS4 Teleop (and disable default controller via launch file)
+roslaunch time_trials time_trials_launch.launch &
+
 cd /home/fizzer/ENPH-353-COMPETITION/src/time_trials/src/LineFollowing
 python3 ImageProcessing.py
