@@ -27,8 +27,13 @@ class PS4Teleop:
         # Left stick vertical (axis 1) -> Linear X
         # Left stick horizontal (axis 0) -> Angular Z
         
+        # Debug logging
+        rospy.loginfo(f"Joy axes: {data.axes}")
+
         twist.linear.x = data.axes[1] * self.linear_scale
         twist.angular.z = data.axes[0] * self.angular_scale
+
+        rospy.loginfo(f"Publishing: v={twist.linear.x}, w={twist.angular.z}")
 
         self.pub_vel.publish(twist)
 
