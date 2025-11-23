@@ -2,7 +2,6 @@ import rospy
 import cv2
 import os
 import csv
-import message_filters
 from sensor_msgs.msg import Image, LaserScan, Joy
 from geometry_msgs.msg import Twist
 from cv_bridge import CvBridge, CvBridgeError
@@ -38,23 +37,16 @@ class DataCollector:
         self.count = 0
         self.recording = False
         self.last_button_state = 0
+        
+        # Store latest messages
+        self.latest_twist = Twist()
+        self.latest_scan = None
 
         # Subscribers
-        self.image_sub = message_filters.Subscriber(self.image_topic, Image)
-        self.cmd_vel_sub = message_filters.Subscriber(self.cmd_vel_topic, Twist)
-        self.scan_sub = message_filters.Subscriber(self.scan_topic, LaserScan)
+        self.image_sub = rospy.Subscriber(self.image_topic, Image, self.image_callback)
+        self.cmd_vel_sub = rospy.Subscriber(self.cmd_vel_topic, Twist, self.cmd_vel_callback)
+        self.scan_sub = rospy.Subscriber(self.scan_topic, LaserScan, self.scan_callback)
         self.joy_sub = rospy.Subscriber('/joy', Joy, self.joy_callback)
-
-        # Synchronizer
-        # Slop allows for slight timing differences - increased for better sync
-        # allow_headerless=True for Twist messages which don't have timestamps
-        self.ts = message_filters.ApproximateTimeSynchronizer(
-            [self.image_sub, self.cmd_vel_sub, self.scan_sub], 
-            queue_size=50, 
-            slop=0.2,
-            allow_headerless=True
-        )
-        self.ts.registerCallback(self.callback)
 
         rospy.loginfo(f"Data Collector ready. Saving to {self.data_dir}")
         rospy.loginfo(f"Subscribed to:")
@@ -77,7 +69,13 @@ class DataCollector:
         except IndexError:
             pass
 
-    def callback(self, image_msg, twist_msg, scan_msg):
+    def cmd_vel_callback(self, msg):
+        self.latest_twist = msg
+
+    def scan_callback(self, msg):
+        self.latest_scan = msg
+
+    def image_callback(self, image_msg):
         if not self.recording:
             return
 
@@ -101,15 +99,18 @@ class DataCollector:
         # Save to CSV
         rel_image_path = os.path.join('images', image_filename)
         
-        v = twist_msg.linear.x
-        w = twist_msg.angular.z
+        v = self.latest_twist.linear.x
+        w = self.latest_twist.angular.z
         
         # Process Scan: Take min range or a subset, or save raw
         # Saving raw ranges as a string to be parsed later
         # We replace 'inf' with a large number
-        scan_ranges = list(scan_msg.ranges)
-        scan_ranges = [30.0 if x == float('inf') else x for x in scan_ranges]
-        scan_str = str(scan_ranges)
+        if self.latest_scan:
+            scan_ranges = list(self.latest_scan.ranges)
+            scan_ranges = [30.0 if x == float('inf') else x for x in scan_ranges]
+            scan_str = str(scan_ranges)
+        else:
+            scan_str = "[]"
 
         try:
             with open(self.csv_file_path, 'a', newline='') as f:
