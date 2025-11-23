@@ -10,16 +10,18 @@ import ast
 from model import PilotNet
 
 class DrivingDataset(Dataset):
-    def __init__(self, csv_file, root_dir, transform=None):
-        self.annotations = pd.read_csv(csv_file)
-        self.root_dir = root_dir
+    def __init__(self, dataframe, transform=None):
+        self.annotations = dataframe
         self.transform = transform
 
     def __len__(self):
         return len(self.annotations)
 
     def __getitem__(self, index):
-        img_path = os.path.join(self.root_dir, self.annotations.iloc[index, 0])
+        # Image path is relative to the log file's directory (base_path)
+        base_path = self.annotations.iloc[index]['base_path']
+        rel_path = self.annotations.iloc[index]['image_path']
+        img_path = os.path.join(base_path, rel_path)
         image = cv2.imread(img_path)
         # Convert BGR to YUV (NVIDIA paper uses YUV)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
@@ -48,16 +50,31 @@ def train():
     LEARNING_RATE = 1e-4 # Lower learning rate for stability
     EPOCHS = 50
     DATA_DIR = '../../data' # Data is in time_trials/data, script is in time_trials/src/LineFollowing
-    CSV_FILE = os.path.join(DATA_DIR, 'log.csv')
+    # Collect all log files
+    all_data = []
+    for root, dirs, files in os.walk(DATA_DIR):
+        if 'log.csv' in files:
+            csv_path = os.path.join(root, 'log.csv')
+            try:
+                df = pd.read_csv(csv_path)
+                # Store the directory of this log file to resolve relative image paths later
+                df['base_path'] = root
+                all_data.append(df)
+                print(f"Loaded {len(df)} samples from {csv_path}")
+            except Exception as e:
+                print(f"Error loading {csv_path}: {e}")
 
-    if not os.path.exists(CSV_FILE):
-        print(f"Error: {CSV_FILE} not found. Please run data_collector.py first.")
+    if not all_data:
+        print(f"Error: No log.csv files found in {DATA_DIR} or its subdirectories.")
         return
+
+    full_dataframe = pd.concat(all_data, ignore_index=True)
+    print(f"Total samples: {len(full_dataframe)}")
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
 
-    dataset = DrivingDataset(csv_file=CSV_FILE, root_dir=DATA_DIR)
+    dataset = DrivingDataset(dataframe=full_dataframe)
     
     # Split into train/val
     train_size = int(0.8 * len(dataset))

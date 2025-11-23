@@ -21,11 +21,20 @@ class DataCollector:
         if not os.path.exists(self.data_dir):
             os.makedirs(self.data_dir)
 
-        self.images_dir = os.path.join(self.data_dir, 'images')
+        # Determine next run number
+        run_id = 0
+        while os.path.exists(os.path.join(self.data_dir, f'run_{run_id}')):
+            run_id += 1
+        
+        self.run_dir = os.path.join(self.data_dir, f'run_{run_id}')
+        os.makedirs(self.run_dir)
+        rospy.loginfo(f"Starting new data collection run: {self.run_dir}")
+
+        self.images_dir = os.path.join(self.run_dir, 'images')
         if not os.path.exists(self.images_dir):
             os.makedirs(self.images_dir)
         
-        self.csv_file_path = os.path.join(self.data_dir, 'log.csv')
+        self.csv_file_path = os.path.join(self.run_dir, 'log.csv')
         
         # Initialize CSV
         if not os.path.exists(self.csv_file_path):
