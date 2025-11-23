@@ -1,23 +1,14 @@
 <launch>
     <!-- Joy Node -->
-    <arg name="joy_dev" default="/dev/input/js0" />
     <node pkg="joy" type="joy_node" name="joy_node">
-        <param name="dev" value="$(arg joy_dev)" />
+        <param name="dev" value="/dev/input/js0" />
         <param name="deadzone" value="0.05" />
         <param name="autorepeat_rate" value="20" />
     </node>
 
     <!-- Teleop Node -->
     <node pkg="time_trials" type="teleop_ps4.py" name="teleop_ps4" output="screen">
-        <param name="linear_scale" value="4.0" />
-        <param name="angular_scale" value="4.0" />
-    </node>
-
-    <!-- Data Collector -->
-    <node pkg="time_trials" type="data_collector.py" name="data_collector" output="screen">
-        <param name="data_dir" value="$(find time_trials)/data" />
-        <param name="image_topic" value="/B1/rrbot/camera1/image_raw" />
-        <param name="scan_topic" value="/scan" />
-        <param name="cmd_vel_topic" value="/B1/cmd_vel" />
+        <param name="linear_scale" value="2.0" />
+        <param name="angular_scale" value="3.0" />
     </node>
 </launch>
