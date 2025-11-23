@@ -1,0 +1,14 @@
+<launch>
+    <!-- Joy Node -->
+    <node pkg="joy" type="joy_node" name="joy_node">
+        <param name="dev" value="/dev/input/js0" />
+        <param name="deadzone" value="0.05" />
+        <param name="autorepeat_rate" value="20" />
+    </node>
+
+    <!-- Teleop Node -->
+    <node pkg="time_trials" type="teleop_ps4.py" name="teleop_ps4" output="screen">
+        <param name="linear_scale" value="1.0" />
+        <param name="angular_scale" value="2.0" />
+    </node>
+</launch>
