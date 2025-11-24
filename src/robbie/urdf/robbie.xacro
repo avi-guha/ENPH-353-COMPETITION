@@ -158,7 +158,7 @@
   <joint name="camera_joint" type="fixed">
     <parent link="chassis"/>
     <child link="camera_link"/>
-    <origin xyz="0.095 0 0.2" rpy="0 0.2 0"/> <!-- Raised up, pitched down -->
+    <origin xyz="0.095 0 0.03" rpy="0 0.2 0"/> <!-- On top of chassis, pitched down slightly -->
   </joint>
 
   <gazebo reference="chassis">

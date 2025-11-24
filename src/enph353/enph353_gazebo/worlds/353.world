@@ -258,10 +258,10 @@
         increasing it increases RTF but simulation accuracy is
         degraded
     -->
-    <!-- Forced realtime factor to 0.4 for slow-motion effect -->
+    <!-- Realtime factor capped at 0.5 for controlled simulation speed -->
     <physics type='ode'>
       <max_step_size>0.001</max_step_size>
-      <real_time_factor>0.75</real_time_factor>
+      <real_time_factor>0.5</real_time_factor>
       <real_time_update_rate>1000.0</real_time_update_rate>
     </physics> 
 
