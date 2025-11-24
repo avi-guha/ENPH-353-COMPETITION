@@ -79,7 +79,7 @@ class InferenceNode:
 
         # Preprocessing Image
         image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2YUV)
-        image = cv2.resize(image, (200, 66))
+        image = cv2.resize(image, (120, 120))
         image = image / 255.0
         image = np.transpose(image, (2, 0, 1))
         image = torch.tensor(image, dtype=torch.float32).unsqueeze(0).to(self.device)
@@ -88,6 +88,7 @@ class InferenceNode:
         scan_ranges = list(scan_msg.ranges)
         scan_ranges = [30.0 if x == float('inf') else x for x in scan_ranges]
         scan_tensor = torch.tensor(scan_ranges, dtype=torch.float32).unsqueeze(0).to(self.device)
+        scan_tensor = scan_tensor / 30.0
 
         # Watchdog Check
         # Check only the front cone (approx +/- 30 degrees)

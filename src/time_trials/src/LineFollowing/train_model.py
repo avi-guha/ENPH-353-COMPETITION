@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
 import cv2
@@ -25,8 +26,8 @@ class DrivingDataset(Dataset):
         image = cv2.imread(img_path)
         # Convert BGR to YUV (NVIDIA paper uses YUV)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
-        # Resize to 200x66
-        image = cv2.resize(image, (200, 66))
+        # Resize to 120x120 (Square aspect ratio)
+        image = cv2.resize(image, (120, 120))
         # Normalize
         image = image / 255.0
         # Transpose to Channel First (C, H, W) for PyTorch
@@ -41,6 +42,8 @@ class DrivingDataset(Dataset):
         scan_str = self.annotations.iloc[index, 3]
         scan = ast.literal_eval(scan_str)
         scan = torch.tensor(scan, dtype=torch.float32)
+        # Normalize LIDAR (0-30 range -> 0-1)
+        scan = scan / 30.0
 
         return image, scan, label
 
@@ -48,7 +51,7 @@ def train():
     # Hyperparameters
     BATCH_SIZE = 32
     LEARNING_RATE = 1e-4 # Lower learning rate for stability
-    EPOCHS = 100
+    EPOCHS = 300
     # Get the directory where this script is located
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     DATA_DIR = os.path.join(SCRIPT_DIR, 'data')
@@ -84,6 +87,14 @@ def train():
             return False
     
     full_dataframe = full_dataframe[full_dataframe.iloc[:, 3].apply(has_valid_scan)]
+    
+    # Filter out stopped data (v=0 AND w=0)
+    # We want to keep frames where robot is turning even if v=0 (though usually v>0 when turning)
+    # User requested: "Get rid of any frames in which velocity and angular velocity is 0"
+    initial_len = len(full_dataframe)
+    full_dataframe = full_dataframe[(full_dataframe.iloc[:, 1] != 0) | (full_dataframe.iloc[:, 2] != 0)]
+    print(f"Removed {initial_len - len(full_dataframe)} stopped samples (v=0 and w=0).")
+    
     print(f"Valid samples after filtering: {len(full_dataframe)}")
     
     if len(full_dataframe) == 0:
@@ -110,6 +121,9 @@ def train():
     model = PilotNet().to(device)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    
+    # Learning Rate Scheduler
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=5, factor=0.5)
 
     best_loss = float('inf')
 
@@ -147,6 +161,9 @@ def train():
             
             avg_val_loss = val_loss / len(val_loader)
             print(f"Val Loss: {avg_val_loss:.4f}")
+            
+            # Step the scheduler
+            scheduler.step(avg_val_loss)
 
             if avg_val_loss < best_loss:
                 best_loss = avg_val_loss
