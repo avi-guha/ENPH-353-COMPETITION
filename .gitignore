@@ -1,0 +1,16 @@
+# Training data - too large for git
+src/time_trials/src/LineFollowing/data/
+*.pth
+*.pyc
+__pycache__/
+
+# Build artifacts
+build/
+devel/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

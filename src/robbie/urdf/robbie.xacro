@@ -156,9 +156,9 @@
   </joint>
 
   <joint name="camera_joint" type="fixed">
-    <parent link="chassis"/>
+    <parent link="hokuyo_link"/>
     <child link="camera_link"/>
-    <origin xyz="0.095 0 0.03" rpy="0 0.2 0"/> <!-- On top of chassis, pitched down slightly -->
+    <origin xyz="0 0 0.02" rpy="0 0 0"/> <!-- Directly on top of lidar, level/horizontal -->
   </joint>
 
   <gazebo reference="chassis">
@@ -231,7 +231,7 @@
     <sensor type="camera" name="camera1">
       <update_rate>30.0</update_rate>
       <camera name="head">
-        <horizontal_fov>1.396</horizontal_fov> <!-- 80 degrees -->
+        <horizontal_fov>1.745</horizontal_fov> <!-- 100 degrees (increased from 80) -->
         <image>
           <width>800</width>
           <height>800</height>
@@ -294,7 +294,7 @@
 
   <joint name="hokuyo_joint" type="fixed">
     <axis xyz="0 1 0" />
-    <origin xyz="0.05 0 0.1" rpy="0 0 0"/> <!-- Placed on top of chassis -->
+    <origin xyz="0.08 0 0.04" rpy="0 0 0"/> <!-- Moved forward on top of chassis -->
     <parent link="chassis"/>
     <child link="hokuyo_link"/>
   </joint>

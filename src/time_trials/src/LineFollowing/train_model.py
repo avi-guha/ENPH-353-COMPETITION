@@ -49,7 +49,9 @@ def train():
     BATCH_SIZE = 32
     LEARNING_RATE = 1e-4 # Lower learning rate for stability
     EPOCHS = 50
-    DATA_DIR = '../../data' # Data is in time_trials/data, script is in time_trials/src/LineFollowing
+    # Get the directory where this script is located
+    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+    DATA_DIR = os.path.join(SCRIPT_DIR, 'data')
     # Collect all log files
     all_data = []
     for root, dirs, files in os.walk(DATA_DIR):
@@ -69,7 +71,22 @@ def train():
         return
 
     full_dataframe = pd.concat(all_data, ignore_index=True)
-    print(f"Total samples: {len(full_dataframe)}")
+    print(f"Total samples loaded: {len(full_dataframe)}")
+    
+    # Filter out samples with empty scans
+    def has_valid_scan(scan_str):
+        try:
+            scan = ast.literal_eval(scan_str)
+            return len(scan) > 0
+        except:
+            return False
+    
+    full_dataframe = full_dataframe[full_dataframe.iloc[:, 3].apply(has_valid_scan)]
+    print(f"Valid samples after filtering: {len(full_dataframe)}")
+    
+    if len(full_dataframe) == 0:
+        print("Error: No valid samples found. Please recollect data with scan data enabled.")
+        return
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")

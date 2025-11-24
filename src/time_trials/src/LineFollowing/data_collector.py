@@ -87,6 +87,11 @@ class DataCollector:
     def image_callback(self, image_msg):
         if not self.recording:
             return
+        
+        # Skip if we don't have scan data yet
+        if self.latest_scan is None:
+            rospy.logwarn_throttle(1.0, "Waiting for scan data before recording...")
+            return
 
         try:
             cv_image = self.bridge.imgmsg_to_cv2(image_msg, "bgr8")
@@ -114,12 +119,9 @@ class DataCollector:
         # Process Scan: Take min range or a subset, or save raw
         # Saving raw ranges as a string to be parsed later
         # We replace 'inf' with a large number
-        if self.latest_scan:
-            scan_ranges = list(self.latest_scan.ranges)
-            scan_ranges = [30.0 if x == float('inf') else x for x in scan_ranges]
-            scan_str = str(scan_ranges)
-        else:
-            scan_str = "[]"
+        scan_ranges = list(self.latest_scan.ranges)
+        scan_ranges = [30.0 if x == float('inf') else x for x in scan_ranges]
+        scan_str = str(scan_ranges)
 
         try:
             with open(self.csv_file_path, 'a', newline='') as f:
