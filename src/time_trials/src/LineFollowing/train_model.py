@@ -52,6 +52,8 @@ def train():
     # Get the directory where this script is located
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     DATA_DIR = os.path.join(SCRIPT_DIR, 'data')
+    MODEL_PATH = os.path.join(SCRIPT_DIR, 'best_model.pth')
+    
     # Collect all log files
     all_data = []
     for root, dirs, files in os.walk(DATA_DIR):
@@ -148,13 +150,15 @@ def train():
 
             if avg_val_loss < best_loss:
                 best_loss = avg_val_loss
-                torch.save(model.state_dict(), 'best_model.pth')
-                print("Saved best model")
+                torch.save(model.state_dict(), MODEL_PATH)
+                print(f"Saved best model to {MODEL_PATH}")
         else:
             # Save last model if no validation
-             torch.save(model.state_dict(), 'model.pth')
+            torch.save(model.state_dict(), MODEL_PATH)
+            print(f"Saved model to {MODEL_PATH}")
 
     print("Training complete.")
+    print(f"Model saved at: {MODEL_PATH}")
 
 if __name__ == '__main__':
     train()

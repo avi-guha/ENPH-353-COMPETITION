@@ -47,6 +47,14 @@ class DataCollector:
         self.recording = False
         self.last_button_state = 0
         
+        # Rate limiting to prevent overfitting - 10 fps
+        self.target_fps = 10
+        self.min_time_between_samples = 1.0 / self.target_fps
+        self.last_sample_time = rospy.Time.now()
+        
+        # Flag to log scan receipt only once
+        self.scan_received_logged = False
+        
         # Store latest messages
         self.latest_twist = Twist()
         self.latest_scan = None
@@ -58,6 +66,7 @@ class DataCollector:
         self.joy_sub = rospy.Subscriber('/joy', Joy, self.joy_callback)
 
         rospy.loginfo(f"Data Collector ready. Saving to {self.data_dir}")
+        rospy.loginfo(f"Data collection rate: {self.target_fps} fps")
         rospy.loginfo(f"Subscribed to:")
         rospy.loginfo(f"  Image: {self.image_topic}")
         rospy.loginfo(f"  Cmd_vel: {self.cmd_vel_topic}")
@@ -83,14 +92,30 @@ class DataCollector:
 
     def scan_callback(self, msg):
         self.latest_scan = msg
+        if not self.scan_received_logged:  # Log only once
+            rospy.loginfo(f"✓ Received scan data with {len(msg.ranges)} samples")
+            self.scan_received_logged = True
 
     def image_callback(self, image_msg):
         if not self.recording:
             return
         
+        # Rate limiting - only collect at 10 fps
+        current_time = rospy.Time.now()
+        time_since_last_sample = (current_time - self.last_sample_time).to_sec()
+        if time_since_last_sample < self.min_time_between_samples:
+            return  # Skip this frame
+        
+        self.last_sample_time = current_time
+        
         # Skip if we don't have scan data yet
         if self.latest_scan is None:
             rospy.logwarn_throttle(1.0, "Waiting for scan data before recording...")
+            return
+        
+        # Verify scan has data
+        if len(self.latest_scan.ranges) == 0:
+            rospy.logwarn_throttle(1.0, "Scan has no ranges, skipping...")
             return
 
         try:

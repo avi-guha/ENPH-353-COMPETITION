@@ -15,11 +15,15 @@ class InferenceNode:
     def __init__(self):
         rospy.init_node('inference_node', anonymous=True)
 
-        # Parameters
-        self.image_topic = rospy.get_param('~image_topic', '/rrbot/camera1/image_raw')
-        self.scan_topic = rospy.get_param('~scan_topic', '/scan')
-        self.cmd_vel_topic = rospy.get_param('~cmd_vel_topic', '/cmd_vel')
-        self.model_path = rospy.get_param('~model_path', 'best_model.pth')
+        # Parameters - Fixed topic names to match robot namespacing
+        self.image_topic = rospy.get_param('~image_topic', '/B1/rrbot/camera1/image_raw')
+        self.scan_topic = rospy.get_param('~scan_topic', '/B1/scan')
+        self.cmd_vel_topic = rospy.get_param('~cmd_vel_topic', '/B1/cmd_vel')
+        
+        # Default model path is in the same directory as this script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        default_model_path = os.path.join(script_dir, 'best_model.pth')
+        self.model_path = rospy.get_param('~model_path', default_model_path)
 
         # Load Model
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -27,9 +31,11 @@ class InferenceNode:
         
         if os.path.exists(self.model_path):
             self.model.load_state_dict(torch.load(self.model_path, map_location=self.device))
-            rospy.loginfo(f"Loaded model from {self.model_path}")
+            rospy.loginfo(f"✓ Loaded model from {self.model_path}")
         else:
-            rospy.logwarn(f"Model not found at {self.model_path}. Using random weights (Robot will crash!).")
+            rospy.logwarn(f"✗ Model not found at {self.model_path}")
+            rospy.logwarn(f"  Checked absolute path: {os.path.abspath(self.model_path)}")
+            rospy.logwarn("  Using random weights (Robot will crash!)")
 
         self.model.eval()
 
@@ -40,13 +46,31 @@ class InferenceNode:
         self.image_sub = message_filters.Subscriber(self.image_topic, Image)
         self.scan_sub = message_filters.Subscriber(self.scan_topic, LaserScan)
         
-        # Sync
-        self.ts = message_filters.ApproximateTimeSynchronizer([self.image_sub, self.scan_sub], queue_size=10, slop=0.1)
+        # Sync - allow_headerless for topics without headers
+        self.ts = message_filters.ApproximateTimeSynchronizer(
+            [self.image_sub, self.scan_sub], 
+            queue_size=10, 
+            slop=0.1,
+            allow_headerless=True
+        )
         self.ts.registerCallback(self.callback)
 
         rospy.loginfo("Inference Node Started")
+        rospy.loginfo(f"Publishing to: {self.cmd_vel_topic}")
+        rospy.loginfo(f"Subscribing to:")
+        rospy.loginfo(f"  Image: {self.image_topic}")
+        rospy.loginfo(f"  Scan: {self.scan_topic}")
+        
+        # Counter for logging
+        self.callback_count = 0
 
     def callback(self, image_msg, scan_msg):
+        self.callback_count += 1
+        
+        # Log first few callbacks to verify it's working
+        if self.callback_count <= 3:
+            rospy.loginfo(f"Callback triggered (count: {self.callback_count})")
+        
         try:
             cv_image = self.bridge.imgmsg_to_cv2(image_msg, "bgr8")
         except CvBridgeError as e:
@@ -91,6 +115,10 @@ class InferenceNode:
         twist.linear.x = v
         twist.angular.z = w
         self.pub.publish(twist)
+        
+        # Log occasionally to verify commands
+        if self.callback_count % 30 == 0:  # Every 30 callbacks
+            rospy.loginfo(f"Publishing cmd_vel: v={v:.3f}, w={w:.3f}")
 
 if __name__ == '__main__':
     try:
