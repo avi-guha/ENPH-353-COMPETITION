@@ -1,0 +1,12 @@
+15:28:28.369: Clue SIZE: UNKNOWN
+15:28:28.369: Clue VICTIM: MAGIC MIKE
+15:28:28.370: Clue CRIME: DISAPPEAR
+15:28:28.370: Clue TIME: CIRCUS
+15:28:28.371: Clue PLACE: WORMHOLE
+15:28:28.371: Clue MOTIVE: STARDOM
+15:28:28.371: Clue WEAPON: QUANTUM WAND
+15:28:28.371: Clue BANDIT: CLOWN CLAUDE
+15:28:45.175: Message received: team, pass, 0, whatever
+15:28:45.176: Plate location is not a number.
+15:28:55.188: Message received: team, pass, -1, whatever
+15:28:55.188: Plate location is not a number.
