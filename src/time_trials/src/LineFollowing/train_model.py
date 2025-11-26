@@ -51,7 +51,7 @@ def train():
     # Hyperparameters
     BATCH_SIZE = 32
     LEARNING_RATE = 1e-4 # Lower learning rate for stability
-    EPOCHS = 300
+    EPOCHS = 50
     # Get the directory where this script is located
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     DATA_DIR = os.path.join(SCRIPT_DIR, 'data')
@@ -119,6 +119,14 @@ def train():
         val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
     model = PilotNet().to(device)
+    
+    # Load existing model if available
+    if os.path.exists(MODEL_PATH):
+        print(f"Loading existing model from {MODEL_PATH}")
+        model.load_state_dict(torch.load(MODEL_PATH))
+    else:
+        print("No existing model found, starting from scratch.")
+
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     
