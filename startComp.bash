@@ -7,6 +7,10 @@ sleep 5
 roslaunch time_trials time_trials_launch.launch &
 sleep 3
 
-# Launch camera viewer
+# Launch inference node
 cd /home/fizzer/ENPH-353-COMPETITION/src/time_trials/src/LineFollowing
+# python3 inference_node.py
+
+#Launch data collector 
+python3 data_collector.py
 python3 camera_viewer.py

@@ -91,14 +91,14 @@ class InferenceNode:
         scan_tensor = scan_tensor / 30.0
 
         # Watchdog Check
-        # Check only the front cone (approx +/- 30 degrees)
+        # Check only the front cone (approx +/- 20 degrees)
         # 720 samples cover 180 degrees (3.14 rad)
-        # Center is 360. 30 degrees is approx 1/6 of 180, so 120 samples.
-        # Range: 360 - 120 = 240 to 360 + 120 = 480
-        front_cone = scan_ranges[240:480]
+        # Center is 360. 20 degrees is approx 1/9 of 180, so 80 samples.
+        # Range: 360 - 80 = 280 to 360 + 80 = 440
+        front_cone = scan_ranges[280:440]
         min_dist = min(front_cone)
         
-        if min_dist < 0.5:
+        if min_dist < 0.2:
             rospy.logwarn(f"Obstacle detected in front cone at {min_dist:.2f}m! Stopping.")
             twist = Twist()
             twist.linear.x = 0.0
