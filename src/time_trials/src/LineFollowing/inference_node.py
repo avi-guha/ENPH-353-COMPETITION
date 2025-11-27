@@ -6,6 +6,7 @@ import torch
 import numpy as np
 from sensor_msgs.msg import Image, LaserScan
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Bool
 from cv_bridge import CvBridge, CvBridgeError
 from model import PilotNet
 import os
@@ -42,6 +43,12 @@ class InferenceNode:
         self.bridge = CvBridge()
         self.pub = rospy.Publisher(self.cmd_vel_topic, Twist, queue_size=1)
         
+        # Track if manual teleop is active
+        self.teleop_active = False
+        self.last_pub_check_time = rospy.Time.now()
+        self.pub_check_interval = 3.0  # Check every 3 seconds
+        rospy.Subscriber('/teleop_active', Bool, self.teleop_active_callback, queue_size=1)
+        
         # Subscribers
         self.image_sub = message_filters.Subscriber(self.image_topic, Image)
         self.scan_sub = message_filters.Subscriber(self.scan_topic, LaserScan)
@@ -60,11 +67,44 @@ class InferenceNode:
         rospy.loginfo(f"Subscribing to:")
         rospy.loginfo(f"  Image: {self.image_topic}")
         rospy.loginfo(f"  Scan: {self.scan_topic}")
+        rospy.loginfo("Note: Will pause when manual teleop is active to avoid conflicts")
         
         # Counter for logging
         self.callback_count = 0
+    
+    def teleop_active_callback(self, msg):
+        """Track when manual teleop controller is active"""
+        if msg.data != self.teleop_active:
+            self.teleop_active = msg.data
+            status = "ACTIVE" if self.teleop_active else "INACTIVE"
+            rospy.loginfo(f"Manual teleop is {status} - Inference {'PAUSED' if msg.data else 'RESUMED'}")
+    
+    def check_publisher_connection(self):
+        """Check if publisher is connected and recreate if needed (for sim resets)"""
+        current_time = rospy.Time.now()
+        if (current_time - self.last_pub_check_time).to_sec() < self.pub_check_interval:
+            return
+        
+        self.last_pub_check_time = current_time
+        
+        # Check if we have subscribers
+        num_connections = self.pub.get_num_connections()
+        
+        if num_connections == 0 and not self.teleop_active:
+            rospy.logwarn_throttle(15.0, 
+                f"No subscribers to {self.cmd_vel_topic}. Simulation may have reset. Recreating publisher...")
+            self.pub.unregister()
+            self.pub = rospy.Publisher(self.cmd_vel_topic, Twist, queue_size=1)
+            rospy.sleep(0.1)
 
     def callback(self, image_msg, scan_msg):
+        # Check publisher connection periodically
+        self.check_publisher_connection()
+        
+        # Don't interfere if manual teleop is active
+        if self.teleop_active:
+            return
+        
         self.callback_count += 1
         
         # Log first few callbacks to verify it's working
@@ -91,14 +131,14 @@ class InferenceNode:
         scan_tensor = scan_tensor / 30.0
 
         # Watchdog Check
-        # Check only the front cone (approx +/- 30 degrees)
+        # Check only the front cone (approx +/- 20 degrees)
         # 720 samples cover 180 degrees (3.14 rad)
-        # Center is 360. 30 degrees is approx 1/6 of 180, so 120 samples.
-        # Range: 360 - 120 = 240 to 360 + 120 = 480
-        front_cone = scan_ranges[240:480]
+        # Center is 360. 20 degrees is approx 1/9 of 180, so 80 samples.
+        # Range: 360 - 80 = 280 to 360 + 80 = 440
+        front_cone = scan_ranges[280:440]
         min_dist = min(front_cone)
         
-        if min_dist < 0.5:
+        if min_dist < 0.2:
             rospy.logwarn(f"Obstacle detected in front cone at {min_dist:.2f}m! Stopping.")
             twist = Twist()
             twist.linear.x = 0.0
