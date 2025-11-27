@@ -1,14 +1,21 @@
 <launch>
-    <!-- Joy Node -->
-    <node pkg="joy" type="joy_node" name="joy_node">
+    <!-- Joy Node with better parameters -->
+    <node pkg="joy" type="joy_node" name="joy_node" respawn="true" respawn_delay="2">
         <param name="dev" value="/dev/input/js0" />
         <param name="deadzone" value="0.05" />
         <param name="autorepeat_rate" value="20" />
+        <param name="coalesce_interval" value="0.01" />
     </node>
 
+    <!-- Small delay to ensure joy_node starts first -->
+    <arg name="start_delay" default="2.0" />
+
     <!-- Teleop Node -->
-    <node pkg="time_trials" type="teleop_ps4.py" name="teleop_ps4" output="screen">
+    <node pkg="time_trials" type="teleop_ps4.py" name="teleop_ps4" output="screen" 
+          launch-prefix="bash -c 'sleep $(arg start_delay); $0 $@'">
         <param name="linear_scale" value="2.0" />
         <param name="angular_scale" value="3.0" />
+        <param name="deadzone" value="0.1" />
+        <param name="joy_timeout" value="1.0" />
     </node>
 </launch>

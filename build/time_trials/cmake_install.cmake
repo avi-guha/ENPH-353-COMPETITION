@@ -52,3 +52,19 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/time_trials" TYPE FILE FILES "/home/fizzer/ENPH-353-COMPETITION/src/time_trials/package.xml")
 endif()
 
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/time_trials" TYPE PROGRAM FILES "/home/fizzer/ENPH-353-COMPETITION/build/time_trials/catkin_generated/installspace/teleop_ps4.py")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/time_trials" TYPE PROGRAM FILES "/home/fizzer/ENPH-353-COMPETITION/build/time_trials/catkin_generated/installspace/camera_viewer.py")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/time_trials" TYPE PROGRAM FILES "/home/fizzer/ENPH-353-COMPETITION/build/time_trials/catkin_generated/installspace/data_collector.py")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/time_trials" TYPE PROGRAM FILES "/home/fizzer/ENPH-353-COMPETITION/build/time_trials/catkin_generated/installspace/inference_node.py")
+endif()
+
