@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>keypress_monitor</name>
+  <version>0.0.1</version>
+  <description>Keypress monitor listens to keyboard events and publishes keypress status on a topic</description>
+
+  <maintainer email="mihael.simonic@ijs.si">Mihael Simonič</maintainer>
+  <author>Mihael Simonič</author>
+  <license>GPLv2</license>
+  <url type="website">https://repo.ijs.si/msimonic/keypress_monitor</url>
+
+  <depend>std_msgs</depend>
+  <depend>rospy</depend>
+  <exec_depend>pynput-pip</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>

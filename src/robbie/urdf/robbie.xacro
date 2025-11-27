@@ -17,6 +17,15 @@
   <xacro:include filename="$(find robbie)/urdf/macros.xacro"/>
   <xacro:include filename="$(find robbie)/urdf/materials.xacro"/>
 
+  <!-- Base link for the robot -->
+  <link name="base_link"/>
+  
+  <joint name="base_to_chassis" type="fixed">
+    <parent link="base_link"/>
+    <child link="chassis"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
   <link name='chassis'>
     <xacro:box_inertial name="chassis" m="${chassis_mass}" x="${chassis_length}" y="${chassis_width}" z="${chassis_height}"/>
     <collision name='chassis_collision'>
@@ -147,9 +156,9 @@
   </joint>
 
   <joint name="camera_joint" type="fixed">
-    <parent link="chassis"/>
+    <parent link="hokuyo_link"/>
     <child link="camera_link"/>
-    <origin xyz="${chassis_length/2} 0 ${chassis_height/2+camera_height/2}"/>
+    <origin xyz="0 0 0.02" rpy="0 0 0"/> <!-- Directly on top of lidar, level/horizontal -->
   </joint>
 
   <gazebo reference="chassis">
@@ -192,11 +201,37 @@
     </plugin>
   </gazebo>
 
+  <!-- Collision detection for bumper sensors -->
+  <link name="bumper_link">
+    <collision name="bumper_collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.22 0.16 0.06"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="bumper_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="bumper_link"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+
+  <gazebo reference="bumper_link">
+    <sensor name="bumper_sensor" type="contact">
+      <always_on>true</always_on>
+      <update_rate>10.0</update_rate>
+      <contact>
+        <collision>bumper_collision</collision>
+      </contact>
+    </sensor>
+  </gazebo>
+
   <gazebo reference="camera_link">
     <sensor type="camera" name="camera1">
       <update_rate>30.0</update_rate>
       <camera name="head">
-        <horizontal_fov>1.3962634</horizontal_fov>
+        <horizontal_fov>2.1</horizontal_fov> <!-- 110 degrees (increased from 100) -->
         <image>
           <width>800</width>
           <height>800</height>
@@ -232,5 +267,68 @@
     </sensor>
   </gazebo>
 
+
+  <!-- LIDAR Link -->
+  <link name="hokuyo_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.03 0.03 0.03"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.03 0.03 0.03"/>
+      </geometry>
+      <material name="hokuyo_material">
+        <color rgba="0.1 0.1 0.1 1"/> 
+      </material>
+    </visual>
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="hokuyo_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="0.08 0 0.04" rpy="0 0 0"/> <!-- Moved forward on top of chassis -->
+    <parent link="chassis"/>
+    <child link="hokuyo_link"/>
+  </joint>
+
+  <gazebo reference="hokuyo_link">
+    <sensor type="ray" name="head_hokuyo_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.570796</min_angle>
+            <max_angle>1.570796</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.10</min>
+          <max>30.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+        <topicName>scan</topicName>
+        <frameName>hokuyo_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
 
 </robot>

@@ -1,0 +1,8 @@
+prefix=/home/fizzer/ENPH-353-COMPETITION/install
+
+Name: keypress_monitor
+Description: Description of keypress_monitor
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

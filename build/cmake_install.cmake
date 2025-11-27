@@ -151,6 +151,8 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/home/fizzer/ENPH-353-COMPETITION/build/enph353/enph353_npcs/cmake_install.cmake")
   include("/home/fizzer/ENPH-353-COMPETITION/build/robbie/cmake_install.cmake")
   include("/home/fizzer/ENPH-353-COMPETITION/build/enph353/enph353_utils/cmake_install.cmake")
+  include("/home/fizzer/ENPH-353-COMPETITION/build/keypress_monitor/cmake_install.cmake")
+  include("/home/fizzer/ENPH-353-COMPETITION/build/clueboard_detection/cmake_install.cmake")
   include("/home/fizzer/ENPH-353-COMPETITION/build/adeept_awr/adeept_awr_gazebo/cmake_install.cmake")
   include("/home/fizzer/ENPH-353-COMPETITION/build/enph353/enph353_gazebo/cmake_install.cmake")
 

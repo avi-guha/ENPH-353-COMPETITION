@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+
+import rospy
+from std_msgs.msg import Bool
+from pynput import keyboard
+
+class KeyPressIdentify:
+
+    def __init__(self):
+        self.keyboard_listener = keyboard.Listener(on_press=self.on_press)
+	self.keyboard_listener.start()
+
+    def on_press(self,key):
+        rospy.loginfo("Keycode: %s",str(key))
+        rospy.signal_shutdown('Exiting.')
+    
+    def stop(self):
+        self.keyboard_listener.stop()
+
+if __name__ == '__main__':
+    rospy.init_node('keypress_identify', anonymous=True)
+    kpm = KeyPressIdentify()
+    rospy.on_shutdown(kpm.stop)
+    rospy.spin() 
+
