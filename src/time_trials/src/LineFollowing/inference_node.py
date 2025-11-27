@@ -8,9 +8,16 @@ from sensor_msgs.msg import Image, LaserScan
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
 from cv_bridge import CvBridge, CvBridgeError
-from model import PilotNet
 import os
+import sys
 import message_filters
+
+# Add the script directory to Python path to import model
+script_dir = os.path.dirname(os.path.abspath(__file__))
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
+
+from model import PilotNet
 
 class InferenceNode:
     def __init__(self):
