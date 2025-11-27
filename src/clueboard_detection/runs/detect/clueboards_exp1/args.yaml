@@ -1,7 +1,7 @@
 task: detect
 mode: train
 model: yolov8n.pt
-data: ./roboflow_dataset/data.yaml
+data: /home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/roboflow_data/data.yaml
 epochs: 100
 time: null
 patience: 100
