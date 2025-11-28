@@ -26,8 +26,6 @@ def preprocess_board(board_path):
     gray_blur = cv2.GaussianBlur(gray_blur, (5, 5), 0)
     return gray_blur
 
-
-# --- Extract words ---
 # --- Extract words ---
 def extract_board_words(board_path):
     gray = preprocess_board(board_path)
@@ -137,17 +135,13 @@ def pad_to_max(imgs, target_size=IMG_SIZE):
     return padded
 
 # --- Character extraction ---
-def characterize_word(word_img):
-    # 1. Image Cleaning and Thresholding
-    
+def characterize_word(word_img):    
     # Use Adaptive Thresholding for better local contrast
     thresh = cv2.adaptiveThreshold(word_img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
     
     # Apply morphological closing to connect broken character lines
     kernel_close = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel_close)
-
-    # 2. Contour Detection and Filtering
     
     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -169,8 +163,6 @@ def characterize_word(word_img):
             valid_contours.append(ctr)
     
     contours = sorted(valid_contours, key=lambda c: cv2.boundingRect(c)[0])
-
-    # 3. Extract Characters and Detect Spaces
     
     for ctr in contours:
         x, y, w, h = cv2.boundingRect(ctr)
@@ -222,7 +214,7 @@ def predict_board(img_path):
     return result
 
 # --- Test ---
-img_path = "/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/course_imgs/board4.png"
+img_path = "/home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/yolo_inference_images/img_5.png"
 #img_path = "/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/validation_data/crime_1/WEAPON_ICEBOMB.png"
 
 print("Predicted board:")
