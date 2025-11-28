@@ -11,7 +11,7 @@ $ tree -L 1
 ├── 353_Clueboard_Reader_NN.ipynb
 ├── clueboard_reader_CNN.h5
 ├── Clueboard_Trainer.py
-├── <span style="color:blue">course_imgs</span>.
+├── course_imgs
 ├── funny_crimes_500.csv
 ├── funny_crimes_validation.csv
 ├── README.md
@@ -23,5 +23,4 @@ $ tree -L 1
 └── validation_data_img_gen
 ```
 
-
-<pre style="color: blue;">your text here</pre>
+Trained, best model saved as `clueboard_reader_CNN.h5`.
