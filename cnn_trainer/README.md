@@ -1,10 +1,6 @@
 ## cnn_trainer Directory
 
-A directory containing all materials I have used in training our CNN model to read clue boards.
-
-
-st.markdown(":blue-background[This text has a blue background.]")
-
+### A directory containing all materials I have used in training our CNN model to read clue boards.
 
 Low-depth structure:
 ```
@@ -27,5 +23,6 @@ $ tree -L 1
 ```
 
 Trained, best model saved as `clueboard_reader_CNN.h5`.
+
 
 
