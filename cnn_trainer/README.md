@@ -11,7 +11,7 @@ $ tree -L 1
 ├── 353_Clueboard_Reader_NN.ipynb
 ├── clueboard_reader_CNN.h5
 ├── Clueboard_Trainer.py
-├── course_imgs
+├── <span style="color:blue">course_imgs</span>.
 ├── funny_crimes_500.csv
 ├── funny_crimes_validation.csv
 ├── README.md
@@ -22,3 +22,4 @@ $ tree -L 1
 ├── validation_data
 └── validation_data_img_gen
 ```
+
