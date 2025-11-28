@@ -1,0 +1,13 @@
+train: /home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/roboflow_data_v2/train/images
+val: /home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/roboflow_data_v2/valid/images 
+test: /home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/roboflow_data_v2/test/images
+
+nc: 1
+names: ['clueboard']
+
+roboflow:
+  workspace: enph252ros
+  project: 353-clueboard-detection-5ualb
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/enph252ros/353-clueboard-detection-5ualb/dataset/2
