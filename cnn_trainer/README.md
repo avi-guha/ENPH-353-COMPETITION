@@ -1,8 +1,10 @@
 ## cnn_trainer Directory
 
-```
 A directory containing all materials I have used in training our CNN model to read clue boards.
-```
+<span style="background-color: blue; color: white;">This text has a blue background.</span>
+<div style="background-color: #ADD8E6; padding: 10px;">
+  This entire block has a light blue background.
+</div>
 Low-depth structure:
 ```
 fizzer@skynet:~/ENPH-353-COMPETITION/cnn_trainer 2025-11-28 14:23:15
@@ -24,3 +26,4 @@ $ tree -L 1
 ```
 
 Trained, best model saved as `clueboard_reader_CNN.h5`.
+
