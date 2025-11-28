@@ -4,12 +4,13 @@
 1. RoboFlow image collection
 2. RoboFlow dataset
 3. YOLOv8 model training
-4.  Trained YOLOV8 model
+4.  Trained YOLOv8 model
 5.  YOLO inference results image collection
 6.  Scripts for:
-    1. YOLO inference
+    1. CNN usage class
     2. Running CNN model on YOLO results
-    3. YOLO integration
+    3. YOLO inference node
+    4. YOLO integration
 7. A copy of trained clueboard reader CNN
    
 
@@ -51,6 +52,7 @@ $ tree -L 2
 ```
 
 Trained, best YOLO model saved in: `clueboard_detection/runs/detect/clueboards_exp12/weights/best.pt`
+
 
 
 
