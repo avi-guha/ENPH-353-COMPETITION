@@ -139,6 +139,17 @@ def train():
     initial_len = len(full_dataframe)
     full_dataframe = full_dataframe[(full_dataframe.iloc[:, 1] != 0) | (full_dataframe.iloc[:, 2] != 0)]
     print(f"Removed {initial_len - len(full_dataframe)} stopped samples (v=0 and w=0).")
+    
+    # Filter out negative linear velocity (backwards driving)
+    initial_len = len(full_dataframe)
+    full_dataframe = full_dataframe[full_dataframe.iloc[:, 1] >= 0]
+    print(f"Removed {initial_len - len(full_dataframe)} samples with negative velocity (v < 0).")
+    
+    print(f"Valid samples after filtering: {len(full_dataframe)}")
+    
+    if len(full_dataframe) == 0:
+        print("Error: No valid samples found.")
+        return
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
