@@ -14,7 +14,7 @@
 7. A copy of trained clueboard reader CNN
    
 
-Low-depth structure:
+General structure:
 ```
 fizzer@skynet:~/ENPH-353-COMPETITION/src/clueboard_detection 2025-11-28 14:31:17
 $ tree -L 2
@@ -52,6 +52,7 @@ $ tree -L 2
 ```
 
 Trained, best YOLO model saved in: `clueboard_detection/runs/detect/clueboards_exp12/weights/best.pt`
+
 
 
 
