@@ -156,8 +156,16 @@ class InferenceNode:
         # Inference
         with torch.no_grad():
             output = self.model(image, scan_tensor)
-            v = 0.8 * output[0][0].item()
-            w = 1.55 * output[0][1].item()
+            
+            # Model outputs normalized values in [-1, 1]
+            # Denormalize back to physical units:
+            # v: [-1, 1] -> [-2, 2] (multiply by 2)
+            # w: [-1, 1] -> [-3, 3] (multiply by 3)
+            v_normalized = output[0][0].item()
+            w_normalized = output[0][1].item()
+            
+            v = v_normalized * 2.0  # Denormalize
+            w = w_normalized * 3.0  # Denormalize
 
         twist = Twist()
         twist.linear.x = v
