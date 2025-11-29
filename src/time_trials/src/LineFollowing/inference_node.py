@@ -156,8 +156,8 @@ class InferenceNode:
         # Inference
         with torch.no_grad():
             output = self.model(image, scan_tensor)
-            v = output[0][0].item()
-            w = output[0][1].item()
+            v = 0.8 * output[0][0].item()
+            w = 1.55 * output[0][1].item()
 
         twist = Twist()
         twist.linear.x = v
