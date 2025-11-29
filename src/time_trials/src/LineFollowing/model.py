@@ -45,17 +45,15 @@ class PilotNet(nn.Module):
         # 4096 (Image) + 64 (LIDAR) = 4160
         self.classifier = nn.Sequential(
             nn.Linear(4160, 100),
-            nn.BatchNorm1d(100),
             nn.ReLU(),
             nn.Dropout(0.5),
             nn.Linear(100, 50),
-            nn.BatchNorm1d(50),
             nn.ReLU(),
             nn.Dropout(0.5),
             nn.Linear(50, 10),
-            nn.BatchNorm1d(10),
             nn.ReLU(),
-            nn.Linear(10, 2) # v, w
+            nn.Linear(10, 2), # v, w
+            nn.Tanh() # Constrain outputs to [-1, 1]
         )
 
     def forward(self, x_img, x_lidar):

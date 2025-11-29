@@ -62,13 +62,23 @@ class DrivingDataset(Dataset):
 
         label = torch.tensor([v, w], dtype=torch.float32)
         
+        # Normalize labels to [-1, 1] for training
+        # v: [-2, 2] -> [-1, 1] (divide by 2)
+        # w: [-3, 3] -> [-1, 1] (divide by 3)
+        label[0] = label[0] / 2.0  # v
+        label[1] = label[1] / 3.0  # w
+        
         return image, label
 
 def train():
     # Hyperparameters
-    BATCH_SIZE = 32
-    LEARNING_RATE = 1e-5 # Lower learning rate for stability
-    EPOCHS = 50
+    BATCH_SIZE = 64
+    LEARNING_RATE = 1e-3 # Standard LR for normalized outputs with Adam
+    EPOCHS = 100
+    
+    # Normalization constants for outputs
+    V_SCALE = 2.0  # v range: [-2, 2]
+    W_SCALE = 3.0  # w range: [-3, 3]
     # Get the directory where this script is located
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     DATA_DIR = os.path.join(SCRIPT_DIR, 'data')
@@ -228,7 +238,12 @@ def train():
             avg_val_loss_v = val_loss_v / len(val_loader)
             avg_val_loss_w = val_loss_w / len(val_loader)
             
+            # Denormalize for interpretability
+            real_v_error = np.sqrt(avg_val_loss_v) * V_SCALE
+            real_w_error = np.sqrt(avg_val_loss_w) * W_SCALE
+            
             print(f"Val Loss: {avg_val_loss:.4f} (v: {avg_val_loss_v:.4f}, w: {avg_val_loss_w:.4f})")
+            print(f"  -> Real errors: v={real_v_error:.3f} m/s, w={real_w_error:.3f} rad/s ({real_w_error*57.3:.1f}°/s)")
             
             # Step the scheduler
             scheduler.step(avg_val_loss)
