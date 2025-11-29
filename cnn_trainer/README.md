@@ -2,7 +2,7 @@
 
 ### A directory containing all materials I have used in training our CNN model to read clue boards.
 
-Low-depth structure:
+General structure:
 ```
 fizzer@skynet:~/ENPH-353-COMPETITION/cnn_trainer 2025-11-28 14:23:15
 $ tree -L 1
@@ -23,6 +23,7 @@ $ tree -L 1
 ```
 
 Trained, best model saved as `clueboard_reader_CNN.h5`.
+
 
 
 
