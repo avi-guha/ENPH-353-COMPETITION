@@ -6,29 +6,35 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 import time
+from board_reader import BoardReader
 
 class BoardDetector:
     LOWER_BLUE_HSV = np.array([100, 50, 20])
-    UPPER_BLUE_HSV = np.array([130, 255, 150])
+    UPPER_BLUE_HSV = np.array([130, 255, 255])
 
     # Constructor
     def __init__(self):
+        self.cnn = BoardReader()
+
         self.bridge = CvBridge()
 
-        curr_time = time()
-        last_board_time = time()
+        self.curr_time = time.time()
+        self.last_board_time = time.time()
 
-        # Hashmap / dict containing all labels of clueboards in course with corresponding clueboard ID (integer).
-        # Bool (item 1 in list of value) marks if this clueboard has been reported to /score_tracker yet.
+        self.current_board = 1
+
+        # Hashmap / dict containing all IDs of clueboards in course with corresponding bool, and Label.
+        # Bool (item 0 in list of value) marks if this clueboard has been reported to /score_tracker yet.
         self.board_map = {
-            "SIZE": [1, False],
-            "VICTIM": [2, False],
-            "CRIME": [3, False],
-            "TIME": [4, False],
-            "PLACE": [5, False],
-            "MOTIVE": [6, False],
-            "WEAPON": [7, False],
-            "BANDIT": [8, False],
+            0: [True, "START"], #assume LF has begun already
+            1: [False, "SIZE"],
+            2: [False, "VICTIM"],
+            3: [False, "CRIME"],
+            4: [False, "TIME"],
+            5: [False, "PLACE"],
+            6: [False, "MOTIVE"],
+            7: [False, "WEAPON"],
+            8: [False, "BANDIT"],
         }
 
         self.team_name = "teamEMAG"
@@ -93,6 +99,19 @@ class BoardDetector:
         """
         return 1
     
+    def validate_previous(self, board_id):
+        """
+        @brief Ensure that board at index board_id - 1 has been reported.
+        @param board_id the board we are ensuring that previous is accounted for.
+        @return True if the baord with id (board_id - 1) has been solved/reported, False otherwise
+        """
+        previously_done = self.board_map[board_id-1][0]
+
+        if(previously_done):
+            return True
+        else:
+            return False
+
     def camera_callback(self, msg):
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
@@ -105,29 +124,32 @@ class BoardDetector:
                 x1, y1, x2, y2 = box.xyxy[0].int().tolist()
                 confidence = box.conf[0].item()
 
-                if confidence > 0.91 and bbz_size:
+                # ensure all conditions met before proceeding to read board
+                sizeable  = (x2-x1) > 70
+                confident = confidence > 0.91
+                ordered = self.validate_previous(self.current_board)
+                cooloff = (time() - self.last_board_time) > 2
+
+                if sizeable and confident and ordered and cooloff:
                     frame_extract = frame[y1:y2, x1:x2]
                     # use BGR until cnn step
-                    # 1. check if whole board captured
+                    # check if whole board captured
                     if(self.board_captured(frame_extract)):
                         rospy.loginfo(">0.9 confidence board, full board found.")
-                        annotated = r.plot()
-                        self.pub.publish(self.bridge.cv2_to_imgmsg(annotated, encoding='bgr8'))
+                        #annotated = r.plot()
+                        #self.pub.publish(self.bridge.cv2_to_imgmsg(annotated, encoding='bgr8'))
 
+                        # 2. if yes, process to gray region
 
-                    # 2. if yes, process to gray region
+                        # 3. feed into cnn, extract 2 words predictions  #CHANGE TO RGB BEFORE GIVING TO CNN
 
-                    # 3. feed into cnn, extract 2 words predictions
+                        # 4. read Label of board (Size, Victim, ...)
+                        
+                        # 5. if safe to continue, report clue to /score_tracker -> WITH NO SPACES! 
+                        #    before reporting lets just test by rospy.loginfo
 
-                    # 4. read Label of board (Size, Victim, ...)
-                    #    if Label in keys(board_map), proceed
-                    #    if previous board has marker 'False', ignore
-                    
-                    # 5. if safe to continue, report clue to /score_tracker -> WITH NO SPACES! , all caps
-                    #    before reporting lets just test by rospy.loginfo
+                        self.current_board += 1
 
-
-                    #CHANGE TO RGB BEFORE GIVING TO CNN
     
 
 

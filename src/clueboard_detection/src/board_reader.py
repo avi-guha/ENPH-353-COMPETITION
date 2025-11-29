@@ -257,7 +257,7 @@ class BoardReader:
 
 if __name__ == "__main__":
      # Load image in RGB (as YOLO would output)
-    img_path = "/home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/yolo_inference_images/img_4.png"
+    img_path = "/home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/yolo_inference_images/img_6.png"
     board = cv2.cvtColor(cv2.imread(img_path, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
 
     reader = BoardReader()

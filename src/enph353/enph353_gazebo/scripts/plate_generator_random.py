@@ -9,30 +9,26 @@ import string
 
 from PIL import Image, ImageFont, ImageDraw
 
-def random_word_fixed_length(length=12):
-    '''Generate a random alphabetic word (with spaces allowed) of exact length'''
-    if length < 3:
-        length = 3  # minimum sensible length
-
+def random_word_variable_length(min_length=4, max_length=12):
+    '''Generate a random alphabetic word (with spaces allowed) of length between min_length and max_length'''
+    length = random.randint(min_length, max_length)
     # first character cannot be a space
-    word = random.choice(string.ascii_uppercase)
-    
-    for _ in range(length - 1):
-        word += random.choice(string.ascii_uppercase + ' ')
-
-    return word[:length]  # ensure exactly the required length
+    word_chars = [random.choice(string.ascii_uppercase)]
+    while len(word_chars) < length:
+        word_chars.append(random.choice(string.ascii_uppercase))
+    return ''.join(word_chars)[:length]
 
 def loadCrimesProfileCompetition():
     '''
     @brief returns a set of clues for one game and save them to plates.csv
 
     @retval clue dictionary of the form 
-                [size:value, victim:value, ...
-                 crime:value,time:value,
-                 place:value,motive:value,
-                 weapon:value,bandit:value]
+                [SIZE:value, VICTIM:value, ...
+                 CRIME:value,TIME:value,
+                 PLACE:value,MOTIVE:value,
+                 WEAPON:value,BANDIT:value]
     '''
-    key_list = ['size','victim','crime','time','place','motive','weapon','bandit']
+    key_list = ['SIZE','VICTIM','CRIME','TIME','PLACE','MOTIVE','WEAPON','BANDIT']
 
     clues = {}
 
@@ -41,7 +37,7 @@ def loadCrimesProfileCompetition():
         csvwriter = csv.writer(plates_file)
 
         for key in key_list:
-            value = random_word_fixed_length(12)
+            value = random_word_variable_length(4, 12)
             clues[key] = value.upper()
             csvwriter.writerow([key, value.upper()])
 
@@ -64,8 +60,6 @@ for key, value in clues.items():
     print(entry)
 
     # Generate plate
-
-    # Convert into a PIL image (to use monospaced font)
     blank_plate_pil = Image.fromarray(banner_canvas)
     draw = ImageDraw.Draw(blank_plate_pil)
     font_size = 90
@@ -80,4 +74,3 @@ for key, value in clues.items():
     cv2.imwrite(os.path.join(SCRIPT_PATH+TEXTURE_PATH+"unlabelled/",
                                 "plate_" + str(i) + ".png"), populated_banner)
     i += 1
-

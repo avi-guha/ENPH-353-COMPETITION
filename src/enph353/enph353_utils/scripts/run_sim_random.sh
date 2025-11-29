@@ -56,6 +56,5 @@ else
 fi
 
 # start the ROS environment
-roslaunch enph353_utils sim.launch spawn_pedestrians:=$spawn_pedestrians spawn_vehicles:=$spawn_vehicles wind_bl>
-
+roslaunch enph353_utils sim.launch spawn_pedestrians:=$spawn_pedestrians spawn_vehicles:=$spawn_vehicles wind_blowing:=$wind_blowing
 

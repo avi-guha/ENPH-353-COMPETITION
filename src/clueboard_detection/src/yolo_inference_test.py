@@ -68,7 +68,7 @@ def main():
 
                     frame_extract = frame[y1:y2, x1:x2]
 
-                    cv2.imwrite(f"{output_path}img_{i}.png", frame_extract)
+                    #cv2.imwrite(f"{output_path}img_{i}.png", frame_extract)
                     i += 1
                     last_time = current_time  # Update timer
 
