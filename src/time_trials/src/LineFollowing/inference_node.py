@@ -78,6 +78,11 @@ class InferenceNode:
         
         # Counter for logging
         self.callback_count = 0
+        
+        # Smoothing for output commands (exponential moving average)
+        self.smoothing_alpha = 0.7  # Higher = more responsive, lower = smoother
+        self.prev_v = 0.0
+        self.prev_w = 0.0
     
     def teleop_active_callback(self, msg):
         """Track when manual teleop controller is active"""
@@ -138,34 +143,43 @@ class InferenceNode:
         scan_tensor = scan_tensor / 30.0
 
         # Watchdog Check
-        # Check only the front cone (approx +/- 20 degrees)
+        # Check only the front cone (approx +/- 15 degrees)
         # 720 samples cover 180 degrees (3.14 rad)
-        # Center is 360. 20 degrees is approx 1/9 of 180, so 80 samples.
-        # Range: 360 - 80 = 280 to 360 + 80 = 440
-        front_cone = scan_ranges[280:440]
+        # Center is 360. 15 degrees is approx 60 samples.
+        # Range: 360 - 60 = 300 to 360 + 60 = 420
+        front_cone = scan_ranges[300:420]
         min_dist = min(front_cone)
         
-        if min_dist < 0.2:
+        if min_dist < 0.15:
             rospy.logwarn(f"Obstacle detected in front cone at {min_dist:.2f}m! Stopping.")
             twist = Twist()
             twist.linear.x = 0.0
             twist.angular.z = 0.0
             self.pub.publish(twist)
+            self.prev_v = 0.0
+            self.prev_w = 0.0
             return
 
         # Inference
         with torch.no_grad():
             output = self.model(image, scan_tensor)
             
-            # Model outputs normalized values in [-1, 1]
-            # Denormalize back to physical units:
+            # Model outputs raw values (no tanh), clamp to expected range
+            # Denormalize: training normalized to [-1, 1]
             # v: [-1, 1] -> [-2, 2] (multiply by 2)
             # w: [-1, 1] -> [-3, 3] (multiply by 3)
-            v_normalized = output[0][0].item()
-            w_normalized = output[0][1].item()
+            v_normalized = torch.clamp(output[0][0], -1.0, 1.0).item()
+            w_normalized = torch.clamp(output[0][1], -1.0, 1.0).item()
             
-            v = v_normalized * 2.0  # Denormalize
-            w = w_normalized * 3.0  # Denormalize
+            v_raw = v_normalized * 2.0  # Denormalize
+            w_raw = w_normalized * 3.0  # Denormalize
+            
+            # Apply exponential smoothing to reduce jitter
+            v = self.smoothing_alpha * v_raw + (1 - self.smoothing_alpha) * self.prev_v
+            w = self.smoothing_alpha * w_raw + (1 - self.smoothing_alpha) * self.prev_w
+            
+            self.prev_v = v
+            self.prev_w = w
 
         twist = Twist()
         twist.linear.x = v

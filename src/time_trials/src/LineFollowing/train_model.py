@@ -3,7 +3,6 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import Dataset, DataLoader
 import pandas as pd
 import cv2
@@ -51,10 +50,17 @@ class DrivingDataset(Dataset):
                 beta = np.random.uniform(-20, 20) # Brightness
                 image = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
                 
-            # 3. Gaussian Noise (30%)
-            if np.random.rand() < 0.3:
-                noise = np.random.normal(0, 10, image.shape).astype(np.uint8)
-                image = cv2.add(image, noise)
+            # 3. Gaussian Noise (20%) - Fixed to avoid overflow
+            if np.random.rand() < 0.2:
+                noise = np.random.normal(0, 8, image.shape)
+                image = np.clip(image.astype(np.float32) + noise, 0, 255).astype(np.uint8)
+            
+            # 4. Color jitter (20%) - Slight hue/saturation shifts
+            if np.random.rand() < 0.2:
+                hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV).astype(np.float32)
+                hsv[:, :, 0] = (hsv[:, :, 0] + np.random.uniform(-10, 10)) % 180
+                hsv[:, :, 1] = np.clip(hsv[:, :, 1] * np.random.uniform(0.8, 1.2), 0, 255)
+                image = cv2.cvtColor(hsv.astype(np.uint8), cv2.COLOR_HSV2BGR)
 
         # Convert BGR to YUV (NVIDIA paper uses YUV)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
@@ -82,9 +88,10 @@ class DrivingDataset(Dataset):
 
 def train():
     # Hyperparameters
-    BATCH_SIZE = 32
-    LEARNING_RATE = 1e-4 # Standard LR for normalized outputs with Adam
-    EPOCHS = 100
+    BATCH_SIZE = 64  # Larger batch for more stable gradients
+    LEARNING_RATE = 3e-4  # Slightly higher LR with cosine annealing
+    EPOCHS = 150  # More epochs with early stopping
+    WEIGHT_DECAY = 1e-4  # L2 regularization
     
     # Normalization constants for outputs
     V_SCALE = 2.0  # v range: [-2, 2]
@@ -186,17 +193,19 @@ def train():
     # Load existing model if available
     if os.path.exists(MODEL_PATH):
         print(f"Loading existing model from {MODEL_PATH}")
-        model.load_state_dict(torch.load(MODEL_PATH))
-    else:
-        print("No existing model found, starting from scratch.")
+        try:
+            model.load_state_dict(torch.load(MODEL_PATH))
+        except RuntimeError as e:
+            print(f"Model architecture changed, starting fresh: {e}")
 
-    # criterion = nn.MSELoss() # We will calculate manual loss
-    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     
-    # Learning Rate Scheduler
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=5, factor=0.5)
+    # Cosine Annealing with Warm Restarts for better convergence
+    scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=2)
 
     best_loss = float('inf')
+    patience_counter = 0
+    early_stop_patience = 20  # Stop if no improvement for 20 epochs
 
     for epoch in range(EPOCHS):
         model.train()
@@ -209,22 +218,30 @@ def train():
             optimizer.zero_grad()
             outputs = model(images, scans)
             
-            # Weighted Loss
+            # Weighted Loss - angular velocity is more important for line following
             # outputs: [batch, 2], labels: [batch, 2]
             # 0: v, 1: w
             loss_v = nn.functional.mse_loss(outputs[:, 0], labels[:, 0])
             loss_w = nn.functional.mse_loss(outputs[:, 1], labels[:, 1])
             
-            # Weight w loss equal to v loss
-            loss = loss_v + loss_w
+            # Weight w loss higher - steering is critical for line following
+            loss = loss_v + 2.0 * loss_w
             
             loss.backward()
+            
+            # Gradient clipping for stability
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            
             optimizer.step()
 
             running_loss += loss.item()
+        
+        # Step scheduler
+        scheduler.step()
 
         avg_train_loss = running_loss / len(train_loader)
-        print(f"Epoch [{epoch+1}/{EPOCHS}], Train Loss: {avg_train_loss:.4f}")
+        current_lr = optimizer.param_groups[0]['lr']
+        print(f"Epoch [{epoch+1}/{EPOCHS}], Train Loss: {avg_train_loss:.4f}, LR: {current_lr:.6f}")
 
         if val_loader:
             model.eval()
@@ -260,14 +277,17 @@ def train():
             
             print(f"Val Loss: {avg_val_loss:.4f} (v: {avg_val_loss_v:.4f}, w: {avg_val_loss_w:.4f})")
             print(f"  -> Real errors: v={real_v_error:.3f} m/s, w={real_w_error:.3f} rad/s ({real_w_error*57.3:.1f}°/s)")
-            
-            # Step the scheduler
-            scheduler.step(avg_val_loss)
 
             if avg_val_loss < best_loss:
                 best_loss = avg_val_loss
+                patience_counter = 0
                 torch.save(model.state_dict(), MODEL_PATH)
-                print(f"Saved best model to {MODEL_PATH}")
+                print(f"✓ Saved best model to {MODEL_PATH}")
+            else:
+                patience_counter += 1
+                if patience_counter >= early_stop_patience:
+                    print(f"Early stopping at epoch {epoch+1} (no improvement for {early_stop_patience} epochs)")
+                    break
         else:
             # Save last model if no validation
             torch.save(model.state_dict(), MODEL_PATH)
