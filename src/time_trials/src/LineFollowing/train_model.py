@@ -82,8 +82,8 @@ class DrivingDataset(Dataset):
 
 def train():
     # Hyperparameters
-    BATCH_SIZE = 64
-    LEARNING_RATE = 1e-3 # Standard LR for normalized outputs with Adam
+    BATCH_SIZE = 32
+    LEARNING_RATE = 1e-4 # Standard LR for normalized outputs with Adam
     EPOCHS = 100
     
     # Normalization constants for outputs
@@ -132,24 +132,6 @@ def train():
     initial_len = len(full_dataframe)
     full_dataframe = full_dataframe[(full_dataframe.iloc[:, 1] != 0) | (full_dataframe.iloc[:, 2] != 0)]
     print(f"Removed {initial_len - len(full_dataframe)} stopped samples (v=0 and w=0).")
-    
-    # Filter out negative linear velocity (v < 0)
-    initial_len = len(full_dataframe)
-    full_dataframe = full_dataframe[full_dataframe.iloc[:, 1] >= 0]
-    print(f"Removed {initial_len - len(full_dataframe)} samples with negative velocity (v < 0).")
-
-    # Filter out risky maneuvers (v > 1.5 AND |w| > 2.0)
-    initial_len = len(full_dataframe)
-    # Keep samples where NOT (v > 1.5 AND |w| > 2.0)
-    # Equivalent to: v <= 1.5 OR |w| <= 2.0
-    full_dataframe = full_dataframe[~((full_dataframe.iloc[:, 1] > 1.5) & (np.abs(full_dataframe.iloc[:, 2]) > 2.0))]
-    print(f"Removed {initial_len - len(full_dataframe)} risky samples (v > 1.5 and |w| > 2.0).")
-    
-    print(f"Valid samples after filtering: {len(full_dataframe)}")
-    
-    if len(full_dataframe) == 0:
-        print("Error: No valid samples found. Please recollect data with scan data enabled.")
-        return
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")

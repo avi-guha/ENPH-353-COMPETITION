@@ -35,10 +35,10 @@ class PilotNet(nn.Module):
         self.classifier = nn.Sequential(
             nn.Linear(4096, 100),
             nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.Dropout(0.2),
             nn.Linear(100, 50),
             nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.Dropout(0.2),
             nn.Linear(50, 10),
             nn.ReLU(),
             nn.Linear(10, 2), # v, w

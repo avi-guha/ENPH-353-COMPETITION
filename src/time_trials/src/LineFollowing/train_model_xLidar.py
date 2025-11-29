@@ -72,7 +72,7 @@ class DrivingDataset(Dataset):
 
 def train():
     # Hyperparameters
-    BATCH_SIZE = 64
+    BATCH_SIZE = 32
     LEARNING_RATE = 1e-3 # Standard LR for normalized outputs with Adam
     EPOCHS = 100
     
@@ -115,11 +115,10 @@ def train():
     full_dataframe = full_dataframe[full_dataframe.iloc[:, 1] >= 0]
     print(f"Removed {initial_len - len(full_dataframe)} samples with negative velocity (v < 0).")
 
-    # Filter out risky maneuvers (v > 1.5 AND |w| > 2.0)
-    initial_len = len(full_dataframe)
-    # Keep samples where NOT (v > 1.5 AND |w| > 2.0)
-    full_dataframe = full_dataframe[~((full_dataframe.iloc[:, 1] > 1.5) & (np.abs(full_dataframe.iloc[:, 2]) > 2.0))]
-    print(f"Removed {initial_len - len(full_dataframe)} risky samples (v > 1.5 and |w| > 2.0).")
+    # Risky maneuver filtering disabled - keeping all data for better learning
+    # initial_len = len(full_dataframe)
+    # full_dataframe = full_dataframe[~((full_dataframe.iloc[:, 1] > 1.5) & (np.abs(full_dataframe.iloc[:, 2]) > 2.0))]
+    # print(f"Removed {initial_len - len(full_dataframe)} risky samples (v > 1.5 and |w| > 2.0).")
     
     print(f"Valid samples after filtering: {len(full_dataframe)}")
     
