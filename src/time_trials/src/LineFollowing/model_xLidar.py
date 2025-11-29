@@ -30,21 +30,10 @@ class PilotNet(nn.Module):
         
         # Image output size: 64 * 8 * 8 = 4096
         
-        # LIDAR Branch
-        # Input: 720 ranges
-        self.lidar_branch = nn.Sequential(
-            nn.Linear(720, 128),
-            nn.BatchNorm1d(128),
-            nn.ReLU(),
-            nn.Linear(128, 64),
-            nn.BatchNorm1d(64),
-            nn.ReLU()
-        )
-        
-        # Fusion
-        # 4096 (Image) + 64 (LIDAR) = 4160
+        # Classifier
+        # Input: 4096 (Image only)
         self.classifier = nn.Sequential(
-            nn.Linear(4160, 100),
+            nn.Linear(4096, 100),
             nn.BatchNorm1d(100),
             nn.ReLU(),
             nn.Dropout(0.5),
@@ -58,12 +47,7 @@ class PilotNet(nn.Module):
             nn.Linear(10, 2) # v, w
         )
 
-    def forward(self, x_img, x_lidar):
+    def forward(self, x_img):
         img_out = self.features(x_img)
-        lidar_out = self.lidar_branch(x_lidar)
-        
-        # Concatenate
-        combined = torch.cat((img_out, lidar_out), dim=1)
-        
-        output = self.classifier(combined)
+        output = self.classifier(img_out)
         return output

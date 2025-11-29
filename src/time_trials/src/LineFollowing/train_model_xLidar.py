@@ -10,7 +10,7 @@ import cv2
 import os
 import numpy as np
 import ast
-from model import PilotNet
+from model_xLidar import PilotNet
 
 class DrivingDataset(Dataset):
     def __init__(self, dataframe, transform=None, augment=False):
@@ -32,18 +32,12 @@ class DrivingDataset(Dataset):
         v = self.annotations.iloc[index, 1]
         w = self.annotations.iloc[index, 2]
         
-        # Get LIDAR
-        scan_str = self.annotations.iloc[index, 3]
-        scan = ast.literal_eval(scan_str)
-        scan = np.array(scan, dtype=np.float32)
-
         # Augmentation
         if self.augment:
             # 1. Horizontal Flip (50%)
             if np.random.rand() < 0.5:
                 image = cv2.flip(image, 1)
                 w = -w
-                scan = scan[::-1].copy() # Reverse LIDAR scan
             
             # 2. Brightness/Contrast (30%)
             if np.random.rand() < 0.3:
@@ -68,21 +62,17 @@ class DrivingDataset(Dataset):
 
         label = torch.tensor([v, w], dtype=torch.float32)
         
-        scan = torch.tensor(scan, dtype=torch.float32)
-        # Normalize LIDAR (0-30 range -> 0-1)
-        scan = scan / 30.0
-
-        return image, scan, label
+        return image, label
 
 def train():
     # Hyperparameters
-    BATCH_SIZE = 16
-    LEARNING_RATE = 1e-6 # Lower learning rate for stability
-    EPOCHS = 100
+    BATCH_SIZE = 32
+    LEARNING_RATE = 1e-5 # Lower learning rate for stability
+    EPOCHS = 50
     # Get the directory where this script is located
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     DATA_DIR = os.path.join(SCRIPT_DIR, 'data')
-    MODEL_PATH = os.path.join(SCRIPT_DIR, 'best_model.pth')
+    MODEL_PATH = os.path.join(SCRIPT_DIR, 'model_xLidar.pth')
     
     # Collect all log files
     all_data = []
@@ -105,19 +95,7 @@ def train():
     full_dataframe = pd.concat(all_data, ignore_index=True)
     print(f"Total samples loaded: {len(full_dataframe)}")
     
-    # Filter out samples with empty scans
-    def has_valid_scan(scan_str):
-        try:
-            scan = ast.literal_eval(scan_str)
-            return len(scan) > 0
-        except:
-            return False
-    
-    full_dataframe = full_dataframe[full_dataframe.iloc[:, 3].apply(has_valid_scan)]
-    
     # Filter out stopped data (v=0 AND w=0)
-    # We want to keep frames where robot is turning even if v=0 (though usually v>0 when turning)
-    # User requested: "Get rid of any frames in which velocity and angular velocity is 0"
     initial_len = len(full_dataframe)
     full_dataframe = full_dataframe[(full_dataframe.iloc[:, 1] != 0) | (full_dataframe.iloc[:, 2] != 0)]
     print(f"Removed {initial_len - len(full_dataframe)} stopped samples (v=0 and w=0).")
@@ -130,21 +108,19 @@ def train():
     # Filter out risky maneuvers (v > 1.5 AND |w| > 2.0)
     initial_len = len(full_dataframe)
     # Keep samples where NOT (v > 1.5 AND |w| > 2.0)
-    # Equivalent to: v <= 1.5 OR |w| <= 2.0
     full_dataframe = full_dataframe[~((full_dataframe.iloc[:, 1] > 1.5) & (np.abs(full_dataframe.iloc[:, 2]) > 2.0))]
     print(f"Removed {initial_len - len(full_dataframe)} risky samples (v > 1.5 and |w| > 2.0).")
     
     print(f"Valid samples after filtering: {len(full_dataframe)}")
     
     if len(full_dataframe) == 0:
-        print("Error: No valid samples found. Please recollect data with scan data enabled.")
+        print("Error: No valid samples found.")
         return
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
 
     # Split into train/val
-    # We create two datasets: one for training (with augmentation) and one for validation (without)
     train_size = int(0.8 * len(full_dataframe))
     val_size = len(full_dataframe) - train_size
     
@@ -161,7 +137,6 @@ def train():
     val_dataset = DrivingDataset(dataframe=val_df, augment=False)
 
     # Calculate weights for WeightedRandomSampler
-    # We want to balance the distribution of w
     y_train = train_df.iloc[:, 2].values # w values
     
     # Bin the continuous w values
@@ -172,7 +147,6 @@ def train():
     bin_counts = np.bincount(binned_w)
     
     # Calculate weight per bin (inverse frequency)
-    # Avoid division by zero for empty bins
     bin_weights = np.zeros_like(bin_counts, dtype=np.float32)
     bin_weights[bin_counts > 0] = 1.0 / bin_counts[bin_counts > 0]
     
@@ -182,8 +156,8 @@ def train():
     
     sampler = torch.utils.data.WeightedRandomSampler(sample_weights, len(sample_weights))
     
-    # Use sampler for training (shuffle must be False when using sampler)
-    # num_workers=8 allows loading data in parallel processes
+    # Use sampler for training
+    # num_workers=4 allows loading data in parallel processes
     # pin_memory=True speeds up transfer to CUDA
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, sampler=sampler, num_workers=8, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=8, pin_memory=True)
@@ -197,7 +171,6 @@ def train():
     else:
         print("No existing model found, starting from scratch.")
 
-    # criterion = nn.MSELoss() # We will calculate manual loss
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     
     # Learning Rate Scheduler
@@ -208,17 +181,14 @@ def train():
     for epoch in range(EPOCHS):
         model.train()
         running_loss = 0.0
-        for images, scans, labels in train_loader:
+        for images, labels in train_loader:
             images = images.to(device)
-            scans = scans.to(device)
             labels = labels.to(device)
 
             optimizer.zero_grad()
-            outputs = model(images, scans)
+            outputs = model(images)
             
             # Weighted Loss
-            # outputs: [batch, 2], labels: [batch, 2]
-            # 0: v, 1: w
             loss_v = nn.functional.mse_loss(outputs[:, 0], labels[:, 0])
             loss_w = nn.functional.mse_loss(outputs[:, 1], labels[:, 1])
             
@@ -240,12 +210,11 @@ def train():
             val_loss_w = 0.0
             
             with torch.no_grad():
-                for images, scans, labels in val_loader:
+                for images, labels in val_loader:
                     images = images.to(device)
-                    scans = scans.to(device)
                     labels = labels.to(device)
                     
-                    outputs = model(images, scans)
+                    outputs = model(images)
                     
                     loss_v = nn.functional.mse_loss(outputs[:, 0], labels[:, 0])
                     loss_w = nn.functional.mse_loss(outputs[:, 1], labels[:, 1])
@@ -269,7 +238,6 @@ def train():
                 torch.save(model.state_dict(), MODEL_PATH)
                 print(f"Saved best model to {MODEL_PATH}")
         else:
-            # Save last model if no validation
             torch.save(model.state_dict(), MODEL_PATH)
             print(f"Saved model to {MODEL_PATH}")
 
