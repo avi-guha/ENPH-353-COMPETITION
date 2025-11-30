@@ -25,7 +25,7 @@ class BoardReader:
     # Constructor
     def __init__(self):
         # check paths pre-comp - where is this running from?
-        model_path = "../../../cnn_trainer/clueboard_reader_CNN.h5"
+        model_path = "/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/clueboard_reader_CNN.h5"
         self.model = load_model(model_path)
 
     # Preprocessing
@@ -124,12 +124,12 @@ class BoardReader:
         words = [gray[y:y+h, x:x+w] for x, y, w, h in word_boxes]
 
         # DEBUGGING: SHOW IMAGE
-        #display_img = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-        #for x, y, w, h in word_boxes:
-            #cv2.rectangle(display_img, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        #plt.imshow(cv2.cvtColor(display_img, cv2.COLOR_BGR2RGB))
-        #plt.axis('off')
-        #plt.show()
+        display_img = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+        for x, y, w, h in word_boxes:
+            cv2.rectangle(display_img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        plt.imshow(cv2.cvtColor(display_img, cv2.COLOR_BGR2RGB))
+        plt.axis('off')
+        plt.show()
 
         return words
 
@@ -226,9 +226,9 @@ class BoardReader:
                     cv2.rectangle(vis_img, (x1 + w1, y1), (x2, y1 + h1), (0, 0, 255), 2)
 
         # DEBUGGING: SHOW IMAGE
-        #plt.imshow(cv2.cvtColor(vis_img, cv2.COLOR_BGR2RGB))
-        #.axis('off')
-        #plt.show()
+        plt.imshow(cv2.cvtColor(vis_img, cv2.COLOR_BGR2RGB))
+        plt.axis('off')
+        plt.show()
 
         return self.pad_to_max(char_images, self.IMG_SIZE)
     
@@ -257,7 +257,7 @@ class BoardReader:
 
 if __name__ == "__main__":
      # Load image in RGB (as YOLO would output)
-    img_path = "/home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/yolo_inference_images/img_6.png"
+    img_path = "/home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/yolo_inference_images/img_14.png"
     board = cv2.cvtColor(cv2.imread(img_path, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
 
     reader = BoardReader()
