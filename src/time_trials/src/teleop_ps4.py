@@ -9,17 +9,21 @@ class PS4Teleop:
     def __init__(self):
         rospy.init_node('teleop_ps4')
 
-        # Parameters
-        self.linear_scale = rospy.get_param('~linear_scale', 0.5)
-        self.angular_scale = rospy.get_param('~angular_scale', 1.0)
-        self.deadzone = rospy.get_param('~deadzone', 0.1)  # Ignore small movements
-        self.publish_rate = rospy.get_param('~publish_rate', 20.0)  # Hz
-        self.joy_timeout = rospy.get_param('~joy_timeout', 1.0)  # Seconds without joy messages before stopping
+        # Parameters - RACING GAME STYLE (responsive and snappy)
+        self.linear_scale = rospy.get_param('~linear_scale', 2.0)  # Max forward speed
+        self.angular_scale = rospy.get_param('~angular_scale', 3.0)  # Max turn rate
+        self.deadzone = rospy.get_param('~deadzone', 0.08)  # Smaller deadzone for precision
+        self.publish_rate = rospy.get_param('~publish_rate', 50.0)  # Higher rate for responsiveness
+        self.joy_timeout = rospy.get_param('~joy_timeout', 0.5)  # Faster timeout
         
-        # SMOOTHING PARAMETERS - Tuned for data collection
-        self.smoothing_alpha = rospy.get_param('~smoothing_alpha', 0.3)  # 0.0 = no smoothing, 1.0 = instant
-        self.max_linear_accel = rospy.get_param('~max_linear_accel', 1.0)  # m/s² 
-        self.max_angular_accel = rospy.get_param('~max_angular_accel', 2.0)  # rad/s²
+        # SMOOTHING PARAMETERS - Racing game feel (responsive but not twitchy)
+        self.smoothing_alpha = rospy.get_param('~smoothing_alpha', 0.8)  # High = responsive
+        self.max_linear_accel = rospy.get_param('~max_linear_accel', 8.0)  # Fast acceleration
+        self.max_angular_accel = rospy.get_param('~max_angular_accel', 12.0)  # Snappy steering
+        
+        # Exponential curve for finer low-speed control (like racing games)
+        self.use_exponential = rospy.get_param('~use_exponential', True)
+        self.expo_factor = rospy.get_param('~expo_factor', 0.3)  # 0=linear, 1=full expo
 
         # State tracking
         self.last_joy_msg = None
@@ -46,14 +50,15 @@ class PS4Teleop:
         rospy.Subscriber('/teleop_enable', Bool, self.enable_callback, queue_size=1)
 
         # Wait a bit for joy_node to start
-        rospy.loginfo("PS4 Teleop Node Started (SMOOTH MODE)")
-        rospy.loginfo(f"  Linear scale: {self.linear_scale}")
-        rospy.loginfo(f"  Angular scale: {self.angular_scale}")
+        rospy.loginfo("PS4 Teleop Node Started (RACING MODE)")
+        rospy.loginfo(f"  Linear scale: {self.linear_scale} m/s")
+        rospy.loginfo(f"  Angular scale: {self.angular_scale} rad/s")
         rospy.loginfo(f"  Deadzone: {self.deadzone}")
         rospy.loginfo(f"  Publish rate: {self.publish_rate} Hz")
-        rospy.loginfo(f"  Smoothing alpha: {self.smoothing_alpha} (lower = smoother)")
+        rospy.loginfo(f"  Smoothing alpha: {self.smoothing_alpha} (higher = more responsive)")
         rospy.loginfo(f"  Max linear accel: {self.max_linear_accel} m/s²")
         rospy.loginfo(f"  Max angular accel: {self.max_angular_accel} rad/s²")
+        rospy.loginfo(f"  Exponential curve: {self.use_exponential} (factor: {self.expo_factor})")
         rospy.loginfo(f"  Joy timeout: {self.joy_timeout}s")
         rospy.loginfo("Waiting for joystick input on /joy...")
         rospy.loginfo("Publish to /teleop_enable (Bool) to enable/disable this controller")
@@ -121,11 +126,32 @@ class PS4Teleop:
         sign = 1 if value > 0 else -1
         return sign * (abs(value) - self.deadzone) / (1.0 - self.deadzone)
     
+    def apply_exponential(self, value):
+        """Apply exponential curve for finer control at low inputs (racing game style)
+        
+        This gives more precision at small stick movements while still allowing
+        full speed at max input. Common in racing games for steering.
+        """
+        if not self.use_exponential:
+            return value
+        
+        # Blend between linear and cubic response
+        # expo_factor = 0: fully linear
+        # expo_factor = 1: fully cubic (more expo feel)
+        sign = 1 if value >= 0 else -1
+        abs_val = abs(value)
+        
+        linear_part = abs_val
+        expo_part = abs_val ** 3  # Cubic gives nice expo curve
+        
+        blended = (1 - self.expo_factor) * linear_part + self.expo_factor * expo_part
+        return sign * blended
+    
     def apply_smoothing(self, target, current, alpha):
         """Exponential moving average smoothing"""
         # alpha = 1.0 means instant (no smoothing)
         # alpha = 0.0 means never change (full smoothing)
-        # alpha = 0.3 means 30% new value, 70% old value (moderate smoothing)
+        # alpha = 0.8 means 80% new value, 20% old value (responsive)
         return alpha * target + (1 - alpha) * current
     
     def rate_limit(self, target, current, max_change, dt):
@@ -180,9 +206,17 @@ class PS4Teleop:
                 raw_linear = self.last_joy_msg.axes[1]
                 raw_angular = self.last_joy_msg.axes[0]
                 
-                # Apply deadzone and scaling to get target velocities
-                target_linear = self.apply_deadzone(raw_linear) * self.linear_scale
-                target_angular = self.apply_deadzone(raw_angular) * self.angular_scale
+                # Apply deadzone first
+                linear_input = self.apply_deadzone(raw_linear)
+                angular_input = self.apply_deadzone(raw_angular)
+                
+                # Apply exponential curve for racing game feel
+                linear_input = self.apply_exponential(linear_input)
+                angular_input = self.apply_exponential(angular_input)
+                
+                # Scale to target velocities
+                target_linear = linear_input * self.linear_scale
+                target_angular = angular_input * self.angular_scale
                 
                 # Calculate dt for rate limiting
                 dt = 1.0 / self.publish_rate

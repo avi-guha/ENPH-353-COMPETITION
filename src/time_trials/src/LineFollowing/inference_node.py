@@ -164,17 +164,13 @@ class InferenceNode:
         with torch.no_grad():
             output = self.model(image, scan_tensor)
             
-            # Model outputs Tanh-bounded values in [-1, 1]
-            # Denormalize back to physical units:
-            # v: [-1, 1] -> [-2, 2] (multiply by 2)
-            # w: [-1, 1] -> [-3, 3] (multiply by 3)
-            v_normalized = output[0][0].item()  # Already in [-1, 1] from Tanh
-            w_normalized = output[0][1].item()  # Already in [-1, 1] from Tanh
+            # Denormalize model outputs to physical units
+            # v: [0, 1] -> [0, 2] m/s
+            # w: [-1, 1] -> [-3, 3] rad/s
+            v_raw = np.clip(output[0][0].item(), 0, 1) * 2.0
+            w_raw = np.clip(output[0][1].item(), -1, 1) * 3.0
             
-            v_raw = v_normalized * 2.0  # Denormalize
-            w_raw = w_normalized * 3.0  # Denormalize
-            
-            # Apply exponential smoothing to reduce jitter
+            # Simple smoothing
             v = self.smoothing_alpha * v_raw + (1 - self.smoothing_alpha) * self.prev_v
             w = self.smoothing_alpha * w_raw + (1 - self.smoothing_alpha) * self.prev_w
             
