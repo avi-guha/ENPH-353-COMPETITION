@@ -61,7 +61,7 @@ class DrivingDataset(Dataset):
 def train():
     # Simple hyperparameters
     BATCH_SIZE = 32
-    LEARNING_RATE = 1e-3
+    LEARNING_RATE = 5e-4
     EPOCHS = 50
     
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -105,18 +105,21 @@ def train():
     val_dataset = DrivingDataset(val_df, augment=False)
     
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, 
-                              num_workers=4, pin_memory=True)
+                              num_workers=8, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False,
-                            num_workers=4, pin_memory=True)
+                            num_workers=8, pin_memory=True)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
 
     model = PilotNet().to(device)
     
-    # Don't load old model - architecture changed
+    # Load existing model if available
     if os.path.exists(MODEL_PATH):
-        print(f"Note: Found existing model but starting fresh due to architecture changes")
+        print(f"Loading existing model from {MODEL_PATH}")
+        model.load_state_dict(torch.load(MODEL_PATH))
+    else:
+        print("No existing model found, starting fresh")
 
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, factor=0.5)
@@ -130,6 +133,9 @@ def train():
         # Training
         model.train()
         train_loss = 0.0
+        train_loss_v = 0.0
+        train_loss_w = 0.0
+        
         for images, scans, labels in train_loader:
             images = images.to(device)
             scans = scans.to(device)
@@ -137,33 +143,69 @@ def train():
 
             optimizer.zero_grad()
             outputs = model(images, scans)
-            loss = criterion(outputs, labels)
+            
+            # Weighted Loss: 5x importance on steering (w)
+            # Use MSE for velocity (smooth regression)
+            loss_v = nn.functional.mse_loss(outputs[:, 0], labels[:, 0])
+            # Use Huber Loss (SmoothL1) for steering to be robust to outliers
+            loss_w = nn.functional.smooth_l1_loss(outputs[:, 1], labels[:, 1])
+            
+            loss = loss_v + 5.0 * loss_w
+            
             loss.backward()
             optimizer.step()
+            
             train_loss += loss.item()
+            train_loss_v += loss_v.item()
+            train_loss_w += loss_w.item()
 
         avg_train = train_loss / len(train_loader)
+        avg_train_v = train_loss_v / len(train_loader)
+        avg_train_w = train_loss_w / len(train_loader)
         
         # Validation
         model.eval()
         val_loss = 0.0
+        val_loss_v = 0.0
+        val_loss_w = 0.0
+        val_mse_w = 0.0  # Track MSE separately for accurate RMSE reporting
+        
         with torch.no_grad():
             for images, scans, labels in val_loader:
                 images = images.to(device)
                 scans = scans.to(device)
                 labels = labels.to(device)
                 outputs = model(images, scans)
-                val_loss += criterion(outputs, labels).item()
+                
+                loss_v = nn.functional.mse_loss(outputs[:, 0], labels[:, 0])
+                loss_w = nn.functional.smooth_l1_loss(outputs[:, 1], labels[:, 1])
+                mse_w = nn.functional.mse_loss(outputs[:, 1], labels[:, 1]) # For reporting
+                
+                loss = loss_v + 5.0 * loss_w
+                
+                val_loss += loss.item()
+                val_loss_v += loss_v.item()
+                val_loss_w += loss_w.item()
+                val_mse_w += mse_w.item()
         
         avg_val = val_loss / len(val_loader)
+        avg_val_v = val_loss_v / len(val_loader)
+        avg_val_w = val_loss_w / len(val_loader)
+        avg_val_mse_w = val_mse_w / len(val_loader)
+        
         scheduler.step(avg_val)
         
-        # Real-world error estimate
-        v_err = np.sqrt(avg_val) * 2.0  # Approximate
-        w_err = np.sqrt(avg_val) * 3.0
+        # Real-world error estimate (approximate)
+        # MSE is on normalized values. 
+        # v_norm = v/2, w_norm = w/3
+        # Real RMSE = sqrt(MSE) * scale
+        v_rmse = np.sqrt(avg_val_v) * 2.0
+        w_rmse = np.sqrt(avg_val_mse_w) * 3.0
         
-        print(f"Epoch {epoch+1}/{EPOCHS} | Train: {avg_train:.4f} | Val: {avg_val:.4f} | "
-              f"~v_err: {v_err:.2f}m/s, ~w_err: {w_err:.2f}rad/s")
+        print(f"Epoch {epoch+1}/{EPOCHS}")
+        print(f"  Train Loss: {avg_train:.4f} (v: {avg_train_v:.4f}, w: {avg_train_w:.4f})")
+        print(f"  Val Loss:   {avg_val:.4f} (v: {avg_val_v:.4f}, w: {avg_val_w:.4f})")
+        print(f"  -> Real RMSE: v={v_rmse:.2f} m/s, w={w_rmse:.2f} rad/s")
 
         if avg_val < best_val_loss:
             best_val_loss = avg_val
