@@ -17,11 +17,10 @@ def evaluate(args):
     model.eval()
     
     # Metrics
-    mae_v = 0.0
     mae_w = 0.0
+    mse_w = 0.0
     count = 0
     
-    MAX_V = 2.5
     MAX_W = 3.5
     
     print("Starting evaluation...")
@@ -32,25 +31,27 @@ def evaluate(args):
             lidars = lidars.to(device)
             targets = targets.to(device)
             
-            # Predict
-            outputs = model(images, lidars)
+            # Predict (single omega value)
+            outputs = model(images)
             
-            # Denormalize predictions
-            v_pred = outputs[:, 0] * MAX_V
-            w_pred = outputs[:, 1] * MAX_W
+            # Denormalize prediction
+            w_pred = outputs[:, 0] * MAX_W
             
-            # Targets are already raw in dataset, so use them directly
-            v_true = targets[:, 0]
+            # Target angular velocity
             w_true = targets[:, 1]
             
             # Accumulate Error
-            mae_v += torch.abs(v_pred - v_true).item()
             mae_w += torch.abs(w_pred - w_true).item()
+            mse_w += ((w_pred - w_true) ** 2).item()
             count += 1
             
-    print(f"Evaluated on {count} samples.")
-    print(f"MAE Linear Velocity: {mae_v/count:.4f} m/s")
-    print(f"MAE Angular Velocity: {mae_w/count:.4f} rad/s")
+    print(f"\n{'='*50}")
+    print(f"Evaluated on {count} samples")
+    print(f"{'='*50}")
+    print(f"MAE Angular Velocity: {mae_w/count:.4f} rad/s ({(mae_w/count)*57.3:.1f}°/s)")
+    print(f"RMSE Angular Velocity: {np.sqrt(mse_w/count):.4f} rad/s ({np.sqrt(mse_w/count)*57.3:.1f}°/s)")
+    print(f"MSE Loss (normalized): {(mse_w/count)/(MAX_W**2):.6f}")
+    print(f"{'='*50}\n")
 
 if __name__ == "__main__":
     # Resolve data directory relative to this script

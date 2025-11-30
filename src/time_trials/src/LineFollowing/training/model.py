@@ -89,44 +89,54 @@ class LidarEncoder(nn.Module):
         x = self.dropout(x)
         return x
 
-class MultiModalPolicyNet(nn.Module):
+class SteeringNet(nn.Module):
     """
-    Fusion network combining Image and LiDAR encoders.
+    Simplified model that ONLY predicts angular velocity (steering) using ONLY images.
+    Linear velocity will be set manually in inference.
     """
     def __init__(self):
         super().__init__()
         
-        # Encoders
-        self.image_encoder = ImageEncoder(feature_dim=256)
-        self.lidar_encoder = LidarEncoder(feature_dim=64)
+        # Deeper image encoder (more capacity)
+        self.image_encoder = nn.Sequential(
+            nn.Conv2d(3, 24, kernel_size=5, stride=2),
+            nn.BatchNorm2d(24),
+            nn.ELU(),
+            nn.Conv2d(24, 36, kernel_size=5, stride=2),
+            nn.BatchNorm2d(36),
+            nn.ELU(),
+            nn.Conv2d(36, 48, kernel_size=5, stride=2),
+            nn.BatchNorm2d(48),
+            nn.ELU(),
+            nn.Conv2d(48, 64, kernel_size=3, stride=1),
+            nn.BatchNorm2d(64),
+            nn.ELU(),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1),
+            nn.BatchNorm2d(64),
+            nn.ELU(),
+            nn.Flatten()
+        )
         
-        # Fusion Head
-        # Input dim = sum of encoder output dims
-        fusion_input_dim = 256 + 64 
+        # Image output: 64 * 8 * 8 = 4096
         
-        self.fusion_fc1 = nn.Linear(fusion_input_dim, 128)
-        self.dropout1 = nn.Dropout(0.5)
-        self.fusion_fc2 = nn.Linear(128, 64)
-        self.dropout2 = nn.Dropout(0.5)
-        self.head = nn.Linear(64, 2) # Output: [v_cmd, w_cmd]
+        # Steering head (Vision Only)
+        self.fc = nn.Sequential(
+            nn.Linear(4096, 100),
+            nn.ELU(),
+            nn.Dropout(0.5),
+            nn.Linear(100, 50),
+            nn.ELU(),
+            nn.Dropout(0.5),
+            nn.Linear(50, 10),
+            nn.ELU(),
+            nn.Linear(10, 1),  # Only omega
+            nn.Tanh()  # Constrain to [-1, 1]
+        )
 
-    def forward(self, img, lidar):
-        """
-        img: (B, 3, 120, 120)
-        lidar: (B, 720)
-        """
+    def forward(self, img):
         img_feat = self.image_encoder(img)
-        lidar_feat = self.lidar_encoder(lidar)
-        
-        # Concatenate features
-        combined = torch.cat([img_feat, lidar_feat], dim=1)
-        
-        # Fusion layers
-        x = F.relu(self.fusion_fc1(combined))
-        x = self.dropout1(x)
-        x = F.relu(self.fusion_fc2(x))
-        x = self.dropout2(x)
-        
-        # Output
-        output = self.head(x)
-        return output
+        omega = self.fc(img_feat)
+        return omega
+
+# Keep old name for compatibility
+MultiModalPolicyNet = SteeringNet

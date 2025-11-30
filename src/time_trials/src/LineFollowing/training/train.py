@@ -10,36 +10,29 @@ from dataset import get_dataloader
 BATCH_SIZE = 128 # Increased for RTX 4080 Super
 LEARNING_RATE = 1e-4
 NUM_EPOCHS = 50
-LAMBDA_W = 5.0 # Weight for angular velocity loss
+LAMBDA_W = 10.0 # Weight for angular velocity loss
 DATA_DIR = '../data' # Relative to this script
 MODELS_DIR = '../models' # Relative to this script
 
 class DrivingLoss(nn.Module):
-    def __init__(self, lambda_w=5.0):
+    def __init__(self, lambda_w=10.0):
         super().__init__()
-        self.lambda_w = lambda_w
-        self.criterion = nn.SmoothL1Loss()
+        self.criterion = nn.MSELoss()
 
     def forward(self, pred, target):
-        # pred: (B, 2) -> [v_pred, w_pred]
-        # target: (B, 2) -> [v_true, w_true]
+        # pred: (B, 1) -> [w_pred]
+        # target: (B, 2) -> [v_true, w_true] (but we only use w)
         
-        # Max values from dataset.py
-        MAX_V = 2.5
         MAX_W = 3.5
         
-        v_target_norm = target[:, 0] / MAX_V
-        w_target_norm = target[:, 1] / MAX_W
+        # Extract and normalize angular velocity
+        w_target_norm = target[:, 1:2] / MAX_W  # Keep as (B, 1)
+        w_pred_norm = pred  # Already (B, 1)
         
-        # Model outputs
-        v_pred_norm = pred[:, 0]
-        w_pred_norm = pred[:, 1]
-        
-        v_loss = self.criterion(v_pred_norm, v_target_norm)
         w_loss = self.criterion(w_pred_norm, w_target_norm)
         
-        total_loss = v_loss + (self.lambda_w * w_loss)
-        return total_loss, v_loss, w_loss
+        # Return w_loss for total, zero for v_loss (compatibility), w_loss for logging
+        return w_loss, torch.tensor(0.0, device=w_loss.device), w_loss
 
 def train(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -122,14 +115,12 @@ def train(args):
         
         for batch_idx, (images, lidars, targets) in enumerate(train_loader):
             images = images.to(device, non_blocking=True)
-            lidars = lidars.to(device, non_blocking=True)
             targets = targets.to(device, non_blocking=True)
-            
             optimizer.zero_grad()
             
             # Mixed Precision Forward Pass
             with torch.cuda.amp.autocast():
-                outputs = model(images, lidars)
+                outputs = model(images)
                 loss, v_loss, w_loss = criterion(outputs, targets)
             
             # Scaled Backward Pass
@@ -148,7 +139,7 @@ def train(args):
             running_w_loss += w_loss.item()
             
             if batch_idx % 10 == 0:
-                print(f"Epoch [{epoch+1}/{NUM_EPOCHS}] Step [{batch_idx}/{len(train_loader)}] Loss: {loss.item():.4f}")
+                print(f"Epoch [{epoch+1}/{NUM_EPOCHS}] Step [{batch_idx}/{len(train_loader)}] Loss: {loss.item():.4f} (v: {v_loss.item():.4f}, w: {w_loss.item():.4f})")
         
         avg_train_loss = running_loss / len(train_loader)
         
@@ -159,17 +150,16 @@ def train(args):
         with torch.no_grad():
             for images, lidars, targets in val_loader:
                 images = images.to(device, non_blocking=True)
-                lidars = lidars.to(device, non_blocking=True)
                 targets = targets.to(device, non_blocking=True)
                 
-                # No need for autocast in validation usually, but consistent is fine
-                outputs = model(images, lidars)
-                loss, _, _ = criterion(outputs, targets)
+                with torch.cuda.amp.autocast():
+                    outputs = model(images)
+                    loss, _, _ = criterion(outputs, targets)
+                
                 val_loss_total += loss.item()
         
         avg_val_loss = val_loss_total / len(val_loader)
         
-        # Step Scheduler
         scheduler.step(avg_val_loss)
         
         print(f"Epoch [{epoch+1}/{NUM_EPOCHS}] Train Loss: {avg_train_loss:.4f} | Val Loss: {avg_val_loss:.4f}")

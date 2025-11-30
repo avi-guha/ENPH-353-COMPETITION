@@ -28,14 +28,21 @@ class DrivingDataset(Dataset):
         # Recursively find all log.csv files
         self._load_data()
         
+        original_count = len(self.samples)
+        print(f"Loaded {original_count} samples from {root_dir}")
+        
         if filter_data:
             self._filter_hard_data()
-        
-        print(f"Loaded {len(self.samples)} samples from {root_dir}")
+            print(f"After filtering: {len(self.samples)} samples remaining ({original_count - len(self.samples)} removed)")
 
     def _filter_hard_data(self):
         initial_len = len(self.samples)
         filtered_samples = []
+        
+        # Import random for straight-line filtering
+        import random
+        random.seed(42)
+        
         for s in self.samples:
             v = s['v']
             w = s['w']
@@ -54,10 +61,16 @@ class DrivingDataset(Dataset):
             if v > 2.0 and abs(w) > 3.0:
                 continue
                 
+            # Filter 4: Downsample straight driving (50% removal)
+            # Define "straight" as |w| < 0.3 rad/s (~17 deg/s)
+            if abs(w) < 0.1:
+                # Keep only 50% of straight samples
+                if random.random() < 0.5:
+                    continue
+                
             filtered_samples.append(s)
             
         self.samples = filtered_samples
-        print(f"Filtered {initial_len - len(self.samples)} samples (Hard/Noisy data). Remaining: {len(self.samples)}")
 
     def _load_data(self):
         for root, dirs, files in os.walk(self.root_dir):
@@ -217,7 +230,7 @@ def get_dataloader(root_dir, batch_size=32, split=0.8, filter_data=False):
     train_dataset = torch.utils.data.Subset(train_dataset_full, train_indices)
     val_dataset = torch.utils.data.Subset(val_dataset_full, val_indices)
     
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True)
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True)
     
     return train_loader, val_loader

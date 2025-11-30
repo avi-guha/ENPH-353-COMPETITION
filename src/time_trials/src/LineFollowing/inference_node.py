@@ -81,11 +81,17 @@ class InferenceNode:
         )
         self.ts.registerCallback(self.callback)
 
-        rospy.loginfo("Multi-Modal Inference Node Started")
+        rospy.loginfo("SteeringNet Inference Node Started")
+        
+        # Manual Speed Control (tunable via ROS params)
+        self.base_speed = rospy.get_param('~base_speed', 0.8)  # m/s
+        self.turn_speed = rospy.get_param('~turn_speed', 0.4)  # m/s when turning
+        self.turn_threshold = rospy.get_param('~turn_threshold', 0.5)  # rad/s
+        
+        rospy.loginfo(f"Speed Control: base={self.base_speed} m/s, turn={self.turn_speed} m/s, threshold={self.turn_threshold} rad/s")
         
         # Smoothing
         self.smoothing_alpha = 0.5
-        self.prev_v_cmd = 0.0
         self.prev_w_cmd = 0.0
     
     def teleop_active_callback(self, msg):
@@ -161,28 +167,27 @@ class InferenceNode:
 
         # 3. Inference
         with torch.no_grad():
-            # Output is [v_norm, w_norm]
-            output = self.model(img_tensor, lidar_tensor)
+            # Output is [w_norm] (single value)
+            output = self.model(img_tensor)
             
-            v_norm_pred = output[0][0].item()
-            w_norm_pred = output[0][1].item()
+            w_norm_pred = output[0][0].item()
             
             # Denormalize
-            v_cmd = v_norm_pred * MAX_V
             w_cmd = w_norm_pred * MAX_W
             
             # Clip to safe limits
-            v_cmd = np.clip(v_cmd, -MAX_V, MAX_V)
             w_cmd = np.clip(w_cmd, -MAX_W, MAX_W)
             
             # Smoothing
-            v_cmd = self.smoothing_alpha * v_cmd + (1 - self.smoothing_alpha) * self.prev_v_cmd
             w_cmd = self.smoothing_alpha * w_cmd + (1 - self.smoothing_alpha) * self.prev_w_cmd
-            
-            self.prev_v_cmd = v_cmd
             self.prev_w_cmd = w_cmd
             
-            # Update state for next iteration
+            # Manual speed control based on turn sharpness
+            if abs(w_cmd) > self.turn_threshold:
+                v_cmd = self.turn_speed
+            else:
+                v_cmd = self.base_speed
+            
             self.current_v = v_cmd
             self.current_w = w_cmd
 
