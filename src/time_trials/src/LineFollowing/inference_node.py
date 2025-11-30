@@ -67,10 +67,15 @@ class InferenceNode:
 
         rospy.loginfo("Inference Node Started (Vision Only)")
         
+<<<<<<< HEAD
         # Smoothing
         self.smoothing_alpha = 0.5
         self.prev_v = 0.0
         self.prev_w = 0.0
+=======
+        # Counter for logging
+        self.callback_count = 0
+>>>>>>> 7720b412679ec3c9c1f7c7453696a796b833d560
     
     def teleop_active_callback(self, msg):
         self.teleop_active = msg.data
@@ -107,7 +112,7 @@ class InferenceNode:
             self.pub.publish(twist)
             return
 
-        # Inference
+        # Inference - direct output like manual controller
         with torch.no_grad():
             output = self.model(image)
             
@@ -134,6 +139,7 @@ class InferenceNode:
                 
             self.prev_v = v
 
+        # Publish directly - no smoothing, just like controller
         twist = Twist()
         twist.linear.x = v
         twist.angular.z = w
