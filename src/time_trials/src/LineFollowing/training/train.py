@@ -8,9 +8,8 @@ from dataset import get_dataloader
 
 # Hyperparameters
 BATCH_SIZE = 128 # Increased for RTX 4080 Super
-LEARNING_RATE = 1e-3
-NUM_EPOCHS = 50
-LAMBDA_W = 5.0 # Weight for angular velocity loss
+LEARNING_RATE = 1e-4
+NUM_EPOCHS = 200
 LAMBDA_W = 5.0 # Weight for angular velocity loss
 DATA_DIR = '../data' # Relative to this script
 MODELS_DIR = '../models' # Relative to this script

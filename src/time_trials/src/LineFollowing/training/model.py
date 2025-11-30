@@ -105,9 +105,9 @@ class MultiModalPolicyNet(nn.Module):
         fusion_input_dim = 256 + 64 
         
         self.fusion_fc1 = nn.Linear(fusion_input_dim, 128)
-        self.dropout1 = nn.Dropout(0.3)
+        self.dropout1 = nn.Dropout(0.5)
         self.fusion_fc2 = nn.Linear(128, 64)
-        self.dropout2 = nn.Dropout(0.3)
+        self.dropout2 = nn.Dropout(0.5)
         self.head = nn.Linear(64, 2) # Output: [v_cmd, w_cmd]
 
     def forward(self, img, lidar):
