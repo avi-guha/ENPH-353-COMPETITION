@@ -9,9 +9,9 @@ import cv2
 import os
 import numpy as np
 import ast
-from model import PilotNet
+from model_angular import PilotNet_AngularOnly
 
-class DrivingDataset(Dataset):
+class DrivingDataset_AngularOnly(Dataset):
     def __init__(self, dataframe, transform=None, augment=False):
         self.annotations = dataframe
         self.transform = transform
@@ -27,8 +27,7 @@ class DrivingDataset(Dataset):
         img_path = os.path.join(base_path, rel_path)
         image = cv2.imread(img_path)
         
-        # Get labels
-        v = self.annotations.iloc[index, 1]
+        # Get angular velocity only
         w = self.annotations.iloc[index, 2]
         
         # Get LIDAR
@@ -42,65 +41,55 @@ class DrivingDataset(Dataset):
             if np.random.rand() < 0.5:
                 image = cv2.flip(image, 1)
                 w = -w
-                scan = scan[::-1].copy() # Reverse LIDAR scan
+                scan = scan[::-1].copy()
             
             # 2. Brightness/Contrast (30%)
             if np.random.rand() < 0.3:
-                alpha = 1.0 + np.random.uniform(-0.2, 0.2) # Contrast
-                beta = np.random.uniform(-20, 20) # Brightness
+                alpha = 1.0 + np.random.uniform(-0.2, 0.2)
+                beta = np.random.uniform(-20, 20)
                 image = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
                 
-            # 3. Gaussian Noise (20%) - Fixed to avoid overflow
+            # 3. Gaussian Noise (20%)
             if np.random.rand() < 0.2:
                 noise = np.random.normal(0, 8, image.shape)
                 image = np.clip(image.astype(np.float32) + noise, 0, 255).astype(np.uint8)
             
-            # 4. Color jitter (20%) - Slight hue/saturation shifts
+            # 4. Color jitter (20%)
             if np.random.rand() < 0.2:
                 hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV).astype(np.float32)
                 hsv[:, :, 0] = (hsv[:, :, 0] + np.random.uniform(-10, 10)) % 180
                 hsv[:, :, 1] = np.clip(hsv[:, :, 1] * np.random.uniform(0.8, 1.2), 0, 255)
                 image = cv2.cvtColor(hsv.astype(np.uint8), cv2.COLOR_HSV2BGR)
 
-        # Convert BGR to YUV (NVIDIA paper uses YUV)
+        # Convert BGR to YUV
         image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
-        # Resize to 120x120 (Square aspect ratio)
         image = cv2.resize(image, (120, 120))
-        # Normalize
         image = image / 255.0
-        # Transpose to Channel First (C, H, W) for PyTorch
         image = np.transpose(image, (2, 0, 1))
         image = torch.tensor(image, dtype=torch.float32)
 
-        label = torch.tensor([v, w], dtype=torch.float32)
-        
-        # Normalize labels to [-1, 1] for training
-        # v: [-2, 2] -> [-1, 1] (divide by 2)
-        # w: [-3, 3] -> [-1, 1] (divide by 3)
-        label[0] = label[0] / 2.0  # v
-        label[1] = label[1] / 3.0  # w
+        # Normalize w to [-1, 1]
+        label = torch.tensor(w / 3.0, dtype=torch.float32)  # Single value, not a list
         
         scan = torch.tensor(scan, dtype=torch.float32)
-        # Normalize LIDAR (0-30 range -> 0-1)
         scan = scan / 30.0
 
         return image, scan, label
 
 def train():
     # Hyperparameters
-    BATCH_SIZE = 32  # Smaller batch for better generalization
-    LEARNING_RATE = 1e-4  # Conservative LR for stable convergence
+    BATCH_SIZE = 32
+    LEARNING_RATE = 1e-4
     EPOCHS = 100
-    WEIGHT_DECAY = 1e-4  # L2 regularization
+    WEIGHT_DECAY = 1e-4
     
-    # Normalization constants for outputs
-    V_SCALE = 2.0  # v range: [-2, 2]
+    # Normalization constant
     W_SCALE = 3.0  # w range: [-3, 3]
     
     # Get the directory where this script is located
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     DATA_DIR = os.path.join(SCRIPT_DIR, 'data')
-    MODEL_PATH = os.path.join(SCRIPT_DIR, 'best_model.pth')
+    MODEL_PATH = os.path.join(SCRIPT_DIR, 'model_angular.pth')
     
     # Collect all log files
     all_data = []
@@ -127,7 +116,7 @@ def train():
                 print(f"Error loading {csv_path}: {e}")
 
     if not all_data:
-        print(f"Error: No log.csv files found in {DATA_DIR} or its subdirectories.")
+        print(f"Error: No log.csv files found in {DATA_DIR}")
         return
 
     full_dataframe = pd.concat(all_data, ignore_index=True)
@@ -146,17 +135,17 @@ def train():
     # Filter out stopped data (v=0 AND w=0)
     initial_len = len(full_dataframe)
     full_dataframe = full_dataframe[(full_dataframe.iloc[:, 1] != 0) | (full_dataframe.iloc[:, 2] != 0)]
-    print(f"Removed {initial_len - len(full_dataframe)} stopped samples (v=0 and w=0).")
+    print(f"Removed {initial_len - len(full_dataframe)} stopped samples.")
     
-    # Filter out negative linear velocity (backwards driving)
+    # Filter out negative linear velocity
     initial_len = len(full_dataframe)
     full_dataframe = full_dataframe[full_dataframe.iloc[:, 1] >= 0]
-    print(f"Removed {initial_len - len(full_dataframe)} samples with negative velocity (v < 0).")
+    print(f"Removed {initial_len - len(full_dataframe)} negative velocity samples.")
 
-    # Risky maneuver filtering - remove high speed + sharp turns
+    # Risky maneuver filtering
     initial_len = len(full_dataframe)
     full_dataframe = full_dataframe[~((full_dataframe.iloc[:, 1] > 1.5) & (np.abs(full_dataframe.iloc[:, 2]) > 2.0))]
-    print(f"Removed {initial_len - len(full_dataframe)} risky samples (v > 1.5 and |w| > 2.0).")
+    print(f"Removed {initial_len - len(full_dataframe)} risky samples.")
     
     print(f"Valid samples after filtering: {len(full_dataframe)}")
     
@@ -168,11 +157,8 @@ def train():
     print(f"Using device: {device}")
 
     # Split into train/val
-    # We create two datasets: one for training (with augmentation) and one for validation (without)
     train_size = int(0.8 * len(full_dataframe))
-    val_size = len(full_dataframe) - train_size
     
-    # Shuffle indices
     indices = np.arange(len(full_dataframe))
     np.random.shuffle(indices)
     train_indices = indices[:train_size]
@@ -181,38 +167,14 @@ def train():
     train_df = full_dataframe.iloc[train_indices]
     val_df = full_dataframe.iloc[val_indices]
     
-    train_dataset = DrivingDataset(dataframe=train_df, augment=True)
-    val_dataset = DrivingDataset(dataframe=val_df, augment=False)
+    train_dataset = DrivingDataset_AngularOnly(dataframe=train_df, augment=True)
+    val_dataset = DrivingDataset_AngularOnly(dataframe=val_df, augment=False)
 
-    # Calculate weights for WeightedRandomSampler
-    # We want to balance the distribution of w
-    y_train = train_df.iloc[:, 2].values # w values
-    
-    # Bin the continuous w values
-    bins = np.linspace(-3, 3, 21) # 20 bins
-    binned_w = np.digitize(y_train, bins)
-    
-    # Count samples per bin
-    bin_counts = np.bincount(binned_w)
-    
-    # Calculate weight per bin (inverse frequency)
-    # Avoid division by zero for empty bins
-    bin_weights = np.zeros_like(bin_counts, dtype=np.float32)
-    bin_weights[bin_counts > 0] = 1.0 / bin_counts[bin_counts > 0]
-    
-    # Assign weight to each sample
-    sample_weights = bin_weights[binned_w]
-    sample_weights = torch.from_numpy(sample_weights).double()
-    
-    sampler = torch.utils.data.WeightedRandomSampler(sample_weights, len(sample_weights))
-    
-    # Use sampler for training (shuffle must be False when using sampler)
-    # num_workers=8 allows loading data in parallel processes
-    # pin_memory=True speeds up transfer to CUDA
-    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, sampler=sampler, num_workers=8, pin_memory=True)
+    # NO WeightedRandomSampler - let model learn natural distribution
+    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=8, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=8, pin_memory=True)
 
-    model = PilotNet().to(device)
+    model = PilotNet_AngularOnly().to(device)
     
     # Load existing model if available
     if os.path.exists(MODEL_PATH):
@@ -224,14 +186,14 @@ def train():
 
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     
-    # ReduceLROnPlateau - only reduce when stuck
+    # ReduceLROnPlateau scheduler
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='min', patience=10, factor=0.5
     )
 
     best_loss = float('inf')
     patience_counter = 0
-    early_stop_patience = 20  # Stop if no improvement for 20 epochs
+    early_stop_patience = 20
 
     for epoch in range(EPOCHS):
         model.train()
@@ -239,23 +201,17 @@ def train():
         for images, scans, labels in train_loader:
             images = images.to(device)
             scans = scans.to(device)
-            labels = labels.to(device)
+            labels = labels.to(device).unsqueeze(1)  # Shape: [batch, 1]
 
             optimizer.zero_grad()
-            outputs = model(images, scans)
+            outputs = model(images, scans)  # Shape: [batch, 1]
             
-            # Weighted Loss - angular velocity is more important for line following
-            # outputs: [batch, 2], labels: [batch, 2]
-            # 0: v, 1: w
-            loss_v = nn.functional.mse_loss(outputs[:, 0], labels[:, 0])
-            loss_w = nn.functional.mse_loss(outputs[:, 1], labels[:, 1])
-            
-            # Equal loss weighting - let model learn both equally
-            loss = loss_v + loss_w
+            # Simple MSE loss on angular velocity only
+            loss = nn.functional.mse_loss(outputs, labels)
             
             loss.backward()
             
-            # Gradient clipping for stability
+            # Gradient clipping
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             
             optimizer.step()
@@ -269,39 +225,26 @@ def train():
         if val_loader:
             model.eval()
             val_loss = 0.0
-            val_loss_v = 0.0
-            val_loss_w = 0.0
             
             with torch.no_grad():
                 for images, scans, labels in val_loader:
                     images = images.to(device)
                     scans = scans.to(device)
-                    labels = labels.to(device)
+                    labels = labels.to(device).unsqueeze(1)
                     
                     outputs = model(images, scans)
-                    
-                    loss_v = nn.functional.mse_loss(outputs[:, 0], labels[:, 0])
-                    loss_w = nn.functional.mse_loss(outputs[:, 1], labels[:, 1])
-                    loss = loss_v + loss_w
-                    
+                    loss = nn.functional.mse_loss(outputs, labels)
                     val_loss += loss.item()
-                    val_loss_v += loss_v.item()
-                    val_loss_w += loss_w.item()
             
             avg_val_loss = val_loss / len(val_loader)
-            avg_val_loss_v = val_loss_v / len(val_loader)
-            avg_val_loss_w = val_loss_w / len(val_loader)
             
-            # Denormalize for interpretability (approximate real-world error)
-            # MSE is computed on normalized values [-1, 1]
-            # To get real error: sqrt(mse) * scale  
-            real_v_error = np.sqrt(avg_val_loss_v) * V_SCALE
-            real_w_error = np.sqrt(avg_val_loss_w) * W_SCALE
+            # Denormalize for interpretability
+            real_w_error = np.sqrt(avg_val_loss) * W_SCALE
             
-            print(f"Val Loss: {avg_val_loss:.4f} (v: {avg_val_loss_v:.4f}, w: {avg_val_loss_w:.4f})")
-            print(f"  -> Real errors: v={real_v_error:.3f} m/s, w={real_w_error:.3f} rad/s ({real_w_error*57.3:.1f}°/s)")
+            print(f"Val Loss: {avg_val_loss:.4f}")
+            print(f"  -> Real angular error: w={real_w_error:.3f} rad/s ({real_w_error*57.3:.1f}°/s)")
             
-            # Step scheduler based on validation loss
+            # Step scheduler
             scheduler.step(avg_val_loss)
 
             if avg_val_loss < best_loss:
@@ -312,12 +255,8 @@ def train():
             else:
                 patience_counter += 1
                 if patience_counter >= early_stop_patience:
-                    print(f"Early stopping at epoch {epoch+1} (no improvement for {early_stop_patience} epochs)")
+                    print(f"Early stopping at epoch {epoch+1}")
                     break
-        else:
-            # Save last model if no validation
-            torch.save(model.state_dict(), MODEL_PATH)
-            print(f"Saved model to {MODEL_PATH}")
 
     print("Training complete.")
     print(f"Model saved at: {MODEL_PATH}")

@@ -34,16 +34,32 @@ class PilotNet(nn.Module):
         # Input: 4096 (Image only)
         self.classifier = nn.Sequential(
             nn.Linear(4096, 100),
-            nn.ReLU(),
+            nn.ELU(),
             nn.Dropout(0.2),
             nn.Linear(100, 50),
-            nn.ReLU(),
+            nn.ELU(),
             nn.Dropout(0.2),
             nn.Linear(50, 10),
-            nn.ReLU(),
-            nn.Linear(10, 2), # v, w
-            nn.Tanh() # Constrain outputs to [-1, 1]
+            nn.ELU(),
+            nn.Linear(10, 2),  # v, w
+            nn.Tanh()  # Constrain outputs to [-1, 1]
         )
+        
+        # Initialize weights
+        self._initialize_weights()
+    
+    def _initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='leaky_relu')
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.BatchNorm1d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='leaky_relu')
+                nn.init.constant_(m.bias, 0)
 
     def forward(self, x_img):
         img_out = self.features(x_img)

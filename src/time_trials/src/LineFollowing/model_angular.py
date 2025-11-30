@@ -3,26 +3,26 @@
 import torch
 import torch.nn as nn
 
-class PilotNet(nn.Module):
+class PilotNet_AngularOnly(nn.Module):
     def __init__(self):
-        super(PilotNet, self).__init__()
+        super(PilotNet_AngularOnly, self).__init__()
         
-        # Image Branch - Using ELU for smoother gradients than ReLU
+        # Image Branch - Using ELU for smoother gradients
         self.features = nn.Sequential(
-            # Input: 120x120x3 (YUV or RGB)
-            nn.Conv2d(3, 24, kernel_size=5, stride=2), # Output: 58x58x24
+            # Input: 120x120x3 (YUV)
+            nn.Conv2d(3, 24, kernel_size=5, stride=2),
             nn.BatchNorm2d(24),
             nn.ELU(),
-            nn.Conv2d(24, 36, kernel_size=5, stride=2), # Output: 27x27x36
+            nn.Conv2d(24, 36, kernel_size=5, stride=2),
             nn.BatchNorm2d(36),
             nn.ELU(),
-            nn.Conv2d(36, 48, kernel_size=5, stride=2), # Output: 12x12x48
+            nn.Conv2d(36, 48, kernel_size=5, stride=2),
             nn.BatchNorm2d(48),
             nn.ELU(),
-            nn.Conv2d(48, 64, kernel_size=3), # Output: 10x10x64
+            nn.Conv2d(48, 64, kernel_size=3),
             nn.BatchNorm2d(64),
             nn.ELU(),
-            nn.Conv2d(64, 64, kernel_size=3), # Output: 8x8x64
+            nn.Conv2d(64, 64, kernel_size=3),
             nn.BatchNorm2d(64),
             nn.ELU(),
             nn.Flatten()
@@ -31,7 +31,6 @@ class PilotNet(nn.Module):
         # Image output size: 64 * 8 * 8 = 4096
         
         # LIDAR Branch
-        # Input: 720 ranges
         self.lidar_branch = nn.Sequential(
             nn.Linear(720, 128),
             nn.BatchNorm1d(128),
@@ -41,7 +40,7 @@ class PilotNet(nn.Module):
             nn.ELU()
         )
         
-        # Fusion - Simplified to match original working architecture
+        # Fusion - Simplified classifier for single output
         # 4096 (Image) + 64 (LIDAR) = 4160
         self.classifier = nn.Sequential(
             nn.Linear(4160, 100),
@@ -52,17 +51,16 @@ class PilotNet(nn.Module):
             nn.Dropout(0.2),
             nn.Linear(50, 10),
             nn.ELU(),
-            nn.Linear(10, 2),  # v, w
-            nn.Tanh()  # CRITICAL: Constrain outputs to [-1, 1]
+            nn.Linear(10, 1),  # Single output: w (angular velocity)
+            nn.Tanh()  # Constrain output to [-1, 1]
         )
         
-        # Initialize weights for better convergence
+        # Initialize weights
         self._initialize_weights()
 
     def _initialize_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                # Use leaky_relu for ELU (similar variance properties)
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='leaky_relu')
                 if m.bias is not None:
                     nn.init.constant_(m.bias, 0)
@@ -81,4 +79,4 @@ class PilotNet(nn.Module):
         combined = torch.cat((img_out, lidar_out), dim=1)
         
         output = self.classifier(combined)
-        return output
+        return output  # Shape: [batch, 1]

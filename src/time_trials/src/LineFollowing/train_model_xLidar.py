@@ -115,10 +115,10 @@ def train():
     full_dataframe = full_dataframe[full_dataframe.iloc[:, 1] >= 0]
     print(f"Removed {initial_len - len(full_dataframe)} samples with negative velocity (v < 0).")
 
-    # Risky maneuver filtering disabled - keeping all data for better learning
-    # initial_len = len(full_dataframe)
-    # full_dataframe = full_dataframe[~((full_dataframe.iloc[:, 1] > 1.5) & (np.abs(full_dataframe.iloc[:, 2]) > 2.0))]
-    # print(f"Removed {initial_len - len(full_dataframe)} risky samples (v > 1.5 and |w| > 2.0).")
+    # Risky maneuver filtering - remove high speed + sharp turns
+    initial_len = len(full_dataframe)
+    full_dataframe = full_dataframe[~((full_dataframe.iloc[:, 1] > 1.5) & (np.abs(full_dataframe.iloc[:, 2]) > 2.0))]
+    print(f"Removed {initial_len - len(full_dataframe)} risky samples (v > 1.5 and |w| > 2.0).")
     
     print(f"Valid samples after filtering: {len(full_dataframe)}")
     
@@ -182,8 +182,10 @@ def train():
 
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     
-    # Learning Rate Scheduler
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=5, factor=0.5)
+    # ReduceLROnPlateau - only reduce when stuck
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode='min', patience=10, factor=0.5
+    )
 
     best_loss = float('inf')
 
@@ -203,6 +205,7 @@ def train():
             
             # Weight w loss equal to v loss
             loss = loss_v + loss_w
+
             
             loss.backward()
             optimizer.step()

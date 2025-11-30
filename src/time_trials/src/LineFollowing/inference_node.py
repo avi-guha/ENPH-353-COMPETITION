@@ -164,12 +164,12 @@ class InferenceNode:
         with torch.no_grad():
             output = self.model(image, scan_tensor)
             
-            # Model outputs raw values (no tanh), clamp to expected range
-            # Denormalize: training normalized to [-1, 1]
+            # Model outputs Tanh-bounded values in [-1, 1]
+            # Denormalize back to physical units:
             # v: [-1, 1] -> [-2, 2] (multiply by 2)
             # w: [-1, 1] -> [-3, 3] (multiply by 3)
-            v_normalized = torch.clamp(output[0][0], -1.0, 1.0).item()
-            w_normalized = torch.clamp(output[0][1], -1.0, 1.0).item()
+            v_normalized = output[0][0].item()  # Already in [-1, 1] from Tanh
+            w_normalized = output[0][1].item()  # Already in [-1, 1] from Tanh
             
             v_raw = v_normalized * 2.0  # Denormalize
             w_raw = w_normalized * 3.0  # Denormalize
