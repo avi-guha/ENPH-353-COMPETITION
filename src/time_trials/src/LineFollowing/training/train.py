@@ -9,7 +9,7 @@ from dataset import get_dataloader
 # Hyperparameters
 BATCH_SIZE = 128 # Increased for RTX 4080 Super
 LEARNING_RATE = 1e-4
-NUM_EPOCHS = 200
+NUM_EPOCHS = 50
 LAMBDA_W = 5.0 # Weight for angular velocity loss
 DATA_DIR = '../data' # Relative to this script
 MODELS_DIR = '../models' # Relative to this script
@@ -50,26 +50,35 @@ def train(args):
 
     # Data
     # Increased num_workers for faster data loading
-    train_loader, val_loader = get_dataloader(args.data_dir, batch_size=BATCH_SIZE)
+    train_loader, val_loader = get_dataloader(args.data_dir, batch_size=BATCH_SIZE, filter_data=True)
     
     # Model
     model = MultiModalPolicyNet().to(device)
     
     # Optimizer & Scheduler
     optimizer = optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-4)
-    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=NUM_EPOCHS)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
     
     # Loss
     criterion = DrivingLoss(lambda_w=LAMBDA_W)
     
     # Mixed Precision Scaler
-    scaler = torch.cuda.amp.GradScaler()
+    scaler = torch.amp.GradScaler('cuda')
     
     start_epoch = 0
     best_val_loss = float('inf')
     
-    # Resume from checkpoint if provided
+    # Auto-resume logic
+    # Priority:
+    # 1. args.resume (Explicit)
+    # 2. best_model.pth (Implicit fine-tuning from best)
+    # 3. checkpoint.pth (Implicit resume of interrupted run)
+    
+    best_model_path = os.path.join(args.models_dir, "best_model.pth")
+    default_checkpoint = os.path.join(args.models_dir, "checkpoint.pth")
+
     if args.resume:
+        # Explicit resume
         if os.path.isfile(args.resume):
             print(f"Loading checkpoint '{args.resume}'")
             checkpoint = torch.load(args.resume, map_location=device)
@@ -83,6 +92,26 @@ def train(args):
             print(f"Loaded checkpoint '{args.resume}' (epoch {checkpoint['epoch']})")
         else:
             print(f"No checkpoint found at '{args.resume}'")
+            
+    elif os.path.isfile(best_model_path):
+        # Implicit fine-tuning from best model
+        print(f"Found best model at '{best_model_path}'. Loading weights for fine-tuning...")
+        model.load_state_dict(torch.load(best_model_path, map_location=device))
+        print("Model weights loaded. Starting fresh optimizer/scheduler from epoch 0.")
+        # start_epoch remains 0
+        
+    elif os.path.isfile(default_checkpoint):
+        # Implicit resume
+        print(f"Found default checkpoint at '{default_checkpoint}'. Resuming...")
+        checkpoint = torch.load(default_checkpoint, map_location=device)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+        start_epoch = checkpoint['epoch'] + 1
+        best_val_loss = checkpoint.get('best_val_loss', float('inf'))
+        if 'scaler_state_dict' in checkpoint:
+            scaler.load_state_dict(checkpoint['scaler_state_dict'])
+        print(f"Loaded checkpoint '{default_checkpoint}' (epoch {checkpoint['epoch']})")
     
     for epoch in range(start_epoch, NUM_EPOCHS):
         # --- Training ---
@@ -141,7 +170,7 @@ def train(args):
         avg_val_loss = val_loss_total / len(val_loader)
         
         # Step Scheduler
-        scheduler.step()
+        scheduler.step(avg_val_loss)
         
         print(f"Epoch [{epoch+1}/{NUM_EPOCHS}] Train Loss: {avg_train_loss:.4f} | Val Loss: {avg_val_loss:.4f}")
         

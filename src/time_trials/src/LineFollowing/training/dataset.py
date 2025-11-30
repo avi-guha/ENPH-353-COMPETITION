@@ -14,11 +14,12 @@ MAX_V = 2.5 # Observed max is 2.0
 MAX_W = 3.5  # Observed max is 3.0
 
 class DrivingDataset(Dataset):
-    def __init__(self, root_dir, transform=None):
+    def __init__(self, root_dir, transform=None, filter_data=False):
         """
         Args:
             root_dir (string): Directory with all the run folders (e.g. 'data/')
             transform (callable, optional): Optional transform to be applied on a sample.
+            filter_data (bool): If True, filter out stationary and backwards driving.
         """
         self.root_dir = root_dir
         self.transform = transform
@@ -27,7 +28,36 @@ class DrivingDataset(Dataset):
         # Recursively find all log.csv files
         self._load_data()
         
+        if filter_data:
+            self._filter_hard_data()
+        
         print(f"Loaded {len(self.samples)} samples from {root_dir}")
+
+    def _filter_hard_data(self):
+        initial_len = len(self.samples)
+        filtered_samples = []
+        for s in self.samples:
+            v = s['v']
+            w = s['w']
+            
+            # Filter 1: Backwards driving
+            if v < 0:
+                continue
+                
+            # Filter 2: Stationary (or near stationary)
+            # Allow if turning significantly (e.g. recovering)
+            if v < 0.1 and abs(w) < 0.5:
+                continue
+                
+            # Filter 3: Extreme turns at high speed (unsafe/unrealistic)
+            # Relaxed: Only filter if REALLY fast and REALLY sharp
+            if v > 2.0 and abs(w) > 3.0:
+                continue
+                
+            filtered_samples.append(s)
+            
+        self.samples = filtered_samples
+        print(f"Filtered {initial_len - len(self.samples)} samples (Hard/Noisy data). Remaining: {len(self.samples)}")
 
     def _load_data(self):
         for root, dirs, files in os.walk(self.root_dir):
@@ -96,8 +126,19 @@ class DrivingDataset(Dataset):
         if self.transform:
             image = self.transform(image)
         else:
-            # Default transform
-            image = transforms.ToTensor()(image) # [0, 1]
+            # Default transform with Augmentation
+            # Only apply augmentation if we are in training mode (which we don't strictly know here, 
+            # but usually we want robust features). 
+            # Ideally, we pass a different transform for Train vs Val in get_dataloader.
+            # But for now, let's add mild augmentation to the default.
+            
+            transform = transforms.Compose([
+                transforms.ToPILImage(),
+                transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.05),
+                transforms.ToTensor(), # [0, 1]
+                # Add noise?
+            ])
+            image = transform(image)
         
         # 2. Parse LiDAR
         # scan_str is "[1.0, 2.0, ...]"
@@ -131,15 +172,52 @@ class DrivingDataset(Dataset):
         
         return image, scan_tensor, target_tensor
 
-def get_dataloader(root_dir, batch_size=32, split=0.8):
-    full_dataset = DrivingDataset(root_dir)
+def get_dataloader(root_dir, batch_size=32, split=0.8, filter_data=False):
+    # Define Transforms
+    train_transform = transforms.Compose([
+        transforms.ToPILImage(),
+        transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.1),
+        transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 2.0)),
+        transforms.ToTensor(),
+    ])
     
-    train_size = int(split * len(full_dataset))
-    val_size = len(full_dataset) - train_size
+    val_transform = transforms.Compose([
+        transforms.ToTensor(),
+    ])
+
+    # We need to split first, then apply transforms. 
+    # But Dataset takes transform in __init__.
+    # So we create two datasets with same root but different transforms?
+    # No, that would load data twice.
+    # Better: Load data once, then split, then wrap in a helper class or just override transform attribute?
+    # Overriding attribute is risky with random_split.
     
-    train_dataset, val_dataset = torch.utils.data.random_split(full_dataset, [train_size, val_size])
+    # Simple approach: Create two instances. It's fast since we just parse CSVs.
+    # Apply filtering ONLY to training data usually? Or both?
+    # Usually we want validation to represent reality, but if reality has garbage, we filter both.
+    # Let's filter both for now to ensure clean metrics.
+    train_dataset_full = DrivingDataset(root_dir, transform=train_transform, filter_data=filter_data)
+    val_dataset_full = DrivingDataset(root_dir, transform=val_transform, filter_data=filter_data)
     
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
+    # Ensure consistent split
+    # We use a fixed generator for reproducibility
+    generator = torch.Generator().manual_seed(42)
+    
+    # Get indices
+    total_size = len(train_dataset_full)
+    train_size = int(split * total_size)
+    val_size = total_size - train_size
+    
+    # We can't easily split indices and map to different datasets with random_split.
+    # Instead, let's use Subset.
+    indices = torch.randperm(total_size, generator=generator).tolist()
+    train_indices = indices[:train_size]
+    val_indices = indices[train_size:]
+    
+    train_dataset = torch.utils.data.Subset(train_dataset_full, train_indices)
+    val_dataset = torch.utils.data.Subset(val_dataset_full, val_indices)
+    
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True)
     
     return train_loader, val_loader
