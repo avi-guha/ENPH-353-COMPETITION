@@ -15,11 +15,21 @@ class PS4Teleop:
         self.deadzone = rospy.get_param('~deadzone', 0.1)  # Ignore small movements
         self.publish_rate = rospy.get_param('~publish_rate', 20.0)  # Hz
         self.joy_timeout = rospy.get_param('~joy_timeout', 1.0)  # Seconds without joy messages before stopping
+        
+        # SMOOTHING PARAMETERS - Tuned for data collection
+        self.smoothing_alpha = rospy.get_param('~smoothing_alpha', 0.3)  # 0.0 = no smoothing, 1.0 = instant
+        self.max_linear_accel = rospy.get_param('~max_linear_accel', 1.0)  # m/s² 
+        self.max_angular_accel = rospy.get_param('~max_angular_accel', 2.0)  # rad/s²
 
         # State tracking
         self.last_joy_msg = None
         self.last_joy_time = None
         self.last_twist = Twist()
+        
+        # Smoothed command tracking (for EMA filter)
+        self.smoothed_linear = 0.0
+        self.smoothed_angular = 0.0
+        
         self.joy_connected = False
         self.enabled = True  # Can be disabled to let other controllers take over
         self.published_stop = False  # Track if we've already published a stop command
@@ -36,11 +46,14 @@ class PS4Teleop:
         rospy.Subscriber('/teleop_enable', Bool, self.enable_callback, queue_size=1)
 
         # Wait a bit for joy_node to start
-        rospy.loginfo("PS4 Teleop Node Started")
+        rospy.loginfo("PS4 Teleop Node Started (SMOOTH MODE)")
         rospy.loginfo(f"  Linear scale: {self.linear_scale}")
         rospy.loginfo(f"  Angular scale: {self.angular_scale}")
         rospy.loginfo(f"  Deadzone: {self.deadzone}")
         rospy.loginfo(f"  Publish rate: {self.publish_rate} Hz")
+        rospy.loginfo(f"  Smoothing alpha: {self.smoothing_alpha} (lower = smoother)")
+        rospy.loginfo(f"  Max linear accel: {self.max_linear_accel} m/s²")
+        rospy.loginfo(f"  Max angular accel: {self.max_angular_accel} rad/s²")
         rospy.loginfo(f"  Joy timeout: {self.joy_timeout}s")
         rospy.loginfo("Waiting for joystick input on /joy...")
         rospy.loginfo("Publish to /teleop_enable (Bool) to enable/disable this controller")
@@ -108,6 +121,21 @@ class PS4Teleop:
         sign = 1 if value > 0 else -1
         return sign * (abs(value) - self.deadzone) / (1.0 - self.deadzone)
     
+    def apply_smoothing(self, target, current, alpha):
+        """Exponential moving average smoothing"""
+        # alpha = 1.0 means instant (no smoothing)
+        # alpha = 0.0 means never change (full smoothing)
+        # alpha = 0.3 means 30% new value, 70% old value (moderate smoothing)
+        return alpha * target + (1 - alpha) * current
+    
+    def rate_limit(self, target, current, max_change, dt):
+        """Limit rate of change (acceleration limiting)"""
+        max_delta = max_change * dt
+        delta = target - current
+        if abs(delta) > max_delta:
+            return current + max_delta * (1 if delta > 0 else -1)
+        return target
+    
     def run(self):
         """Main control loop with consistent publishing rate"""
         rate = rospy.Rate(self.publish_rate)
@@ -152,9 +180,26 @@ class PS4Teleop:
                 raw_linear = self.last_joy_msg.axes[1]
                 raw_angular = self.last_joy_msg.axes[0]
                 
-                # Apply deadzone and scaling
-                twist.linear.x = self.apply_deadzone(raw_linear) * self.linear_scale
-                twist.angular.z = self.apply_deadzone(raw_angular) * self.angular_scale
+                # Apply deadzone and scaling to get target velocities
+                target_linear = self.apply_deadzone(raw_linear) * self.linear_scale
+                target_angular = self.apply_deadzone(raw_angular) * self.angular_scale
+                
+                # Calculate dt for rate limiting
+                dt = 1.0 / self.publish_rate
+                
+                # Apply exponential smoothing
+                self.smoothed_linear = self.apply_smoothing(
+                    target_linear, self.smoothed_linear, self.smoothing_alpha)
+                self.smoothed_angular = self.apply_smoothing(
+                    target_angular, self.smoothed_angular, self.smoothing_alpha)
+                
+                # Apply rate limiting (acceleration capping)
+                twist.linear.x = self.rate_limit(
+                    self.smoothed_linear, self.last_twist.linear.x, 
+                    self.max_linear_accel, dt)
+                twist.angular.z = self.rate_limit(
+                    self.smoothed_angular, self.last_twist.angular.z,
+                    self.max_angular_accel, dt)
                 
                 # Log only when values change significantly (reduce spam)
                 if (abs(twist.linear.x - self.last_twist.linear.x) > 0.05 or 
