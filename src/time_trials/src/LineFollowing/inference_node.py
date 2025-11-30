@@ -26,6 +26,7 @@ class InferenceNode:
         # Parameters - Fixed topic names to match robot namespacing
         self.image_topic = rospy.get_param('~image_topic', '/B1/rrbot/camera1/image_raw')
         self.scan_topic = rospy.get_param('~scan_topic', '/B1/scan')
+        self.front_scan_topic = rospy.get_param('~front_scan_topic', '/B1/front_scan')
         self.cmd_vel_topic = rospy.get_param('~cmd_vel_topic', '/B1/cmd_vel')
         
         # Default model path is in the same directory as this script
@@ -54,7 +55,16 @@ class InferenceNode:
         self.teleop_active = False
         self.last_pub_check_time = rospy.Time.now()
         self.pub_check_interval = 3.0  # Check every 3 seconds
+        
+        # Counter for logging - must be initialized before callbacks are registered
+        self.callback_count = 0
+        
         rospy.Subscriber('/teleop_active', Bool, self.teleop_active_callback, queue_size=1)
+        
+        # Front lidar for obstacle detection (30 degree cone, 0.1m threshold)
+        self.front_scan_data = None
+        self.obstacle_detected = False
+        rospy.Subscriber(self.front_scan_topic, LaserScan, self.front_scan_callback, queue_size=1)
         
         # Subscribers
         self.image_sub = message_filters.Subscriber(self.image_topic, Image)
@@ -74,10 +84,8 @@ class InferenceNode:
         rospy.loginfo(f"Subscribing to:")
         rospy.loginfo(f"  Image: {self.image_topic}")
         rospy.loginfo(f"  Scan: {self.scan_topic}")
+        rospy.loginfo(f"  Front Scan: {self.front_scan_topic}")
         rospy.loginfo("Note: Will pause when manual teleop is active to avoid conflicts")
-        
-        # Counter for logging
-        self.callback_count = 0
     
     def teleop_active_callback(self, msg):
         """Track when manual teleop controller is active"""
@@ -85,6 +93,28 @@ class InferenceNode:
             self.teleop_active = msg.data
             status = "ACTIVE" if self.teleop_active else "INACTIVE"
             rospy.loginfo(f"Manual teleop is {status} - Inference {'PAUSED' if msg.data else 'RESUMED'}")
+    
+    def front_scan_callback(self, msg):
+        """Process front lidar scan for obstacle detection in 30 degree cone at 0.1m"""
+        self.front_scan_data = msg
+        
+        # Get valid ranges (filter out inf and nan, and values outside sensor range)
+        ranges = list(msg.ranges)
+        valid_ranges = [r for r in ranges if r > msg.range_min and r < msg.range_max and not np.isnan(r) and not np.isinf(r)]
+        
+        if valid_ranges:
+            min_dist = min(valid_ranges)
+            # Detect obstacle within 0.1m in the 30 degree front cone
+            self.obstacle_detected = min_dist < 0.1
+            
+            # Debug logging (throttled)
+            rospy.loginfo_throttle(2.0, f"Front LIDAR: min={min_dist:.3f}m, valid_samples={len(valid_ranges)}/{len(ranges)}, range_min={msg.range_min:.3f}, range_max={msg.range_max:.3f}")
+            
+            if self.obstacle_detected:
+                rospy.logwarn_throttle(0.5, f"⚠️ OBSTACLE DETECTED at {min_dist:.3f}m in front cone! Stopping.")
+        else:
+            self.obstacle_detected = False
+            rospy.loginfo_throttle(2.0, f"Front LIDAR: No valid ranges (all inf/nan or outside bounds)")
     
     def check_publisher_connection(self):
         """Check if publisher is connected and recreate if needed (for sim resets)"""
@@ -137,16 +167,8 @@ class InferenceNode:
         scan_tensor = torch.tensor(scan_ranges, dtype=torch.float32).unsqueeze(0).to(self.device)
         scan_tensor = scan_tensor / 30.0
 
-        # Watchdog Check
-        # Check only the front cone (approx +/- 20 degrees)
-        # 720 samples cover 180 degrees (3.14 rad)
-        # Center is 360. 20 degrees is approx 1/9 of 180, so 80 samples.
-        # Range: 360 - 80 = 280 to 360 + 80 = 440
-        front_cone = scan_ranges[280:440]
-        min_dist = min(front_cone)
-        
-        if min_dist < 0.2:
-            rospy.logwarn(f"Obstacle detected in front cone at {min_dist:.2f}m! Stopping.")
+        # Front lidar obstacle detection - stop if obstacle within 0.1m in 30 degree cone
+        if self.obstacle_detected:
             twist = Twist()
             twist.linear.x = 0.0
             twist.angular.z = 0.0
@@ -156,8 +178,8 @@ class InferenceNode:
         # Inference
         with torch.no_grad():
             output = self.model(image, scan_tensor)
-            v = output[0][0].item()
-            w = output[0][1].item()
+            v = 0.8 * output[0][0].item()
+            w = 1.4 * output[0][1].item()
 
         twist = Twist()
         twist.linear.x = v

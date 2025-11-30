@@ -331,4 +331,67 @@
     </sensor>
   </gazebo>
 
+  <!-- Front Low LIDAR Link - for close obstacle detection -->
+  <link name="front_lidar_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+      <material name="front_lidar_material">
+        <color rgba="0.8 0.2 0.2 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="front_lidar_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="0.11 0 0.02" rpy="0 0 0"/> <!-- Front face of robot, slightly above chassis center -->
+    <parent link="chassis"/>
+    <child link="front_lidar_link"/>
+  </joint>
+
+  <gazebo reference="front_lidar_link">
+    <sensor type="ray" name="front_lidar_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>60</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.2618</min_angle>  <!-- -15 degrees -->
+            <max_angle>0.2618</max_angle>   <!-- +15 degrees (30 degree cone) -->
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.02</min>   <!-- Minimum 2cm to avoid self-detection -->
+          <max>0.5</max>    <!-- Short range for obstacle detection -->
+          <resolution>0.005</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.005</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_front_lidar_controller" filename="libgazebo_ros_laser.so">
+        <topicName>front_scan</topicName>
+        <frameName>front_lidar_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
 </robot>
