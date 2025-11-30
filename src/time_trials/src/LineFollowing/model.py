@@ -40,8 +40,10 @@ class PilotNet(nn.Module):
         self.head = nn.Sequential(
             nn.Linear(4128, 100),
             nn.ReLU(),
+            nn.Dropout(0.5),  # Higher dropout for small dataset
             nn.Linear(100, 50),
             nn.ReLU(),
+            nn.Dropout(0.3),
             nn.Linear(50, 10),
             nn.ReLU(),
             nn.Linear(10, 2)  # v, w (raw output, clamped at inference)
