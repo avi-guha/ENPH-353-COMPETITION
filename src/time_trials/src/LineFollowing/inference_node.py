@@ -78,11 +78,6 @@ class InferenceNode:
         
         # Counter for logging
         self.callback_count = 0
-        
-        # Smoothing for output commands (exponential moving average)
-        self.smoothing_alpha = 0.7  # Higher = more responsive, lower = smoother
-        self.prev_v = 0.0
-        self.prev_w = 0.0
     
     def teleop_active_callback(self, msg):
         """Track when manual teleop controller is active"""
@@ -156,27 +151,32 @@ class InferenceNode:
             twist.linear.x = 0.0
             twist.angular.z = 0.0
             self.pub.publish(twist)
-            self.prev_v = 0.0
-            self.prev_w = 0.0
             return
 
-        # Inference
+        # Inference - direct output like manual controller
         with torch.no_grad():
             output = self.model(image, scan_tensor)
+            
+            # Get raw model outputs
+            v_raw = output[0][0].item()
+            w_raw = output[0][1].item()
             
             # Denormalize model outputs to physical units
             # v: [0, 1] -> [0, 2] m/s
             # w: [-1, 1] -> [-3, 3] rad/s
-            v_raw = np.clip(output[0][0].item(), 0, 1) * 2.0
-            w_raw = np.clip(output[0][1].item(), -1, 1) * 3.0
+            v = float(np.clip(v_raw, 0, 1) * 2.0)
+            w = float(np.clip(w_raw, -1, 1) * 3.0)
             
-            # Simple smoothing
-            v = self.smoothing_alpha * v_raw + (1 - self.smoothing_alpha) * self.prev_v
-            w = self.smoothing_alpha * w_raw + (1 - self.smoothing_alpha) * self.prev_w
+            # Reduce speed when turning sharply (like a real driver would)
+            # This prevents the robot from flipping or losing control
+            turn_factor = 1.0 - 0.3 * min(abs(w) / 3.0, 1.0)  # Reduce speed up to 30% at max turn
+            v = v * turn_factor
             
-            self.prev_v = v
-            self.prev_w = w
+            # Debug: log raw vs final values
+            if self.callback_count % 10 == 0:
+                rospy.loginfo(f"Raw: v={v_raw:.3f}, w={w_raw:.3f} | Final: v={v:.3f}, w={w:.3f}")
 
+        # Publish directly - no smoothing, just like controller
         twist = Twist()
         twist.linear.x = v
         twist.angular.z = w
