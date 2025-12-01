@@ -43,10 +43,26 @@ class BoardDetector:
         self.team_pass = "secret3"
 
         rospy.init_node('yolo_clueboard_node')
+
+        # init publishers for GUI
+        self.pub_raw_board = rospy.Publisher('/clueboard/raw_board', Image, queue_size=1)
+        self.pub_proc_board = rospy.Publisher('/clueboard/processed_board', Image, queue_size=1)
+        self.pub_words_debug = rospy.Publisher('/clueboard/words_debug', Image, queue_size=1)
+        self.pub_letters_debug = rospy.Publisher('/clueboard/letters_debug', Image, queue_size=1)
+
+        # publishers for debug images
+        self.pub_words_debug = rospy.Publisher('/clueboard/words_debug', Image, queue_size=1)
+        self.pub_letters_debug = rospy.Publisher('/clueboard/letters_debug', Image, queue_size=1)
+
+        # Give BoardReader access to publishers
+        self.cnn.bridge = self.bridge
+        self.cnn.pub_words_debug = self.pub_words_debug
+        self.cnn.pub_letters_debug = self.pub_letters_debug
         
         model_path = rospy.get_param("~model_path", 
         "/home/fizzer/ENPH-353-COMPETITION/src/competition/clueboard_detection/runs/detect/clueboards_exp12/weights/best.pt")
         self.model = YOLO(model_path)
+        self.model.fuse = lambda *args, **kwargs: self.model
 
         self.camera_topic_left = rospy.get_param("~camera_topic_left", "/B1/left_front_cam/left_front/image_raw")
         self.camera_topic_right = rospy.get_param("~camera_topic_right", "/B1/right_front_cam/right_front/image_raw")
@@ -217,7 +233,7 @@ class BoardDetector:
                 confidence = box.conf[0].item()
 
                 # ensure all conditions met before proceeding to read board
-                sizeable  = (x2-x1) > 250
+                sizeable  = (x2-x1) > 450
                 aspectratio = (x2-x1) / (y2-y1) > 1.4
                 confident = confidence > 0.91
 
@@ -240,6 +256,10 @@ class BoardDetector:
 
                         # convert to rgb for cnn
                         rgb_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
+
+                        # publish for GUI
+                        self.pub_raw_board.publish(self.bridge.cv2_to_imgmsg(frame_extract, "bgr8"))
+                        self.pub_proc_board.publish(self.bridge.cv2_to_imgmsg(roi, "bgr8"))
 
                         # feed into cnn, extract predicted LABEL for board                        
                         pred_chars = self.cnn.predict_board(rgb_roi)

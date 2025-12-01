@@ -131,6 +131,17 @@ class BoardReader:
         #plt.axis('off')
         #plt.show()
 
+        # Publish to GUI
+        if hasattr(self, 'pub_words_debug'):
+            debug = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+            for (x, y, w, h) in word_boxes:
+                cv2.rectangle(debug, (x, y), (x+w, y+h), (0,255,0), 2)
+            try:
+                msg = self.bridge.cv2_to_imgmsg(debug, "bgr8")
+                self.pub_words_debug.publish(msg)
+            except:
+                pass
+
         return words
 
     # Pad images 
@@ -229,6 +240,17 @@ class BoardReader:
         #plt.imshow(cv2.cvtColor(vis_img, cv2.COLOR_BGR2RGB))
         #plt.axis('off')
         #plt.show()
+
+        # Publish to GUI
+        if hasattr(self, 'pub_letters_debug'):
+            dbg = cv2.cvtColor(word_img, cv2.COLOR_GRAY2BGR)
+            for (x, y, w, h) in letter_boxes:
+                cv2.rectangle(dbg, (x, y), (x+w, y+h), (255,0,0), 2)
+            try:
+                msg = self.bridge.cv2_to_imgmsg(dbg, "bgr8")
+                self.pub_letters_debug.publish(msg)
+            except:
+                pass
 
         return self.pad_to_max(char_images, self.IMG_SIZE)
     
