@@ -111,7 +111,7 @@ class InferenceNode:
             rospy.loginfo(f"Manual teleop is {status} - Inference {'PAUSED' if msg.data else 'RESUMED'}")
     
     def front_scan_callback(self, msg):
-        """Process front lidar scan for obstacle detection in 30 degree cone at 0.005m"""
+        """Process front lidar scan for obstacle detection in 25 degree cone"""
         self.front_scan_data = msg
         
         # Get valid ranges (filter out inf and nan, and values outside sensor range)
@@ -120,17 +120,17 @@ class InferenceNode:
         
         if valid_ranges:
             min_dist = min(valid_ranges)
-            # Detect obstacle within 0.025m in the 30 degree front cone
-            self.obstacle_detected = min_dist < 0.025
+            # Detect obstacle within 0.35m (35cm) in the front cone - STOP robot
+            self.obstacle_detected = min_dist < 0.35
             
             # Debug logging (throttled)
-            rospy.loginfo_throttle(2.0, f"Front LIDAR: min={min_dist:.3f}m, valid_samples={len(valid_ranges)}/{len(ranges)}, range_min={msg.range_min:.3f}, range_max={msg.range_max:.3f}")
+            rospy.loginfo_throttle(2.0, f"Front LIDAR: min={min_dist:.3f}m, valid={len(valid_ranges)}/{len(ranges)}, obstacle={self.obstacle_detected}")
             
             if self.obstacle_detected:
-                rospy.logwarn_throttle(0.5, f"⚠️ OBSTACLE DETECTED at {min_dist:.3f}m in front cone! Stopping.")
+                rospy.logwarn_throttle(0.5, f"⚠️ FRONT OBSTACLE at {min_dist:.3f}m - STOPPING!")
         else:
             self.obstacle_detected = False
-            rospy.loginfo_throttle(2.0, f"Front LIDAR: No valid ranges (all inf/nan or outside bounds)")
+            rospy.logwarn_throttle(5.0, f"Front LIDAR: No valid ranges (all inf/nan or outside bounds)")
     
     def left_scan_callback(self, msg):
         """Process left lidar scan - steer right if obstacle detected"""
@@ -219,12 +219,13 @@ class InferenceNode:
         scan_tensor = torch.tensor(scan_ranges, dtype=torch.float32).unsqueeze(0).to(self.device)
         scan_tensor = scan_tensor / 30.0
 
-        # Front lidar obstacle detection - stop if obstacle within 0.2m in front center
+        # Front lidar obstacle detection - stop if obstacle detected
         if self.obstacle_detected:
             twist = Twist()
             twist.linear.x = 0.0
             twist.angular.z = 0.0
             self.pub.publish(twist)
+            rospy.logwarn_throttle(0.5, f"🛑 STOP COMMAND SENT - Obstacle in front!")
             return
 
         # Inference
