@@ -6,6 +6,7 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 import time
+from std_msgs.msg import String
 from board_reader import BoardReader
 from PIL import Image as PImage
 
@@ -44,7 +45,7 @@ class BoardDetector:
         rospy.init_node('yolo_clueboard_node')
         
         model_path = rospy.get_param("~model_path", 
-        "/home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/runs/detect/clueboards_exp12/weights/best.pt")
+        "/home/fizzer/ENPH-353-COMPETITION/src/competition/clueboard_detection/runs/detect/clueboards_exp12/weights/best.pt")
         self.model = YOLO(model_path)
 
         self.camera_topic_left = rospy.get_param("~camera_topic_left", "/B1/left_front_cam/left_front/image_raw")
@@ -53,7 +54,9 @@ class BoardDetector:
         rospy.Subscriber(self.camera_topic_left, Image, self.camera_callback, queue_size=1)
         rospy.Subscriber(self.camera_topic_right, Image, self.camera_callback, queue_size=1)
 
-        self.pub = rospy.Publisher('/yolo_clueboard/image', Image, queue_size=1)
+        self.pub_score = rospy.Publisher('/score_tracker', String, queue_size=1)
+
+        self.pub_yolo = rospy.Publisher('/yolo_clueboard/image', Image, queue_size=1)
 
         rospy.loginfo("Board Detector Initialized!")
     
@@ -101,9 +104,7 @@ class BoardDetector:
         img = raw_board.copy()
         H, W = img.shape[:2]
 
-        # ------------------------------------------------------------
-        # 1. DETECT BLUE BORDER (outer quad)
-        # ------------------------------------------------------------
+        # Detect blue border
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         blue = cv2.inRange(hsv, (90,60,20), (130,255,255))
 
@@ -113,15 +114,10 @@ class BoardDetector:
 
         outer = max(cnts, key=cv2.contourArea)
 
-        # ------------------------------------------------------------
-        # 2. CREATE MASK ONLY INSIDE BLUE BORDER
-        # ------------------------------------------------------------
+        # Create mask inside blue border
         border_mask = np.zeros((H,W), np.uint8)
         cv2.drawContours(border_mask, [outer], -1, 255, -1)
 
-        # ------------------------------------------------------------
-        # 3. FIND INNER GREY QUAD USING EDGE DETECTION
-        # ------------------------------------------------------------
         # Blur to remove letter strokes
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (11,11), 0)
@@ -140,9 +136,7 @@ class BoardDetector:
 
         inner = max(cnts2, key=cv2.contourArea)
 
-        # ------------------------------------------------------------
-        # 4. APPROXIMATE INNER BORDER TO 4 POINTS
-        # ------------------------------------------------------------
+        # Approx inner border to 4 points
         peri = cv2.arcLength(inner, True)
         approx = cv2.approxPolyDP(inner, 0.03 * peri, True)
 
@@ -166,9 +160,7 @@ class BoardDetector:
 
         pts_src = order_pts(pts_src).astype(np.float32)
 
-        # ------------------------------------------------------------
-        # 5. DEFINE OUTPUT SIZE (preserve aspect ratio)
-        # ------------------------------------------------------------
+        # Define output size
         # estimate width / height from distances
         w1 = np.linalg.norm(pts_src[0] - pts_src[1])
         w2 = np.linalg.norm(pts_src[3] - pts_src[2])
@@ -185,28 +177,20 @@ class BoardDetector:
             [0, H_out-1]
         ], dtype=np.float32)
 
-        # ------------------------------------------------------------
-        # 6. HOMOGRAPHY: WARP INNER GREY PANEL
-        # ------------------------------------------------------------
+        # Homography
         M = cv2.getPerspectiveTransform(pts_src, pts_dst)
         rectified = cv2.warpPerspective(img, M, (W_out, H_out))
         
-        # ------------------------------------------------------------
-        # FINAL CLEANUP — trim 8 pixels from each edge to remove border
-        # ------------------------------------------------------------
-        trim = 8  # you can tune 6–12 if needed
+        # Trim pixels from edges
+        trim = 8 
 
         Hf, Wf = rectified.shape[:2]
 
         if Hf > 2*trim and Wf > 2*trim:
             rectified = rectified[trim:Hf-trim, trim:Wf-trim]
 
-        # ------------------------------------------------------------
-        # DONE — rectified IS PURE GREY PANEL WITH LETTERS, NO BORDER
-        # ------------------------------------------------------------
         return rectified
 
-   
 
     def camera_callback(self, msg):
         """
@@ -218,7 +202,7 @@ class BoardDetector:
             return
 
         # enforce cooldown BEFORE running YOLO to prevent double triggers
-        if (time.time() - self.last_board_time) < 11.0: #DEBUGGGGGGGGGGGGGGGGG CHANGE BACK TO 2/3
+        if (time.time() - self.last_board_time) < 3.0: 
             return
 
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
@@ -234,6 +218,7 @@ class BoardDetector:
 
                 # ensure all conditions met before proceeding to read board
                 sizeable  = (x2-x1) > 250
+                aspectratio = (x2-x1) / (y2-y1) > 1.4
                 confident = confidence > 0.91
 
                 # validate order of board detection, ensure this baord isnt seen yet
@@ -243,7 +228,7 @@ class BoardDetector:
                     not self.board_map[self.current_board][0]
                 )
 
-                if sizeable and confident and ordered:
+                if sizeable and aspectratio and confident and ordered:
                     frame_extract = frame[y1:y2, x1:x2]
 
                     # check if whole board captured
@@ -253,30 +238,42 @@ class BoardDetector:
                         # process to gray region (you already planned this)
                         roi = self.process_raw_board(frame_extract)
 
-                        # convert to rgb
+                        # convert to rgb for cnn
                         rgb_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
 
-                        # feed into cnn, extract predicted LABEL for board
-                        # MAKE SURE TO CONVERT TO RGB FOR CNN
-                        # predicted_label = self.cnn.read_label(cv2.cvtColor(frame_extract, cv2.COLOR_BGR2RGB))
-                        """
+                        # feed into cnn, extract predicted LABEL for board                        
                         pred_chars = self.cnn.predict_board(rgb_roi)
-                        predicted_label = "".join(pred_chars).split(" ")[0]
+                        words = "".join(pred_chars).split()
 
-                        # Validate that expected label matches CNN label.  
+                        predicted_label = words[0]
+
+                        # validate that expected label matches CNN label  
                         expected_label = self.board_map[self.current_board][1]
 
                         if predicted_label != expected_label:
                             rospy.logwarn(f"Ignoring board: CNN label '{predicted_label}' "
                                           f"does not match expected '{expected_label}'")
                             return
+                                    
+                        #only read rest of board if passed check
+                        predicted_text = [w.replace(" ", "") for w in words[1:]]
 
-                        rospy.loginfo(f"---BOARD FOUND: {self.current_board}")
-                        rospy.loginfo(f"---BOARD LABEL: {self.board_map[self.current_board][1]}")
-                        rospy.loginfo("------------------------------------------")
-
-                        # 5. if safe to continue, report clue to /score_tracker -> WITH NO SPACES! 
+                        # debug
                         """
+                        rospy.loginfo(f"---BOARD FOUND! ID: {self.current_board}, LABEL: {predicted_label}")
+                        rospy.loginfo(f"---BOARD TEXT: {predicted_text}")
+                        rospy.loginfo("------------------------------------------")
+                        """
+
+                        # report clue to /score_tracker -> WITH NO SPACES! 
+                        clue_text = "".join(predicted_text)
+
+                        msg_out = String()
+                        msg_out.data = f"{self.team_name},{self.team_pass},{self.current_board},{clue_text}"
+
+                        self.pub_score.publish(msg_out)
+
+                        
                         # mark board as reported
                         self.board_map[self.current_board][0] = True
                         self.last_board_time = time.time()
@@ -285,21 +282,8 @@ class BoardDetector:
                         if self.current_board < max(self.board_map.keys()):
                             self.current_board += 1
                         
-                        #DEBUGGGGGGGGGGGGG---------------------------------------------------
-                        # --- Show YOLO crop BEFORE processing ---
-                        pil_yolo = PImage.fromarray(cv2.cvtColor(frame_extract, cv2.COLOR_BGR2RGB))
-                        pil_yolo.show()
-
-                        # Convert to PIL Image
-                        pil_img = PImage.fromarray(rgb_roi)
-
-                        # Show image
-                        pil_img.show()
-
-
                         # return immediately to avoid multiple detections per callback
                         return
-
 
 
 if __name__ == "__main__":

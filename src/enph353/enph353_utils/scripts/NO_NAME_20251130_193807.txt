@@ -1,0 +1,35 @@
+19:38:07.175: Clue SIZE: UNKNOWN
+19:38:07.176: Clue VICTIM: MAGIC MIKE
+19:38:07.176: Clue CRIME: DISAPPEAR
+19:38:07.176: Clue TIME: CIRCUS
+19:38:07.177: Clue PLACE: WORMHOLE
+19:38:07.177: Clue MOTIVE: STARDOM
+19:38:07.177: Clue WEAPON: QUANTUM WAND
+19:38:07.177: Clue BANDIT: CLOWN CLAUDE
+19:38:36.315: Message received: teamEMAG,secret3,1,UNKNOWN
+19:38:36.315: Team total: 6 pts
+19:38:36.316: Awarded: 6 pts
+19:39:33.985: Message received: teamEMAG,secret3,2,MAGICMIKE
+19:39:33.986: Team total: 12 pts
+19:39:33.987: Awarded: 6 pts
+19:39:44.138: Message received: teamEMAG,secret3,3,DISAPPEAR
+19:39:44.139: Team total: 18 pts
+19:39:44.139: Awarded: 6 pts
+19:40:15.967: Message received: teamEMAG,secret3,4,CIRCUS
+19:40:15.969: Team total: 24 pts
+19:40:15.970: Awarded: 6 pts
+19:41:34.583: Message received: teamEMAG,secret3,5,WORMHOLE
+19:41:34.586: Team total: 30 pts
+19:41:34.598: Awarded: 6 pts
+19:52:03.819: Message received: teamEMAG,secret3,6,STARDOM
+19:52:03.820: Team total: 36 pts
+19:52:03.820: Awarded: 6 pts
+19:53:34.374: Message received: teamEMAG,secret3,7,QUANTUMWAND
+19:53:34.375: Team total: 44 pts
+19:53:34.378: Awarded: 8 pts
+19:55:44.940: Message received: teamEMAG,secret3,8,CLOWNCLAUDE
+19:55:44.941: Team total: 52 pts
+19:55:44.942: Awarded: 8 pts
+19:55:45.145: Message received: teamEMAG,secret3,8,FMECLOWNCLAUDE
+19:55:45.146: Team total: 44 pts
+19:55:45.146: Awarded: 0 pts

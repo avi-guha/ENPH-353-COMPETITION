@@ -1,0 +1,12 @@
+18:23:19.711: Clue SIZE: ENFNKPNU
+18:23:19.712: Clue VICTIM: CCFDGBKQEHLZ
+18:23:19.712: Clue CRIME: WEGCRDYTPZ
+18:23:19.714: Clue TIME: YAWFMN
+18:23:19.714: Clue PLACE: BCYIFZYYO
+18:23:19.714: Clue MOTIVE: NUCDJAYX
+18:23:19.714: Clue WEAPON: AJXQFNHLF
+18:23:19.714: Clue BANDIT: SQDY
+18:23:30.573: Bonus completed: +5 points
+18:23:30.573: Team total: 5 pts
+18:23:32.721: Bonus completed already awarded points.
+18:23:33.039: Bonus completed already awarded points.
