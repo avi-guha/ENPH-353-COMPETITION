@@ -1,0 +1,6 @@
+train: /home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/roboflow_data/train/images
+val:   /home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/roboflow_data/valid/images
+
+nc: 1
+names: ['clueboard']
+
