@@ -21,8 +21,13 @@
         output="screen"
     />
 
-    <!-- BoardDetector inference node -->
+    <!-- GUI Node -->
+    <node pkg="your_package"
+        type="gui.py"
+        name="competition_gui"
+        output="screen"/>
 
+    <!-- BoardDetector inference node -->
     <node pkg="clueboard_detection"
           type="board_detector.py"
           name="board_detector"
@@ -37,7 +42,6 @@
 
 
     <!-- Line follow inference node -->
-
     <node pkg="line_following"
           type="inference_node.py"
           name="line_follower"
