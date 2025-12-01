@@ -236,7 +236,7 @@ class InferenceNode:
 
         # If max turning speed > 2.0 rad/s, set max velocity to 0.5 m/s
         if abs(w) > 3.0:
-            v = min(v, 0.8)
+            v = min(v, 0.85)
 
         # Front corner lidar obstacle avoidance - steer away from obstacles
         if self.left_obstacle_detected:
@@ -252,7 +252,7 @@ class InferenceNode:
 
         twist = Twist()
         # twist.linear.x = v
-        twist.linear.x = 1.6
+        twist.linear.x = 1.7
         
         twist.angular.z = w
         self.pub.publish(twist)

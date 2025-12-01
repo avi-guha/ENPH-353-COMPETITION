@@ -35,25 +35,25 @@ python3 /home/fizzer/ENPH-353-COMPETITION/src/competition/line_following/inferen
 INFERENCE_PID=$!
 sleep 1
 
-# Launch camera viewer in foreground
-echo "[4/4] Launching camera viewer..."
-echo ""
-echo "========================================="
-echo "Startup Complete!"
-echo "========================================="
-echo "Inference node is running autonomously."
-echo "Camera viewer is running in foreground."
-echo "Press 'q' in camera window to quit."
-echo "Press Ctrl+C to stop all processes."
-echo "========================================="
-echo ""
+# # Launch camera viewer in foreground
+# echo "[4/4] Launching camera viewer..."
+# echo ""
+# echo "========================================="
+# echo "Startup Complete!"
+# echo "========================================="
+# echo "Inference node is running autonomously."
+# echo "Camera viewer is running in foreground."
+# echo "Press 'q' in camera window to quit."
+# echo "Press Ctrl+C to stop all processes."
+# echo "========================================="
+# echo ""
 
-# Run camera viewer in foreground (blocks here)
-python3 /home/fizzer/ENPH-353-COMPETITION/src/competition/line_following/camera_viewer.py
+# # Run camera viewer in foreground (blocks here)
+# python3 /home/fizzer/ENPH-353-COMPETITION/src/competition/line_following/camera_viewer.py
 
-# Cleanup when camera viewer exits
-echo ""
-echo "Shutting down..."
-kill $INFERENCE_PID 2>/dev/null || true
-kill $SIM_PID 2>/dev/null || true
-echo "Done."
+# # Cleanup when camera viewer exits
+# echo ""
+# echo "Shutting down..."
+# kill $INFERENCE_PID 2>/dev/null || true
+# kill $SIM_PID 2>/dev/null || true
+# echo "Done."
