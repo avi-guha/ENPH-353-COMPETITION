@@ -365,15 +365,15 @@
   <gazebo reference="front_lidar_link">
     <sensor type="ray" name="front_lidar_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>false</visualize>
+      <visualize>true</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
           <horizontal>
-            <samples>60</samples>
+            <samples>70</samples>
             <resolution>1</resolution>
-            <min_angle>-0.2182</min_angle>  <!-- -12.5 degrees -->
-            <max_angle>0.2182</max_angle>   <!-- +12.5 degrees (25 degree cone) -->
+            <min_angle>-0.3054</min_angle>  <!-- -17.5 degrees -->
+            <max_angle>0.3054</max_angle>   <!-- +17.5 degrees (35 degree cone) -->
           </horizontal>
         </scan>
         <range>
