@@ -120,8 +120,8 @@ class InferenceNode:
         
         if valid_ranges:
             min_dist = min(valid_ranges)
-            # Detect obstacle within 0.35m (35cm) in the front cone - STOP robot
-            self.obstacle_detected = min_dist < 0.35
+            # Detect obstacle within 0.20m (20cm) in the front cone - STOP robot
+            self.obstacle_detected = min_dist < 0.20
             
             # Debug logging (throttled)
             rospy.loginfo_throttle(2.0, f"Front LIDAR: min={min_dist:.3f}m, valid={len(valid_ranges)}/{len(ranges)}, obstacle={self.obstacle_detected}")
