@@ -162,7 +162,7 @@
   </joint>
 
   <gazebo reference="chassis">
-    <material>Gazebo/Orange</material>
+    <material>Gazebo/Purple</material>
   </gazebo>
 
   <gazebo reference="camera_link">
@@ -170,19 +170,19 @@
   </gazebo>
 
   <gazebo reference="wheel_FL">
-    <material>Gazebo/Yellow</material>
+    <material>Gazebo/Pink</material>
   </gazebo>
 
   <gazebo reference="wheel_FR">
-    <material>Gazebo/Yellow</material>
+    <material>Gazebo/Pink</material>
   </gazebo>
 
   <gazebo reference="wheel_RL">
-    <material>Gazebo/Yellow</material>
+    <material>Gazebo/Pink</material>
   </gazebo>
 
   <gazebo reference="wheel_RR">
-    <material>Gazebo/Yellow</material>
+    <material>Gazebo/Pink</material>
   </gazebo>
 
   <gazebo>
@@ -646,7 +646,64 @@
     </sensor>
   </gazebo>
 
-    <!-- Left cam -->
+  <!-- Camera mount structure -->
+  <!-- Vertical post from chassis -->
+  <link name="camera_mount_post">
+    <inertial>
+      <mass value="0.02"/>
+      <inertia ixx="1e-6" iyy="1e-6" izz="1e-6" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <collision>
+      <geometry>
+        <cylinder radius="0.005" length="0.055"/>
+      </geometry>
+    </collision>
+    <visual>
+      <geometry>
+        <cylinder radius="0.005" length="0.055"/>
+      </geometry>
+      <material name="mount_material">
+        <color rgba="0.3 0.3 0.3 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="camera_mount_post_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="camera_mount_post"/>
+    <!-- Post at front of chassis, from top (z=0.025) up to camera height (z=0.08) -->
+    <origin xyz="${chassis_length/2 - 0.1} 0 0.0525" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Horizontal crossbar connecting both cameras -->
+  <link name="camera_mount_crossbar">
+    <inertial>
+      <mass value="0.01"/>
+      <inertia ixx="1e-6" iyy="1e-6" izz="1e-6" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <collision>
+      <geometry>
+        <box size="0.01 0.11 0.01"/>
+      </geometry>
+    </collision>
+    <visual>
+      <geometry>
+        <box size="0.01 0.11 0.01"/>
+      </geometry>
+      <material name="crossbar_material">
+        <color rgba="0.3 0.3 0.3 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="camera_mount_crossbar_joint" type="fixed">
+    <parent link="camera_mount_post"/>
+    <child link="camera_mount_crossbar"/>
+    <!-- Crossbar at top of post, spanning from y=-0.05 to y=+0.05 -->
+    <origin xyz="0 0 0.0275" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Left cam -->
   <link name="left_front_cam_link">
     <inertial>
       <mass value="0.01"/>
@@ -661,10 +718,10 @@
   </link>
 
   <joint name="left_front_cam_joint" type="fixed">
-    <parent link="chassis"/>
+    <parent link="camera_mount_crossbar"/>
     <child link="left_front_cam_link"/>
-    <!-- front + left side of chassis, tilted outward -->
-    <origin xyz="${chassis_length/2 - 0.1} 0.05 0.08" rpy="0 0 0.3491"/>
+    <!-- Attached to left end of crossbar, tilted outward -->
+    <origin xyz="0 0.05 0" rpy="0 0 0.3491"/>
   </joint>
 
   <gazebo reference="left_front_cam_link">
@@ -709,10 +766,10 @@
   </link>
 
   <joint name="right_front_cam_joint" type="fixed">
-    <parent link="chassis"/>
+    <parent link="camera_mount_crossbar"/>
     <child link="right_front_cam_link"/>
-    <!-- front + right side of chassis, tilted outward -->
-    <origin xyz="${chassis_length/2 - 0.1} -0.05 0.08" rpy="0 0 -0.3491"/>
+    <!-- Attached to right end of crossbar, tilted outward -->
+    <origin xyz="0 -0.05 0" rpy="0 0 -0.3491"/>
   </joint>
 
   <gazebo reference="right_front_cam_link">
