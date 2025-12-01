@@ -133,20 +133,20 @@ class InferenceNode:
             rospy.loginfo_throttle(2.0, f"Front LIDAR: No valid ranges (all inf/nan or outside bounds)")
     
     def left_scan_callback(self, msg):
-        """Process left lidar scan for obstacle detection"""
+        """Process left lidar scan - steer right if obstacle detected"""
         ranges = [r for r in msg.ranges if r > msg.range_min and r < msg.range_max]
-        if ranges and min(ranges) < 0.1:
+        if ranges and min(ranges) < 0.20:
             self.left_obstacle_detected = True
-            rospy.logwarn_throttle(0.5, f"⚠️ LEFT OBSTACLE DETECTED at {min(ranges):.3f}m! Stopping.")
+            rospy.logwarn_throttle(0.5, f"⚠️ LEFT FRONT OBSTACLE at {min(ranges):.3f}m! Steering right.")
         else:
             self.left_obstacle_detected = False
 
     def right_scan_callback(self, msg):
-        """Process right lidar scan for obstacle detection"""
+        """Process right lidar scan - steer left if obstacle detected"""
         ranges = [r for r in msg.ranges if r > msg.range_min and r < msg.range_max]
-        if ranges and min(ranges) < 0.1:
+        if ranges and min(ranges) < 0.20:
             self.right_obstacle_detected = True
-            rospy.logwarn_throttle(0.5, f"⚠️ RIGHT OBSTACLE DETECTED at {min(ranges):.3f}m! Stopping.")
+            rospy.logwarn_throttle(0.5, f"⚠️ RIGHT FRONT OBSTACLE at {min(ranges):.3f}m! Steering left.")
         else:
             self.right_obstacle_detected = False
 
@@ -219,8 +219,8 @@ class InferenceNode:
         scan_tensor = torch.tensor(scan_ranges, dtype=torch.float32).unsqueeze(0).to(self.device)
         scan_tensor = scan_tensor / 30.0
 
-        # Front lidar obstacle detection - stop if obstacle within 0.1m in 30 degree cone
-        if self.obstacle_detected or self.left_obstacle_detected or self.right_obstacle_detected:
+        # Front lidar obstacle detection - stop if obstacle within 0.2m in front center
+        if self.obstacle_detected:
             twist = Twist()
             twist.linear.x = 0.0
             twist.angular.z = 0.0
@@ -237,11 +237,17 @@ class InferenceNode:
         if abs(w) > 3.0:
             v = min(v, 0.7)
 
+        # Front corner lidar obstacle avoidance - steer away from obstacles
+        if self.left_obstacle_detected:
+            w -= 0.3  # Steer right (negative angular velocity)
+        if self.right_obstacle_detected:
+            w += 0.3  # Steer left (positive angular velocity)
+
         # Side lidar obstacle avoidance - steer away from obstacles
         if self.side_left_obstacle_detected:
-            w -= 0.5  # Steer right (negative angular velocity)
+            w -= 0.6  # Steer right (negative angular velocity)
         if self.side_right_obstacle_detected:
-            w += 0.5  # Steer left (positive angular velocity)
+            w += 0.6  # Steer left (positive angular velocity)
 
         twist = Twist()
         # twist.linear.x = v

@@ -372,8 +372,8 @@
           <horizontal>
             <samples>60</samples>
             <resolution>1</resolution>
-            <min_angle>-0.2618</min_angle>  <!-- -15 degrees -->
-            <max_angle>0.2618</max_angle>   <!-- +15 degrees (30 degree cone) -->
+            <min_angle>-0.2182</min_angle>  <!-- -12.5 degrees -->
+            <max_angle>0.2182</max_angle>   <!-- +12.5 degrees (25 degree cone) -->
           </horizontal>
         </scan>
         <range>
@@ -567,7 +567,7 @@
         </scan>
         <range>
           <min>0.02</min>
-          <max>0.15</max>
+          <max>0.25</max>
           <resolution>0.005</resolution>
         </range>
         <noise>
@@ -630,7 +630,7 @@
         </scan>
         <range>
           <min>0.02</min>
-          <max>0.15</max>
+          <max>0.25</max>
           <resolution>0.005</resolution>
         </range>
         <noise>
@@ -642,6 +642,101 @@
       <plugin name="gazebo_ros_side_right_lidar_controller" filename="libgazebo_ros_laser.so">
         <topicName>side_right_scan</topicName>
         <frameName>side_right_lidar_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+    <!-- Left cam -->
+  <link name="left_front_cam_link">
+    <inertial>
+      <mass value="0.01"/>
+      <inertia ixx="1e-6" iyy="1e-6" izz="1e-6" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.02 0.02 0.01"/>
+      </geometry>
+      <material name="Gazebo/Black"/>
+    </visual>
+  </link>
+
+  <joint name="left_front_cam_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="left_front_cam_link"/>
+    <!-- front + left side of chassis, tilted outward -->
+    <origin xyz="${chassis_length/2 - 0.1} 0.05 0.08" rpy="0 0 0.3491"/>
+  </joint>
+
+  <gazebo reference="left_front_cam_link">
+    <sensor type="camera" name="left_front_camera_sensor">
+      <always_on>true</always_on>
+      <update_rate>30</update_rate>
+      <camera>
+        <horizontal_fov>1.396</horizontal_fov>
+        <image>
+          <width>3840</width>
+          <height>2160</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>200</far>
+        </clip>
+      </camera>
+
+      <plugin name="left_front_camera_controller" filename="libgazebo_ros_camera.so">
+        <cameraName>left_front_cam</cameraName>
+        <imageTopicName>left_front/image_raw</imageTopicName>
+        <cameraInfoTopicName>left_front/camera_info</cameraInfoTopicName>
+        <frameName>left_front_cam_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+
+  <!-- Right cam -->
+  <link name="right_front_cam_link">
+    <inertial>
+      <mass value="0.01"/>
+      <inertia ixx="1e-6" iyy="1e-6" izz="1e-6" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.02 0.02 0.01"/>
+      </geometry>
+      <material name="Gazebo/Black"/>
+    </visual>
+  </link>
+
+  <joint name="right_front_cam_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="right_front_cam_link"/>
+    <!-- front + right side of chassis, tilted outward -->
+    <origin xyz="${chassis_length/2 - 0.1} -0.05 0.08" rpy="0 0 -0.3491"/>
+  </joint>
+
+  <gazebo reference="right_front_cam_link">
+    <sensor type="camera" name="right_front_camera_sensor">
+      <always_on>true</always_on>
+      <update_rate>30</update_rate>
+      <camera>
+        <horizontal_fov>1.396</horizontal_fov>
+        <image>
+          <width>3840</width>
+          <height>2160</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>200</far>
+        </clip>
+      </camera>
+
+      <plugin name="right_front_camera_controller" filename="libgazebo_ros_camera.so">
+        <cameraName>right_front_cam</cameraName>
+        <imageTopicName>right_front/image_raw</imageTopicName>
+        <cameraInfoTopicName>right_front/camera_info</cameraInfoTopicName>
+        <frameName>right_front_cam_link</frameName>
       </plugin>
     </sensor>
   </gazebo>
