@@ -302,7 +302,7 @@
   <gazebo reference="hokuyo_link">
     <sensor type="ray" name="head_hokuyo_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>true</visualize>
+      <visualize>false</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
@@ -365,7 +365,7 @@
   <gazebo reference="front_lidar_link">
     <sensor type="ray" name="front_lidar_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>true</visualize>
+      <visualize>false</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
@@ -428,7 +428,7 @@
   <gazebo reference="left_lidar_link">
     <sensor type="ray" name="left_lidar_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>true</visualize>
+      <visualize>false</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
@@ -491,7 +491,7 @@
   <gazebo reference="right_lidar_link">
     <sensor type="ray" name="right_lidar_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>true</visualize>
+      <visualize>false</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
@@ -554,7 +554,7 @@
   <gazebo reference="side_left_lidar_link">
     <sensor type="ray" name="side_left_lidar_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>true</visualize>
+      <visualize>false</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
@@ -617,7 +617,7 @@
   <gazebo reference="side_right_lidar_link">
     <sensor type="ray" name="side_right_lidar_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>true</visualize>
+      <visualize>false</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
