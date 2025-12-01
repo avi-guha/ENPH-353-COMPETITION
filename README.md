@@ -74,7 +74,7 @@ Then when you need to stop the simulation call
 ```
 killjim
 ```
-from a new terminal.
+from new terminal.
 
 <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
     <img alt="Creative Commons Licence" style="border-width:0" 
