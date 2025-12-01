@@ -1,2 +1,0 @@
-adeept_awr/adeept_awr_description:adeept_awr/adeept_awr_gazebo:enph353/enph353:enph353/enph353_gazebo:enph353/enph353_npcs:enph353/enph353_utils:robbie:time_trials
--DCATKIN_DEVEL_PREFIX=/home/fizzer/ENPH-353-COMPETITION/devel -DCMAKE_INSTALL_PREFIX=/home/fizzer/ENPH-353-COMPETITION/install -G Unix Makefiles
