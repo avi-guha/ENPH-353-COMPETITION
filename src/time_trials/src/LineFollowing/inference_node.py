@@ -27,6 +27,10 @@ class InferenceNode:
         self.image_topic = rospy.get_param('~image_topic', '/B1/rrbot/camera1/image_raw')
         self.scan_topic = rospy.get_param('~scan_topic', '/B1/scan')
         self.front_scan_topic = rospy.get_param('~front_scan_topic', '/B1/front_scan')
+        self.left_scan_topic = rospy.get_param('~left_scan_topic', '/B1/left_scan')
+        self.right_scan_topic = rospy.get_param('~right_scan_topic', '/B1/right_scan')
+        self.side_left_scan_topic = rospy.get_param('~side_left_scan_topic', '/B1/side_left_scan')
+        self.side_right_scan_topic = rospy.get_param('~side_right_scan_topic', '/B1/side_right_scan')
         self.cmd_vel_topic = rospy.get_param('~cmd_vel_topic', '/B1/cmd_vel')
         
         # Default model path is in the same directory as this script
@@ -66,6 +70,16 @@ class InferenceNode:
         self.obstacle_detected = False
         rospy.Subscriber(self.front_scan_topic, LaserScan, self.front_scan_callback, queue_size=1)
         
+        # Left and Right lidars for obstacle detection
+        self.left_obstacle_detected = False
+        self.right_obstacle_detected = False
+        self.side_left_obstacle_detected = False
+        self.side_right_obstacle_detected = False
+        rospy.Subscriber(self.left_scan_topic, LaserScan, self.left_scan_callback, queue_size=1)
+        rospy.Subscriber(self.right_scan_topic, LaserScan, self.right_scan_callback, queue_size=1)
+        rospy.Subscriber(self.side_left_scan_topic, LaserScan, self.side_left_scan_callback, queue_size=1)
+        rospy.Subscriber(self.side_right_scan_topic, LaserScan, self.side_right_scan_callback, queue_size=1)
+        
         # Subscribers
         self.image_sub = message_filters.Subscriber(self.image_topic, Image)
         self.scan_sub = message_filters.Subscriber(self.scan_topic, LaserScan)
@@ -85,6 +99,8 @@ class InferenceNode:
         rospy.loginfo(f"  Image: {self.image_topic}")
         rospy.loginfo(f"  Scan: {self.scan_topic}")
         rospy.loginfo(f"  Front Scan: {self.front_scan_topic}")
+        rospy.loginfo(f"  Left Scan: {self.left_scan_topic}")
+        rospy.loginfo(f"  Right Scan: {self.right_scan_topic}")
         rospy.loginfo("Note: Will pause when manual teleop is active to avoid conflicts")
     
     def teleop_active_callback(self, msg):
@@ -116,6 +132,42 @@ class InferenceNode:
             self.obstacle_detected = False
             rospy.loginfo_throttle(2.0, f"Front LIDAR: No valid ranges (all inf/nan or outside bounds)")
     
+    def left_scan_callback(self, msg):
+        """Process left lidar scan for obstacle detection"""
+        ranges = [r for r in msg.ranges if r > msg.range_min and r < msg.range_max]
+        if ranges and min(ranges) < 0.1:
+            self.left_obstacle_detected = True
+            rospy.logwarn_throttle(0.5, f"⚠️ LEFT OBSTACLE DETECTED at {min(ranges):.3f}m! Stopping.")
+        else:
+            self.left_obstacle_detected = False
+
+    def right_scan_callback(self, msg):
+        """Process right lidar scan for obstacle detection"""
+        ranges = [r for r in msg.ranges if r > msg.range_min and r < msg.range_max]
+        if ranges and min(ranges) < 0.1:
+            self.right_obstacle_detected = True
+            rospy.logwarn_throttle(0.5, f"⚠️ RIGHT OBSTACLE DETECTED at {min(ranges):.3f}m! Stopping.")
+        else:
+            self.right_obstacle_detected = False
+
+    def side_left_scan_callback(self, msg):
+        """Process side left lidar scan - steer right if obstacle detected"""
+        ranges = [r for r in msg.ranges if r > msg.range_min and r < msg.range_max and not np.isnan(r) and not np.isinf(r)]
+        if ranges and min(ranges) < 0.15:
+            self.side_left_obstacle_detected = True
+            rospy.logwarn_throttle(0.5, f"⚠️ SIDE LEFT OBSTACLE at {min(ranges):.3f}m! Steering right.")
+        else:
+            self.side_left_obstacle_detected = False
+
+    def side_right_scan_callback(self, msg):
+        """Process side right lidar scan - steer left if obstacle detected"""
+        ranges = [r for r in msg.ranges if r > msg.range_min and r < msg.range_max and not np.isnan(r) and not np.isinf(r)]
+        if ranges and min(ranges) < 0.15:
+            self.side_right_obstacle_detected = True
+            rospy.logwarn_throttle(0.5, f"⚠️ SIDE RIGHT OBSTACLE at {min(ranges):.3f}m! Steering left.")
+        else:
+            self.side_right_obstacle_detected = False
+
     def check_publisher_connection(self):
         """Check if publisher is connected and recreate if needed (for sim resets)"""
         current_time = rospy.Time.now()
@@ -168,7 +220,7 @@ class InferenceNode:
         scan_tensor = scan_tensor / 30.0
 
         # Front lidar obstacle detection - stop if obstacle within 0.1m in 30 degree cone
-        if self.obstacle_detected:
+        if self.obstacle_detected or self.left_obstacle_detected or self.right_obstacle_detected:
             twist = Twist()
             twist.linear.x = 0.0
             twist.angular.z = 0.0
@@ -179,14 +231,22 @@ class InferenceNode:
         with torch.no_grad():
             output = self.model(image, scan_tensor)
             v = 0.73 * output[0][0].item()
-            w = 1.37 * output[0][1].item()
+            w = 1.40 * output[0][1].item()
 
         # If max turning speed > 2.0 rad/s, set max velocity to 0.5 m/s
         if abs(w) > 3.0:
-            v = min(v, 1.0)
+            v = min(v, 0.7)
+
+        # Side lidar obstacle avoidance - steer away from obstacles
+        if self.side_left_obstacle_detected:
+            w -= 0.5  # Steer right (negative angular velocity)
+        if self.side_right_obstacle_detected:
+            w += 0.5  # Steer left (positive angular velocity)
 
         twist = Twist()
-        twist.linear.x = v
+        # twist.linear.x = v
+        twist.linear.x = 1.4
+        
         twist.angular.z = w
         self.pub.publish(twist)
         
