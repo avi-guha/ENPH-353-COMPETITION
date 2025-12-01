@@ -1,8 +1,11 @@
 <launch>
    <!-- My Package launch file -->
-   <node pkg="time_trials"
+   <!-- <node pkg="time_trials"
          type="my_controller.py"
          name="topic_publisher" 
          output="screen">
-   </node>
+   </node> -->
+
+   <!-- PS4 Teleop -->
+   <include file="$(find time_trials)/launch/teleop.launch"/>
 </launch>

@@ -17,6 +17,15 @@
   <xacro:include filename="$(find robbie)/urdf/macros.xacro"/>
   <xacro:include filename="$(find robbie)/urdf/materials.xacro"/>
 
+  <!-- Base link for the robot -->
+  <link name="base_link"/>
+  
+  <joint name="base_to_chassis" type="fixed">
+    <parent link="base_link"/>
+    <child link="chassis"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
   <link name='chassis'>
     <xacro:box_inertial name="chassis" m="${chassis_mass}" x="${chassis_length}" y="${chassis_width}" z="${chassis_height}"/>
     <collision name='chassis_collision'>
@@ -147,13 +156,13 @@
   </joint>
 
   <joint name="camera_joint" type="fixed">
-    <parent link="chassis"/>
+    <parent link="hokuyo_link"/>
     <child link="camera_link"/>
-    <origin xyz="${chassis_length/2} 0 ${chassis_height/2+camera_height/2}"/>
+    <origin xyz="0 0 0.02" rpy="0 0 0"/> <!-- Directly on top of lidar, level/horizontal -->
   </joint>
 
   <gazebo reference="chassis">
-    <material>Gazebo/Orange</material>
+    <material>Gazebo/Purple</material>
   </gazebo>
 
   <gazebo reference="camera_link">
@@ -161,19 +170,19 @@
   </gazebo>
 
   <gazebo reference="wheel_FL">
-    <material>Gazebo/Yellow</material>
+    <material>Gazebo/Pink</material>
   </gazebo>
 
   <gazebo reference="wheel_FR">
-    <material>Gazebo/Yellow</material>
+    <material>Gazebo/Pink</material>
   </gazebo>
 
   <gazebo reference="wheel_RL">
-    <material>Gazebo/Yellow</material>
+    <material>Gazebo/Pink</material>
   </gazebo>
 
   <gazebo reference="wheel_RR">
-    <material>Gazebo/Yellow</material>
+    <material>Gazebo/Pink</material>
   </gazebo>
 
   <gazebo>
@@ -192,11 +201,37 @@
     </plugin>
   </gazebo>
 
+  <!-- Collision detection for bumper sensors -->
+  <link name="bumper_link">
+    <collision name="bumper_collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.22 0.16 0.06"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="bumper_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="bumper_link"/>
+    <origin xyz="0 0 0"/>
+  </joint>
+
+  <gazebo reference="bumper_link">
+    <sensor name="bumper_sensor" type="contact">
+      <always_on>true</always_on>
+      <update_rate>10.0</update_rate>
+      <contact>
+        <collision>bumper_collision</collision>
+      </contact>
+    </sensor>
+  </gazebo>
+
   <gazebo reference="camera_link">
     <sensor type="camera" name="camera1">
       <update_rate>30.0</update_rate>
       <camera name="head">
-        <horizontal_fov>1.3962634</horizontal_fov>
+        <horizontal_fov>2.1</horizontal_fov> <!-- 110 degrees (increased from 100) -->
         <image>
           <width>800</width>
           <height>800</height>
@@ -232,5 +267,535 @@
     </sensor>
   </gazebo>
 
+
+  <!-- LIDAR Link -->
+  <link name="hokuyo_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.03 0.03 0.03"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.03 0.03 0.03"/>
+      </geometry>
+      <material name="hokuyo_material">
+        <color rgba="0.1 0.1 0.1 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="hokuyo_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="0.08 0 0.04" rpy="0 0 0"/> <!-- Moved forward on top of chassis -->
+    <parent link="chassis"/>
+    <child link="hokuyo_link"/>
+  </joint>
+
+  <gazebo reference="hokuyo_link">
+    <sensor type="ray" name="head_hokuyo_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.570796</min_angle>
+            <max_angle>1.570796</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.10</min>
+          <max>30.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+        <topicName>scan</topicName>
+        <frameName>hokuyo_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- Front Low LIDAR Link - for close obstacle detection -->
+  <link name="front_lidar_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+      <material name="front_lidar_material">
+        <color rgba="0.8 0.2 0.2 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="front_lidar_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="0.10 0 -0.01" rpy="0 -0.2 0"/> <!-- Directly on front face, lower, pitched up -->
+    <parent link="chassis"/>
+    <child link="front_lidar_link"/>
+  </joint>
+
+  <gazebo reference="front_lidar_link">
+    <sensor type="ray" name="front_lidar_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>60</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.2182</min_angle>  <!-- -12.5 degrees -->
+            <max_angle>0.2182</max_angle>   <!-- +12.5 degrees (25 degree cone) -->
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.02</min>   <!-- Minimum 2cm to avoid self-detection -->
+          <max>0.5</max>    <!-- Short range for obstacle detection -->
+          <resolution>0.005</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.005</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_front_lidar_controller" filename="libgazebo_ros_laser.so">
+        <topicName>front_scan</topicName>
+        <frameName>front_lidar_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- Left Edge LIDAR Link -->
+  <link name="left_lidar_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+      <material name="left_lidar_material">
+        <color rgba="0.2 0.8 0.2 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="left_lidar_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="0.10 0.0375 -0.01" rpy="0 -0.2 0"/> <!-- On front face, 1/4 from left edge, angled up -->
+    <parent link="chassis"/>
+    <child link="left_lidar_link"/>
+  </joint>
+
+  <gazebo reference="left_lidar_link">
+    <sensor type="ray" name="left_lidar_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>15</samples> <!-- 15 degrees scan -->
+            <resolution>1</resolution>
+            <min_angle>0.2618</min_angle>   <!-- 15 degrees -->
+            <max_angle>0.5236</max_angle>   <!-- 30 degrees -->
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.02</min>
+          <max>0.75</max>
+          <resolution>0.005</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.005</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_left_lidar_controller" filename="libgazebo_ros_laser.so">
+        <topicName>left_scan</topicName>
+        <frameName>left_lidar_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- Right Edge LIDAR Link -->
+  <link name="right_lidar_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+      <material name="right_lidar_material">
+        <color rgba="0.2 0.2 0.8 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="right_lidar_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="0.10 -0.0375 -0.01" rpy="0 -0.2 0"/> <!-- On front face, 1/4 from right edge, angled up -->
+    <parent link="chassis"/>
+    <child link="right_lidar_link"/>
+  </joint>
+
+  <gazebo reference="right_lidar_link">
+    <sensor type="ray" name="right_lidar_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>15</samples> <!-- 15 degrees scan -->
+            <resolution>1</resolution>
+            <min_angle>-0.5236</min_angle>  <!-- -30 degrees -->
+            <max_angle>-0.2618</max_angle>  <!-- -15 degrees -->
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.02</min>
+          <max>0.75</max>
+          <resolution>0.005</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.005</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_right_lidar_controller" filename="libgazebo_ros_laser.so">
+        <topicName>right_scan</topicName>
+        <frameName>right_lidar_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- Left Side LIDAR Link -->
+  <link name="side_left_lidar_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+      <material name="side_left_lidar_material">
+        <color rgba="0.8 0.8 0.2 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="side_left_lidar_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="0.0 0.076 0.025" rpy="0 0 1.570796"/> <!-- Center of left edge, pointing left -->
+    <parent link="chassis"/>
+    <child link="side_left_lidar_link"/>
+  </joint>
+
+  <gazebo reference="side_left_lidar_link">
+    <sensor type="ray" name="side_left_lidar_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>60</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.523599</min_angle> <!-- -30 degrees -->
+            <max_angle>0.523599</max_angle>  <!-- +30 degrees (60 degree total) -->
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.02</min>
+          <max>0.25</max>
+          <resolution>0.005</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.005</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_side_left_lidar_controller" filename="libgazebo_ros_laser.so">
+        <topicName>side_left_scan</topicName>
+        <frameName>side_left_lidar_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- Right Side LIDAR Link -->
+  <link name="side_right_lidar_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.02 0.02"/>
+      </geometry>
+      <material name="side_right_lidar_material">
+        <color rgba="0.8 0.2 0.8 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="side_right_lidar_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="0.0 -0.076 0.025" rpy="0 0 -1.570796"/> <!-- Center of right edge, pointing right -->
+    <parent link="chassis"/>
+    <child link="side_right_lidar_link"/>
+  </joint>
+
+  <gazebo reference="side_right_lidar_link">
+    <sensor type="ray" name="side_right_lidar_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>60</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.523599</min_angle> <!-- -30 degrees -->
+            <max_angle>0.523599</max_angle>  <!-- +30 degrees (60 degree total) -->
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.02</min>
+          <max>0.25</max>
+          <resolution>0.005</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.005</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_side_right_lidar_controller" filename="libgazebo_ros_laser.so">
+        <topicName>side_right_scan</topicName>
+        <frameName>side_right_lidar_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- Camera mount structure -->
+  <!-- Vertical post from chassis -->
+  <link name="camera_mount_post">
+    <inertial>
+      <mass value="0.02"/>
+      <inertia ixx="1e-6" iyy="1e-6" izz="1e-6" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <collision>
+      <geometry>
+        <cylinder radius="0.005" length="0.055"/>
+      </geometry>
+    </collision>
+    <visual>
+      <geometry>
+        <cylinder radius="0.005" length="0.055"/>
+      </geometry>
+      <material name="mount_material">
+        <color rgba="0.3 0.3 0.3 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="camera_mount_post_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="camera_mount_post"/>
+    <!-- Post at front of chassis, from top (z=0.025) up to camera height (z=0.08) -->
+    <origin xyz="${chassis_length/2 - 0.1} 0 0.0525" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Horizontal crossbar connecting both cameras -->
+  <link name="camera_mount_crossbar">
+    <inertial>
+      <mass value="0.01"/>
+      <inertia ixx="1e-6" iyy="1e-6" izz="1e-6" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <collision>
+      <geometry>
+        <box size="0.01 0.11 0.01"/>
+      </geometry>
+    </collision>
+    <visual>
+      <geometry>
+        <box size="0.01 0.11 0.01"/>
+      </geometry>
+      <material name="crossbar_material">
+        <color rgba="0.3 0.3 0.3 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="camera_mount_crossbar_joint" type="fixed">
+    <parent link="camera_mount_post"/>
+    <child link="camera_mount_crossbar"/>
+    <!-- Crossbar at top of post, spanning from y=-0.05 to y=+0.05 -->
+    <origin xyz="0 0 0.0275" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Left cam -->
+  <link name="left_front_cam_link">
+    <inertial>
+      <mass value="0.01"/>
+      <inertia ixx="1e-6" iyy="1e-6" izz="1e-6" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.02 0.02 0.01"/>
+      </geometry>
+      <material name="Gazebo/Black"/>
+    </visual>
+  </link>
+
+  <joint name="left_front_cam_joint" type="fixed">
+    <parent link="camera_mount_crossbar"/>
+    <child link="left_front_cam_link"/>
+    <!-- Attached to left end of crossbar, tilted outward -->
+    <origin xyz="0 0.05 0" rpy="0 0 0.3491"/>
+  </joint>
+
+  <gazebo reference="left_front_cam_link">
+    <sensor type="camera" name="left_front_camera_sensor">
+      <always_on>true</always_on>
+      <update_rate>30</update_rate>
+      <camera>
+        <horizontal_fov>1.396</horizontal_fov>
+        <image>
+          <width>3840</width>
+          <height>2160</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>200</far>
+        </clip>
+      </camera>
+
+      <plugin name="left_front_camera_controller" filename="libgazebo_ros_camera.so">
+        <cameraName>left_front_cam</cameraName>
+        <imageTopicName>left_front/image_raw</imageTopicName>
+        <cameraInfoTopicName>left_front/camera_info</cameraInfoTopicName>
+        <frameName>left_front_cam_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+
+  <!-- Right cam -->
+  <link name="right_front_cam_link">
+    <inertial>
+      <mass value="0.01"/>
+      <inertia ixx="1e-6" iyy="1e-6" izz="1e-6" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.02 0.02 0.01"/>
+      </geometry>
+      <material name="Gazebo/Black"/>
+    </visual>
+  </link>
+
+  <joint name="right_front_cam_joint" type="fixed">
+    <parent link="camera_mount_crossbar"/>
+    <child link="right_front_cam_link"/>
+    <!-- Attached to right end of crossbar, tilted outward -->
+    <origin xyz="0 -0.05 0" rpy="0 0 -0.3491"/>
+  </joint>
+
+  <gazebo reference="right_front_cam_link">
+    <sensor type="camera" name="right_front_camera_sensor">
+      <always_on>true</always_on>
+      <update_rate>30</update_rate>
+      <camera>
+        <horizontal_fov>1.396</horizontal_fov>
+        <image>
+          <width>3840</width>
+          <height>2160</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>200</far>
+        </clip>
+      </camera>
+
+      <plugin name="right_front_camera_controller" filename="libgazebo_ros_camera.so">
+        <cameraName>right_front_cam</cameraName>
+        <imageTopicName>right_front/image_raw</imageTopicName>
+        <cameraInfoTopicName>right_front/camera_info</cameraInfoTopicName>
+        <frameName>right_front_cam_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
 
 </robot>
