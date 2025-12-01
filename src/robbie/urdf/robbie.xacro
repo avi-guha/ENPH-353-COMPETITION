@@ -9,7 +9,7 @@
   <xacro:property name="chassis_width" value="0.15"/>
   <xacro:property name="chassis_length" value="0.2"/>
   <xacro:property name="chassis_height" value="0.05"/>
-  <xacro:property name="chassis_mass" value="0.5"/>
+  <xacro:property name="chassis_mass" value="0.38"/>
   <xacro:property name="wheel_radius" value="0.04"/>
   <xacro:property name="wheel_width" value="0.03"/>
   <xacro:property name="wheel_mass" value="0.025"/>
@@ -286,7 +286,7 @@
       </material>
     </visual>
     <inertial>
-      <mass value="1e-5" />
+      <mass value="0.01" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
     </inertial>
@@ -349,7 +349,7 @@
       </material>
     </visual>
     <inertial>
-      <mass value="1e-5" />
+      <mass value="0.01" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
     </inertial>
@@ -412,7 +412,7 @@
       </material>
     </visual>
     <inertial>
-      <mass value="1e-5" />
+      <mass value="0.01" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
     </inertial>
@@ -475,7 +475,7 @@
       </material>
     </visual>
     <inertial>
-      <mass value="1e-5" />
+      <mass value="0.01" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
     </inertial>
@@ -538,7 +538,7 @@
       </material>
     </visual>
     <inertial>
-      <mass value="1e-5" />
+      <mass value="0.01" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
     </inertial>
@@ -601,7 +601,7 @@
       </material>
     </visual>
     <inertial>
-      <mass value="1e-5" />
+      <mass value="0.01" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
     </inertial>

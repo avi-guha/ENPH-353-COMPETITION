@@ -111,7 +111,7 @@ class InferenceNode:
             rospy.loginfo(f"Manual teleop is {status} - Inference {'PAUSED' if msg.data else 'RESUMED'}")
     
     def front_scan_callback(self, msg):
-        """Process front lidar scan for obstacle detection in 30 degree cone at 0.1m"""
+        """Process front lidar scan for obstacle detection in 30 degree cone at 0.005m"""
         self.front_scan_data = msg
         
         # Get valid ranges (filter out inf and nan, and values outside sensor range)
@@ -120,8 +120,8 @@ class InferenceNode:
         
         if valid_ranges:
             min_dist = min(valid_ranges)
-            # Detect obstacle within 0.1m in the 30 degree front cone
-            self.obstacle_detected = min_dist < 0.1
+            # Detect obstacle within 0.025m in the 30 degree front cone
+            self.obstacle_detected = min_dist < 0.025
             
             # Debug logging (throttled)
             rospy.loginfo_throttle(2.0, f"Front LIDAR: min={min_dist:.3f}m, valid_samples={len(valid_ranges)}/{len(ranges)}, range_min={msg.range_min:.3f}, range_max={msg.range_max:.3f}")
@@ -231,11 +231,11 @@ class InferenceNode:
         with torch.no_grad():
             output = self.model(image, scan_tensor)
             v = 0.73 * output[0][0].item()
-            w = 1.40 * output[0][1].item()
+            w = 1.44 * output[0][1].item()
 
         # If max turning speed > 2.0 rad/s, set max velocity to 0.5 m/s
         if abs(w) > 3.0:
-            v = min(v, 0.7)
+            v = min(v, 0.85)
 
         # Front corner lidar obstacle avoidance - steer away from obstacles
         if self.left_obstacle_detected:
@@ -245,13 +245,13 @@ class InferenceNode:
 
         # Side lidar obstacle avoidance - steer away from obstacles
         if self.side_left_obstacle_detected:
-            w -= 0.6  # Steer right (negative angular velocity)
+            w -= 0.65  # Steer right (negative angular velocity)
         if self.side_right_obstacle_detected:
-            w += 0.6  # Steer left (positive angular velocity)
+            w += 0.65  # Steer left (positive angular velocity)
 
         twist = Twist()
         # twist.linear.x = v
-        twist.linear.x = 1.4
+        twist.linear.x = 1.5
         
         twist.angular.z = w
         self.pub.publish(twist)
