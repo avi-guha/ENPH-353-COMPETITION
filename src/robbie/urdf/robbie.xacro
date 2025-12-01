@@ -9,7 +9,7 @@
   <xacro:property name="chassis_width" value="0.15"/>
   <xacro:property name="chassis_length" value="0.2"/>
   <xacro:property name="chassis_height" value="0.05"/>
-  <xacro:property name="chassis_mass" value="0.38"/>
+  <xacro:property name="chassis_mass" value="0.32"/>
   <xacro:property name="wheel_radius" value="0.04"/>
   <xacro:property name="wheel_width" value="0.03"/>
   <xacro:property name="wheel_mass" value="0.025"/>
@@ -372,8 +372,8 @@
           <horizontal>
             <samples>60</samples>
             <resolution>1</resolution>
-            <min_angle>-0.2182</min_angle>  <!-- -12.5 degrees -->
-            <max_angle>0.2182</max_angle>   <!-- +12.5 degrees (25 degree cone) -->
+            <min_angle>-0.2705</min_angle>  <!-- -15.5 degrees -->
+            <max_angle>0.2705</max_angle>   <!-- +15.5 degrees (31 degree cone) -->
           </horizontal>
         </scan>
         <range>
