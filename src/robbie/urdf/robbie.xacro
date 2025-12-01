@@ -331,9 +331,7 @@
     </sensor>
   </gazebo>
   
-  <!-- ============================== -->
-  <!-- LEFT FRONT CAMERA (4K)         -->
-  <!-- ============================== -->
+  <!-- Left cam -->
   <link name="left_front_cam_link">
     <inertial>
       <mass value="0.01"/>
@@ -381,9 +379,7 @@
   </gazebo>
 
 
-  <!-- ============================== -->
-  <!-- RIGHT FRONT CAMERA (4K)        -->
-  <!-- ============================== -->
+  <!-- Right cam -->
   <link name="right_front_cam_link">
     <inertial>
       <mass value="0.01"/>
