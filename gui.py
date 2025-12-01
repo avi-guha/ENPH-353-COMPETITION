@@ -6,7 +6,7 @@ import numpy as np
 
 from PyQt6.QtWidgets import (
     QApplication, QLabel, QMainWindow, QWidget,
-    QVBoxLayout, QHBoxLayout
+    QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy
 )
 from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtCore import pyqtSignal, Qt, QObject
@@ -24,6 +24,33 @@ def cv_to_qt(img):
     return QImage(rgb.data, w, h, ch*w, QImage.Format.Format_RGB888)
 
 
+# Create a panel with a LaTeX-style heading and fixed-size image display
+def make_panel(title):
+    container = QWidget()
+    layout = QVBoxLayout()
+
+    title_label = QLabel(title)
+    title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    title_label.setStyleSheet("""
+        font-family: 'CMU Serif';
+        font-size: 18px;
+        font-weight: bold;
+    """)
+
+    image_label = QLabel()
+    image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    image_label.setStyleSheet("background-color: black; color: white;")
+
+    # FIXED image size (but panel can resize)
+    image_label.setFixedSize(600, 400)
+
+    layout.addWidget(title_label)
+    layout.addWidget(image_label, alignment=Qt.AlignmentFlag.AlignCenter)
+
+    container.setLayout(layout)
+    return container, image_label
+
+
 # Thread-safe signal bridge
 class RosBridge(QObject):
     raw_sig = pyqtSignal(np.ndarray)
@@ -37,46 +64,67 @@ class MainGUI(QMainWindow):
         super().__init__()
         self.setWindowTitle("Clueboard Debug Viewer")
 
-        # Labels
-        self.raw_label = QLabel("Raw Board")
-        self.proc_label = QLabel("Processed Board")
-        self.words_label = QLabel("Words Debug")
-        self.letters_label = QLabel("Letters Debug")
+        # Panels with headings
+        self.raw_panel, self.raw_label = make_panel("Raw Board")
+        self.proc_panel, self.proc_label = make_panel("Processed Board")
+        self.words_panel, self.words_label = make_panel("Words Debug")
+        self.letters_panel, self.letters_label = make_panel("Letters Debug")
 
-        for lab in [self.raw_label, self.proc_label,
-                    self.words_label, self.letters_label]:
-            lab.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            lab.setStyleSheet("background-color: black; color: white;")
-
-        # Layout
-        top = QHBoxLayout()
-        top.addWidget(self.raw_label)
-        top.addWidget(self.proc_label)
-
-        bottom = QVBoxLayout()
-        bottom.addWidget(self.words_label)
-        bottom.addWidget(self.letters_label)
-
-        full = QVBoxLayout()
-        full.addLayout(top)
-        full.addLayout(bottom)
+        # Grid layout (2×2)
+        grid = QGridLayout()
+        grid.addWidget(self.raw_panel,    0, 0)
+        grid.addWidget(self.proc_panel,   0, 1)
+        grid.addWidget(self.words_panel,  1, 0)
+        grid.addWidget(self.letters_panel,1, 1)
 
         widget = QWidget()
-        widget.setLayout(full)
+        widget.setLayout(grid)
         self.setCentralWidget(widget)
 
     # Update methods
-    def update_raw(self, img): 
-        self.raw_label.setPixmap(QPixmap.fromImage(cv_to_qt(img)))
+    def update_raw(self, img):
+        qimg = cv_to_qt(img)
+        pix = QPixmap.fromImage(qimg)
+        self.raw_label.setPixmap(
+            pix.scaled(
+                600, 500,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
+        )
 
     def update_proc(self, img):
-        self.proc_label.setPixmap(QPixmap.fromImage(cv_to_qt(img)))
+        qimg = cv_to_qt(img)
+        pix = QPixmap.fromImage(qimg)
+        self.proc_label.setPixmap(
+            pix.scaled(
+                600, 500,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
+        )
 
     def update_words(self, img):
-        self.words_label.setPixmap(QPixmap.fromImage(cv_to_qt(img)))
+        qimg = cv_to_qt(img)
+        pix = QPixmap.fromImage(qimg)
+        self.words_label.setPixmap(
+            pix.scaled(
+                600, 500,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
+        )
 
     def update_letters(self, img):
-        self.letters_label.setPixmap(QPixmap.fromImage(cv_to_qt(img)))
+        qimg = cv_to_qt(img)
+        pix = QPixmap.fromImage(qimg)
+        self.letters_label.setPixmap(
+            pix.scaled(
+                600, 500,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation
+            )
+        )
 
 
 class GuiNode:
@@ -127,5 +175,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
