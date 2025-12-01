@@ -20,9 +20,6 @@ CLASSES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 "
 VAL_SPLIT = 0.2  # still used for recreating splits, but not needed here
 
 
-# ================================
-# LOAD TRAINING DATA (REBUILD)
-# ================================
 def load_training_data():
     char_to_idx = {c: i for i, c in enumerate(CLASSES)}
 
@@ -48,10 +45,6 @@ def load_training_data():
 
     return X_shuf, y_shuf
 
-
-# ================================
-# CONFUSION MATRIX FOR ALL DATA
-# ================================
 def plot_confusion_matrix_all_data(model, X_all, y_all):
     y_pred_prob = model.predict(X_all)
     y_pred = np.argmax(y_pred_prob, axis=1)
@@ -71,9 +64,6 @@ def plot_confusion_matrix_all_data(model, X_all, y_all):
     plt.show()
 
 
-# ================================
-# MAIN
-# ================================
 def main():
     print("Loading model...")
     model = load_model(MODEL_PATH)
