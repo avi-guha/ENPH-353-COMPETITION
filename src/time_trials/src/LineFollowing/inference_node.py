@@ -178,8 +178,12 @@ class InferenceNode:
         # Inference
         with torch.no_grad():
             output = self.model(image, scan_tensor)
-            v = 0.77 * output[0][0].item()
-            w = 1.44 * output[0][1].item()
+            v = 0.73 * output[0][0].item()
+            w = 1.37 * output[0][1].item()
+
+        # If max turning speed > 2.0 rad/s, set max velocity to 0.5 m/s
+        if abs(w) > 3.0:
+            v = min(v, 1.0)
 
         twist = Twist()
         twist.linear.x = v

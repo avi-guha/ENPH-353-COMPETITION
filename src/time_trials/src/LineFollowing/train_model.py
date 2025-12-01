@@ -77,7 +77,7 @@ class DrivingDataset(Dataset):
 def train():
     # Hyperparameters
     BATCH_SIZE = 16
-    LEARNING_RATE = 1e-6 # Lower learning rate for stability
+    LEARNING_RATE = 1e-5 # Lower learning rate for stability
     EPOCHS = 100
     # Get the directory where this script is located
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
