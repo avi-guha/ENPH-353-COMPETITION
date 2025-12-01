@@ -31,7 +31,7 @@ fi
 
 # Launch inference node in background
 echo "[3/4] Launching inference node..."
-rosrun time_trials inference_node.py &
+python3 /home/fizzer/ENPH-353-COMPETITION/src/competition/line_following/inference_node.py &
 INFERENCE_PID=$!
 sleep 1
 
@@ -49,7 +49,7 @@ echo "========================================="
 echo ""
 
 # Run camera viewer in foreground (blocks here)
-rosrun time_trials camera_viewer.py
+python3 /home/fizzer/ENPH-353-COMPETITION/src/competition/line_following/camera_viewer.py
 
 # Cleanup when camera viewer exits
 echo ""
