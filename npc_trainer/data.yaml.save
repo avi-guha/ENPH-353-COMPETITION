@@ -1,0 +1,13 @@
+train: ages
+val: ../valid/images
+test: ../test/images
+
+nc: 2
+names: ['pedestrian', 'yoda']
+
+roboflow:
+  workspace: enph252ros
+  project: babeped-jo67m
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/enph252ros/babeped-jo67m/dataset/1
