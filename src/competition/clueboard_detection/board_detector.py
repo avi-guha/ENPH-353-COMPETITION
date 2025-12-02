@@ -23,7 +23,7 @@ class BoardDetector:
         self.curr_time = time.time()
         self.last_board_time = time.time()
 
-        self.current_board = 1
+        self.current_board = 0
 
         # Hashmap / dict containing all IDs of clueboards in course with corresponding bool, and Label.
         # Bool (item 0 in list of value) marks if this clueboard has been reported to /score_tracker yet.
@@ -74,8 +74,8 @@ class BoardDetector:
 
         self.pub_yolo = rospy.Publisher('/yolo_clueboard/image', Image, queue_size=1)
 
-        rospy.loginfo("Board Detector Initialized!")
-    
+        rospy.loginfo("Board Detector Initialized!")                        
+
     # Board validation
     def board_captured(self, raw_board):
         """
@@ -214,6 +214,15 @@ class BoardDetector:
         @param msg the callback Image
         """
         # early exit if current_board is out of range
+        if self.current_board > 8:
+            msg = String()
+            msg.data = f"{self.team_name},{self.team_pass},-1,NA"
+            self.pub_score.publish(msg)
+        elif self.current_board == 0:
+            msg = String()
+            msg.data = f"{self.team_name},{self.team_pass},0,NA"
+            self.pub_score.publish(msg)
+            self.current_board += 1
         if self.current_board not in self.board_map:
             return
 
@@ -233,8 +242,8 @@ class BoardDetector:
                 confidence = box.conf[0].item()
 
                 # ensure all conditions met before proceeding to read board
-                sizeable  = (x2-x1) > 450
-                aspectratio = (x2-x1) / (y2-y1) > 1.4
+                sizeable  = (x2-x1) > 420
+                aspectratio = (x2-x1) / (y2-y1) > 1.35
                 confident = confidence > 0.91
 
                 # validate order of board detection, ensure this baord isnt seen yet
@@ -292,15 +301,12 @@ class BoardDetector:
                         msg_out.data = f"{self.team_name},{self.team_pass},{self.current_board},{clue_text}"
 
                         self.pub_score.publish(msg_out)
-
                         
                         # mark board as reported
                         self.board_map[self.current_board][0] = True
                         self.last_board_time = time.time()
 
-                        # --- CHANGE: increment safely, prevent overflow
-                        if self.current_board < max(self.board_map.keys()):
-                            self.current_board += 1
+                        self.current_board += 1
                         
                         # return immediately to avoid multiple detections per callback
                         return
