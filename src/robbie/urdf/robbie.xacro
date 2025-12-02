@@ -233,8 +233,8 @@
       <camera name="head">
         <horizontal_fov>2.1</horizontal_fov> <!-- 110 degrees (increased from 100) -->
         <image>
-          <width>800</width>
-          <height>800</height>
+          <width>1500</width>
+          <height>1500</height>
           <format>R8G8B8</format>
         </image>
         <clip>
