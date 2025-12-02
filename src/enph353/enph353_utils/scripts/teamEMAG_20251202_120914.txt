@@ -11,3 +11,8 @@
 12:09:21.707: Message received: teamEMAG,secret3,1,UNKNOWN
 12:09:21.708: Team total: 6 pts
 12:09:21.708: Awarded: 6 pts
+12:14:18.492: Out of time: 240.488sec sim time (real time: 304sec).
+12:16:24.064: Message received: teamEMAG,secret3,0,NA
+12:16:24.065: Timer started.
+12:16:42.810: Message received: teamEMAG,secret3,1,UNKNOWN
+12:16:42.816: Awarded: 6 pts
