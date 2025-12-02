@@ -1,6 +1,6 @@
 # Training data - too large for git
 src/time_trials/src/LineFollowing/data/
-
+*.pth
 *.pyc
 __pycache__/
 
