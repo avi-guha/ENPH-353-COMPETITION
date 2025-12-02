@@ -1,0 +1,178 @@
+11:29:23.769: Clue SIZE: UNKNOWN
+11:29:23.769: Clue VICTIM: MAGIC MIKE
+11:29:23.769: Clue CRIME: DISAPPEAR
+11:29:23.769: Clue TIME: CIRCUS
+11:29:23.769: Clue PLACE: WORMHOLE
+11:29:23.770: Clue MOTIVE: STARDOM
+11:29:23.770: Clue WEAPON: QUANTUM WAND
+11:29:23.820: Clue BANDIT: CLOWN CLAUDE
+11:29:40.220: Message received: teamEMAG,secret3,0,NA
+11:29:40.220: Timer started.
+11:29:48.029: Message received: teamEMAG,secret3,1,UNKNOWN
+11:29:48.030: Team total: 6 pts
+11:29:48.032: Awarded: 6 pts
+11:33:57.400: Message received: teamEMAG,secret3,0,NA
+11:33:57.402: Timer started.
+11:34:06.120: Message received: teamEMAG,secret3,1,UNKNOWN
+11:34:06.121: Awarded: 6 pts
+11:36:16.683: Message received: teamEMAG,secret3,2,MAGICMIKE
+11:36:16.684: Team total: 12 pts
+11:36:16.686: Awarded: 6 pts
+11:36:25.775: Message received: teamEMAG,secret3,3,DISAPPEAR
+11:36:25.776: Team total: 18 pts
+11:36:25.777: Awarded: 6 pts
+11:36:49.304: Message received: teamEMAG,secret3,4,A
+11:36:49.305: Awarded: 0 pts
+11:37:29.281: Message received: teamEMAG,secret3,5,WORMHOLE
+11:37:29.282: Team total: 24 pts
+11:37:29.284: Awarded: 6 pts
+11:37:53.293: Message received: teamEMAG,secret3,6,STARDOM
+11:37:53.293: Team total: 30 pts
+11:37:53.296: Awarded: 6 pts
+11:38:35.124: Message received: teamEMAG,secret3,7,QUANTUMWAND
+11:38:35.125: Team total: 38 pts
+11:38:35.125: Awarded: 8 pts
+11:39:19.493: Out of time: 240.26600000000002sec sim time (real time: 322sec).
+11:41:42.133: Message received: teamEMAG,secret3,8,CLOWNCLAUDE
+11:41:42.134: Team total: 46 pts
+11:41:42.135: Awarded: 8 pts
+11:41:42.219: Message received: teamEMAG,secret3,-1,NA
+11:41:42.220: Timer stopped: 344.86 sec sim time (real time: 322sec).
+11:41:42.397: Message received: teamEMAG,secret3,-1,NA
+11:41:42.398: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:42.399: Message received: teamEMAG,secret3,-1,NA
+11:41:42.399: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:42.451: Message received: teamEMAG,secret3,-1,NA
+11:41:42.452: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:42.711: Message received: teamEMAG,secret3,-1,NA
+11:41:42.712: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:42.761: Message received: teamEMAG,secret3,-1,NA
+11:41:42.763: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:42.810: Message received: teamEMAG,secret3,-1,NA
+11:41:42.811: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:42.842: Message received: teamEMAG,secret3,-1,NA
+11:41:42.843: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:42.935: Message received: teamEMAG,secret3,-1,NA
+11:41:42.936: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:42.973: Message received: teamEMAG,secret3,-1,NA
+11:41:42.974: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:43.144: Message received: teamEMAG,secret3,-1,NA
+11:41:43.144: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:43.174: Message received: teamEMAG,secret3,-1,NA
+11:41:43.175: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:43.367: Message received: teamEMAG,secret3,-1,NA
+11:41:43.368: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:43.395: Message received: teamEMAG,secret3,-1,NA
+11:41:43.396: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:43.587: Message received: teamEMAG,secret3,-1,NA
+11:41:43.588: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:43.622: Message received: teamEMAG,secret3,-1,NA
+11:41:43.623: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:43.812: Message received: teamEMAG,secret3,-1,NA
+11:41:43.813: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:43.847: Message received: teamEMAG,secret3,-1,NA
+11:41:43.848: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:44.016: Message received: teamEMAG,secret3,-1,NA
+11:41:44.017: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:44.056: Message received: teamEMAG,secret3,-1,NA
+11:41:44.057: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:44.233: Message received: teamEMAG,secret3,-1,NA
+11:41:44.234: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:44.269: Message received: teamEMAG,secret3,-1,NA
+11:41:44.270: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:44.451: Message received: teamEMAG,secret3,-1,NA
+11:41:44.452: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:44.482: Message received: teamEMAG,secret3,-1,NA
+11:41:44.483: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:44.711: Message received: teamEMAG,secret3,-1,NA
+11:41:44.712: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:44.764: Message received: teamEMAG,secret3,-1,NA
+11:41:44.765: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:44.957: Message received: teamEMAG,secret3,-1,NA
+11:41:44.957: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:44.991: Message received: teamEMAG,secret3,-1,NA
+11:41:44.992: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:45.181: Message received: teamEMAG,secret3,-1,NA
+11:41:45.182: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:45.211: Message received: teamEMAG,secret3,-1,NA
+11:41:45.212: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:45.410: Message received: teamEMAG,secret3,-1,NA
+11:41:45.410: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:45.449: Message received: teamEMAG,secret3,-1,NA
+11:41:45.450: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:45.626: Message received: teamEMAG,secret3,-1,NA
+11:41:45.627: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:45.662: Message received: teamEMAG,secret3,-1,NA
+11:41:45.663: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:45.843: Message received: teamEMAG,secret3,-1,NA
+11:41:45.844: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:45.876: Message received: teamEMAG,secret3,-1,NA
+11:41:45.876: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:46.064: Message received: teamEMAG,secret3,-1,NA
+11:41:46.065: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:46.103: Message received: teamEMAG,secret3,-1,NA
+11:41:46.104: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:46.280: Message received: teamEMAG,secret3,-1,NA
+11:41:46.281: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:46.310: Message received: teamEMAG,secret3,-1,NA
+11:41:46.311: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:46.509: Message received: teamEMAG,secret3,-1,NA
+11:41:46.510: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:46.555: Message received: teamEMAG,secret3,-1,NA
+11:41:46.556: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:46.726: Message received: teamEMAG,secret3,-1,NA
+11:41:46.726: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:46.766: Message received: teamEMAG,secret3,-1,NA
+11:41:46.767: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:46.944: Message received: teamEMAG,secret3,-1,NA
+11:41:46.945: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:46.989: Message received: teamEMAG,secret3,-1,NA
+11:41:46.990: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:47.160: Message received: teamEMAG,secret3,-1,NA
+11:41:47.162: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:47.192: Message received: teamEMAG,secret3,-1,NA
+11:41:47.193: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:47.371: Message received: teamEMAG,secret3,-1,NA
+11:41:47.372: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:47.405: Message received: teamEMAG,secret3,-1,NA
+11:41:47.406: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:47.581: Message received: teamEMAG,secret3,-1,NA
+11:41:47.582: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:47.607: Message received: teamEMAG,secret3,-1,NA
+11:41:47.608: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:47.796: Message received: teamEMAG,secret3,-1,NA
+11:41:47.797: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:47.828: Message received: teamEMAG,secret3,-1,NA
+11:41:47.829: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:48.005: Message received: teamEMAG,secret3,-1,NA
+11:41:48.005: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:48.052: Message received: teamEMAG,secret3,-1,NA
+11:41:48.053: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:48.216: Message received: teamEMAG,secret3,-1,NA
+11:41:48.217: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:48.262: Message received: teamEMAG,secret3,-1,NA
+11:41:48.263: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:48.439: Message received: teamEMAG,secret3,-1,NA
+11:41:48.440: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:48.471: Message received: teamEMAG,secret3,-1,NA
+11:41:48.472: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:48.660: Message received: teamEMAG,secret3,-1,NA
+11:41:48.661: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:48.695: Message received: teamEMAG,secret3,-1,NA
+11:41:48.696: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:48.880: Message received: teamEMAG,secret3,-1,NA
+11:41:48.881: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:48.915: Message received: teamEMAG,secret3,-1,NA
+11:41:48.916: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:49.091: Message received: teamEMAG,secret3,-1,NA
+11:41:49.092: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:49.131: Message received: teamEMAG,secret3,-1,NA
+11:41:49.132: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:49.309: Message received: teamEMAG,secret3,-1,NA
+11:41:49.310: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:49.337: Message received: teamEMAG,secret3,-1,NA
+11:41:49.338: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:49.535: Message received: teamEMAG,secret3,-1,NA
+11:41:49.536: Careful there detective the timer is not active yet. How about you start the timer first.
+11:41:49.569: Message received: teamEMAG,secret3,-1,NA
+11:41:49.570: Careful there detective the timer is not active yet. How about you start the timer first.
