@@ -63,27 +63,12 @@ class BoardDetector:
         self.camera_topic_left  = rospy.get_param("~camera_topic_left",  "/B1/left_front_cam/left_front/image_raw")
         self.camera_topic_right = rospy.get_param("~camera_topic_right", "/B1/right_front_cam/right_front/image_raw")
 
-        # Expected camera at start:
-        self.expected_cam = self.camera_topic_left
-
         rospy.Subscriber(self.camera_topic_left,  Image, self.camera_callback, queue_size=1)
         rospy.Subscriber(self.camera_topic_right, Image, self.camera_callback, queue_size=1)
 
         self.pub_score = rospy.Publisher('/score_tracker', String, queue_size=1)
 
         rospy.loginfo("SUPER-Optimized Board Detector initialized.")
-
-
-    # Camera usage switcher
-    def update_expected_camera(self):
-        # Board 1,3,5,7 → LEFT
-        # Board 2,4,6,8 → RIGHT
-        if 1 <= self.current_board <= 8:
-            if self.current_board % 2 == 1:
-                self.expected_cam = self.camera_topic_left
-            else:
-                self.expected_cam = self.camera_topic_right
-
 
     # Check if whole board captured
     def board_captured(self, raw_board):
@@ -152,25 +137,14 @@ class BoardDetector:
             rectified = rectified[6:-6, 6:-6]
 
         return rectified
-
+    
 
     # Camera callback for inference and reading
     def camera_callback(self, msg):
-
-        # Camera selection 
-        self.update_expected_camera()
-        if msg._connection_header["topic"] != self.expected_cam:
-            return
-
         # Starting case
         if self.current_board == 0:
             self.pub_score.publish(String(f"{self.team_name},{self.team_pass},0,NA"))
             self.current_board = 1
-            return
-
-        # Ending case
-        if self.current_board > 8:
-            self.pub_score.publish(String(f"{self.team_name},{self.team_pass},-1,NA"))
             return
 
         # cooldown
@@ -183,13 +157,13 @@ class BoardDetector:
             return
 
         # Only run YOLO if board NOT acquired 
-        if self.board_map[self.current_board][0]:
-            return
+        #if self.board_map[self.current_board][0]:
+            #return
 
         frame = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
         # YOLO Inference (light mode) 
-        results = self.model.predict(frame, verbose=False, imgsz=480)
+        results = self.model.predict(frame, verbose=False, imgsz=416)
 
         for r in results:
             for box in r.boxes:
@@ -204,10 +178,10 @@ class BoardDetector:
                 aspect_ok = bw / bh > 1.2
                 confident = conf > 0.65
 
-                prev_ok  = self.board_map[self.current_board - 1][0]
-                curr_not_done = not self.board_map[self.current_board][0]
+                #prev_ok  = self.board_map[self.current_board - 1][0]
+                #curr_not_done = not self.board_map[self.current_board][0]
 
-                if not (sizeable and aspect_ok and confident and curr_not_done and prev_ok): # remove prev_ok check
+                if not (sizeable and aspect_ok and confident): # remove prev_ok check, curr_not_done check
                     continue
 
                 crop = frame[y1:y2, x1:x2]
@@ -220,27 +194,42 @@ class BoardDetector:
                 self.pub_raw_board.publish(self.bridge.cv2_to_imgmsg(crop, "bgr8"))
                 self.pub_proc_board.publish(self.bridge.cv2_to_imgmsg(roi, "bgr8"))
 
-                # CNN reading 
                 chars = self.cnn.predict_board(rgb)
                 words = "".join(chars).split()
                 if not words:
                     return
 
                 label = words[0]
-                expected = self.board_map[self.current_board][1]
 
-                if label != expected:
-                    rospy.logwarn(f"CNN mismatch: {label} != {expected}")
+                # Determine which board it is
+                board_id = None
+                for i, (_, name) in self.board_map.items():
+                    if name == label:
+                        board_id = i
+                        break
+
+                if board_id is None:
+                    rospy.logwarn(f"Unknown board label: {label}")
                     return
 
-                rest = "".join(w.replace(" ", "") for w in words[1:])
-                self.pub_score.publish(String(f"{self.team_name},{self.team_pass},{self.current_board},{rest}"))
+                # If board already reported, skip
+                if self.board_map[board_id][0]:
+                    return
 
-                # Mark board done
-                self.board_map[self.current_board][0] = True
+                # Extract remaining info
+                rest = "".join(w.replace(" ", "") for w in words[1:])
+
+                # Publish
+                self.pub_score.publish(String(f"{self.team_name},{self.team_pass},{board_id},{rest}"))
+
+                # Mark board as processed
+                self.board_map[board_id][0] = True
                 self.last_board_time = time.time()
-                self.current_board += 1
-                
+
+                # If BANDIT (board 8) reported, send end
+                if board_id == 8:
+                    self.pub_score.publish(String(f"{self.team_name},{self.team_pass},-1,NA"))
+
                 return
 
 
