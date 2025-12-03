@@ -1,0 +1,23 @@
+01:01:35.158: Clue SIZE: CE18XPJ
+01:01:35.158: Clue VICTIM: DEPFGZ4
+01:01:35.158: Clue CRIME: JLLVN
+01:01:35.160: Clue TIME: 6R09ZJ
+01:01:35.160: Clue PLACE: 4V4M
+01:01:35.161: Clue MOTIVE: WC839JPY552
+01:01:35.161: Clue WEAPON: M6XXD4
+01:01:35.161: Clue BANDIT: KPCZ8WF1
+01:02:24.920: Message received: teamEMAG,secret3,0,NA
+01:02:24.921: Timer started.
+01:02:35.952: Message received: teamEMAG,secret3,1,CEIBXPJ
+01:02:35.953: Awarded: 0 pts
+01:02:40.090: Message received: teamEMAG,secret3,2,DEPFGZA
+01:02:40.092: Awarded: 0 pts
+01:02:43.720: Message received: teamEMAG,secret3,3,JLLVN
+01:02:43.721: Team total: 6 pts
+01:02:43.724: Awarded: 6 pts
+01:02:58.196: Message received: teamEMAG,secret3,4,SRODZJ
+01:02:58.197: Awarded: 0 pts
+01:03:12.017: Message received: teamEMAG,secret3,5,AVAM
+01:03:12.017: Awarded: 0 pts
+01:03:24.565: Message received: teamEMAG,secret3,6,WCBBDJPYSSZ
+01:03:24.566: Awarded: 0 pts
