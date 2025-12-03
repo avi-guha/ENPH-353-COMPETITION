@@ -1,0 +1,33 @@
+00:14:54.913: Clue SIZE: ADQEXORRA
+00:14:54.913: Clue VICTIM: WDOSNJ
+00:14:54.913: Clue CRIME: IQDUCWOCWDV
+00:14:54.913: Clue TIME: IEHIUGHHVO
+00:14:54.914: Clue PLACE: UFSJTZHOY
+00:14:54.914: Clue MOTIVE: TTBOPI
+00:14:54.914: Clue WEAPON: LQEPVEUA
+00:14:54.914: Clue BANDIT: FTMWVGX
+00:15:17.189: Message received: teamEMAG,secret3,0,NA
+00:15:17.190: Timer started.
+00:15:29.001: Message received: teamEMAG,secret3,1,ADQEXORRA
+00:15:29.002: Team total: 6 pts
+00:15:29.005: Awarded: 6 pts
+00:15:35.423: Message received: teamEMAG,secret3,2,WDOSNJ
+00:15:35.424: Team total: 12 pts
+00:15:35.425: Awarded: 6 pts
+00:15:39.742: Message received: teamEMAG,secret3,3,IQDUCWOCWDV
+00:15:39.743: Team total: 18 pts
+00:15:39.744: Awarded: 6 pts
+00:15:51.847: Message received: teamEMAG,secret3,4,IEHIUGHHVO
+00:15:51.848: Team total: 24 pts
+00:15:51.850: Awarded: 6 pts
+00:16:03.475: Message received: teamEMAG,secret3,5,UFSJTZHOY
+00:16:03.476: Team total: 30 pts
+00:16:03.478: Awarded: 6 pts
+00:16:09.754: Message received: teamEMAG,secret3,6,TTBOPI
+00:16:09.755: Team total: 36 pts
+00:16:09.758: Awarded: 6 pts
+00:16:20.065: Message received: teamEMAG,secret3,7,LQEPVEUA
+00:16:20.066: Team total: 44 pts
+00:16:20.067: Awarded: 8 pts
+00:16:23.623: Bonus completed: +5 points
+00:16:23.623: Team total: 49 pts

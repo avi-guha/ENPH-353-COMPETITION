@@ -10,13 +10,20 @@ import string
 from PIL import Image, ImageFont, ImageDraw
 
 def random_word_variable_length(min_length=4, max_length=12):
-    '''Generate a random alphabetic word (with spaces allowed) of length between min_length and max_length'''
+    """Generate a random alphanumeric word of length between min_length and max_length."""
     length = random.randint(min_length, max_length)
-    # first character cannot be a space
-    word_chars = [random.choice(string.ascii_uppercase)]
+    
+    # Character pool includes letters and digits
+    chars = string.ascii_uppercase + string.digits
+
+    # First character cannot be a space (your code doesn't use spaces anymore)
+    word_chars = [random.choice(chars)]
+
     while len(word_chars) < length:
-        word_chars.append(random.choice(string.ascii_uppercase))
+        word_chars.append(random.choice(chars))
+
     return ''.join(word_chars)[:length]
+
 
 def loadCrimesProfileCompetition():
     '''

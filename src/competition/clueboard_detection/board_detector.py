@@ -174,8 +174,8 @@ class BoardDetector:
                 bh = y2 - y1
 
                 # Cheap box filters
-                sizeable = bw > 230
-                aspect_ok = bw / bh > 1.0
+                sizeable = bw > 240
+                aspect_ok = bw / bh > 1.2
                 confident = conf > 0.65
 
                 #prev_ok  = self.board_map[self.current_board - 1][0]

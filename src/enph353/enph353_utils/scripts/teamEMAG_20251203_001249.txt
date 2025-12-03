@@ -1,0 +1,38 @@
+00:12:28.729: Clue SIZE: UNKNOWN
+00:12:28.729: Clue VICTIM: MAGIC MIKE
+00:12:28.729: Clue CRIME: DISAPPEAR
+00:12:28.730: Clue TIME: CIRCUS
+00:12:28.730: Clue PLACE: WORMHOLE
+00:12:28.730: Clue MOTIVE: STARDOM
+00:12:28.730: Clue WEAPON: QUANTUM WAND
+00:12:28.730: Clue BANDIT: CLOWN CLAUDE
+00:12:49.713: Message received: teamEMAG,secret3,0,NA
+00:12:49.713: Timer started.
+00:13:02.054: Message received: teamEMAG,secret3,1,UNKNOWN
+00:13:02.054: Team total: 6 pts
+00:13:02.056: Awarded: 6 pts
+00:13:09.410: Message received: teamEMAG,secret3,2,MAGICMIKE
+00:13:09.410: Team total: 12 pts
+00:13:09.412: Awarded: 6 pts
+00:13:13.947: Message received: teamEMAG,secret3,3,DISAPPEAR
+00:13:13.948: Team total: 18 pts
+00:13:13.949: Awarded: 6 pts
+00:13:26.930: Message received: teamEMAG,secret3,4,CIRCUS
+00:13:26.930: Team total: 24 pts
+00:13:26.931: Awarded: 6 pts
+00:13:40.493: Message received: teamEMAG,secret3,5,WORMHOLE
+00:13:40.494: Team total: 30 pts
+00:13:40.495: Awarded: 6 pts
+00:13:47.252: Message received: teamEMAG,secret3,6,STARDOM
+00:13:47.253: Team total: 36 pts
+00:13:47.255: Awarded: 6 pts
+00:13:58.001: Message received: teamEMAG,secret3,7,QUANTUMWAND
+00:13:58.002: Team total: 44 pts
+00:13:58.004: Awarded: 8 pts
+00:14:17.819: Message received: teamEMAG,secret3,8,CLOWNCLAUDE
+00:14:17.820: Team total: 52 pts
+00:14:17.820: Awarded: 8 pts
+00:14:18.320: Message received: teamEMAG,secret3,-1,NA
+00:14:18.320: Timer stopped: 78.96 sec sim time (real time: 88sec).
+00:14:20.291: Bonus completed: +5 points
+00:14:20.292: Team total: 57 pts
