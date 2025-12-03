@@ -9,10 +9,6 @@
         args="-vpgw"
     />
 
-    <!-- Let Gazebo fully spawn -->
-    <param name="gazebo_spawn_delay" value="3"/>
-    <node pkg="roslaunch" type="roslaunch" name="delay_gazebo" args="" />
-
     <!-- Score tracker -->
     <node 
         pkg="enph353_utils"

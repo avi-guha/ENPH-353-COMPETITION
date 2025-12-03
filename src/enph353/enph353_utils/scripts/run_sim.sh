@@ -41,17 +41,18 @@ if $generate_plates = 'true'
 then
   echo "Generating new plates."
 	DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-	RELATIVE_PATH="/../../enph353_gazebo/scripts/plate_generator.py"
-	FULL_PATH=".$RELATIVE_PATH"
+	FULL_PATH="$DIR/../../enph353_gazebo/scripts/plate_generator.py"
 	python3 $FULL_PATH
 fi
 
 # display plates with or without QR code
 if $label_plates = 'true'
 then
-  ln -sfn labelled ../../enph353_gazebo/media/materials/textures/license_plates
+  DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+  ln -sfn labelled $DIR/../../enph353_gazebo/media/materials/textures/license_plates
 else
-  ln -sfn unlabelled ../../enph353_gazebo/media/materials/textures/license_plates
+  DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+  ln -sfn unlabelled $DIR/../../enph353_gazebo/media/materials/textures/license_plates
 fi
 
 # start the ROS environment
