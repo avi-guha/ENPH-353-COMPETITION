@@ -720,19 +720,19 @@
   <joint name="left_front_cam_joint" type="fixed">
     <parent link="camera_mount_crossbar"/>
     <child link="left_front_cam_link"/>
-    <!-- Attached to left end of crossbar, tilted outward (10 degrees) -->
-    <origin xyz="0 0.05 0" rpy="0 0 0.1746"/>
+    <!-- Attached to left end of crossbar, tilted outward -->
+    <origin xyz="0 0.05 0" rpy="0 0 0.3491"/>
   </joint>
 
   <gazebo reference="left_front_cam_link">
     <sensor type="camera" name="left_front_camera_sensor">
       <always_on>true</always_on>
-      <update_rate>10</update_rate>
+      <update_rate>15</update_rate>
       <camera>
         <horizontal_fov>1.396</horizontal_fov>
         <image>
-          <width>1920</width>
-          <height>1080</height>
+          <width>1280</width>
+          <height>720</height>
           <format>R8G8B8</format>
         </image>
         <clip>
@@ -768,19 +768,19 @@
   <joint name="right_front_cam_joint" type="fixed">
     <parent link="camera_mount_crossbar"/>
     <child link="right_front_cam_link"/>
-    <!-- Attached to right end of crossbar, tilted outward (10 degrees) -->
-    <origin xyz="0 -0.05 0" rpy="0 0 -0.1746"/>
+    <!-- Attached to right end of crossbar, tilted outward -->
+    <origin xyz="0 -0.05 0" rpy="0 0 -0.3491"/>
   </joint>
 
   <gazebo reference="right_front_cam_link">
     <sensor type="camera" name="right_front_camera_sensor">
       <always_on>true</always_on>
-      <update_rate>10</update_rate>
+      <update_rate>15</update_rate>
       <camera>
         <horizontal_fov>1.396</horizontal_fov>
         <image>
-          <width>1920</width>
-          <height>1080</height>
+          <width>1280</width>
+          <height>720</height>
           <format>R8G8B8</format>
         </image>
         <clip>
