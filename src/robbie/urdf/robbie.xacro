@@ -377,7 +377,7 @@
           </horizontal>
         </scan>
         <range>
-          <min>0.02</min>   <!-- Minimum 2cm to avoid self-detection -->
+          <min>0.035</min>   <!-- Minimum 3.5cm to avoid self-detection -->
           <max>0.5</max>    <!-- Short range for obstacle detection -->
           <resolution>0.005</resolution>
         </range>

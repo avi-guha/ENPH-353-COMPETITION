@@ -306,7 +306,7 @@ class InferenceNode:
         # Inference
         with torch.no_grad():
             output = self.model(image, scan_tensor)
-            v = 2.0
+            v = 1.7
             w = 1.44 * output[0][1].item()
 
         # If max turning speed > 2.0 rad/s, set max velocity to 0.85 m/s
