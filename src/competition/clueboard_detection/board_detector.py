@@ -8,7 +8,6 @@ import numpy as np
 import time
 from std_msgs.msg import String
 from board_reader import BoardReader
-from PIL import Image as PImage
 
 
 class BoardDetector:
@@ -22,7 +21,7 @@ class BoardDetector:
         self.last_board_time = time.time()
         self.current_board = 0
 
-        # Board detection sequence
+        # Board detection order
         self.board_map = {
             0: [True,  "START"],
             1: [False, "SIZE"],
@@ -40,13 +39,13 @@ class BoardDetector:
 
         rospy.init_node('yolo_clueboard_node')
 
-        # GUI publishers
+        # Debug publishers for CNN visualization
         self.pub_raw_board = rospy.Publisher('/clueboard/raw_board', Image, queue_size=1)
         self.pub_proc_board = rospy.Publisher('/clueboard/processed_board', Image, queue_size=1)
         self.pub_words_debug = rospy.Publisher('/clueboard/words_debug', Image, queue_size=1)
         self.pub_letters_debug = rospy.Publisher('/clueboard/letters_debug', Image, queue_size=1)
 
-        # Give BoardReader the debug pubs
+        # Give to CNN
         self.cnn.bridge = self.bridge
         self.cnn.pub_words_debug = self.pub_words_debug
         self.cnn.pub_letters_debug = self.pub_letters_debug
@@ -56,9 +55,8 @@ class BoardDetector:
             "~model_path",
             "/home/fizzer/ENPH-353-COMPETITION/src/competition/clueboard_detection/runs/detect/clueboards_exp12/weights/best.pt"
         )
-
         self.model = YOLO(model_path)
-        self.model.fuse = lambda *a, **k: self.model     # no-op fuse
+        self.model.fuse = lambda *a, **k: self.model
 
         # Camera topics
         self.camera_topic_left  = rospy.get_param("~camera_topic_left",  "/B1/left_front_cam/left_front/image_raw")
@@ -67,16 +65,10 @@ class BoardDetector:
         rospy.Subscriber(self.camera_topic_left,  Image, self.camera_callback, queue_size=1)
         rospy.Subscriber(self.camera_topic_right, Image, self.camera_callback, queue_size=1)
 
-        # Score publisher
         self.pub_score = rospy.Publisher('/score_tracker', String, queue_size=1)
 
-        # YOLO visualization
-        self.pub_yolo = rospy.Publisher('/yolo_clueboard/image', Image, queue_size=1)
+        rospy.loginfo("Board Detector Initialized (no RVIZ visualization).")
 
-        rospy.loginfo("Board Detector Initialized (optimized for 1280x720 cameras).")
-
-    # ----------------------------------------------------------------------
-    #                      BOARD COMPLETENESS CHECK
     # ----------------------------------------------------------------------
     def board_captured(self, raw_board):
         hsv = cv2.cvtColor(raw_board, cv2.COLOR_BGR2HSV)
@@ -94,10 +86,10 @@ class BoardDetector:
         return (n == 4) or (3 <= n <= 5)
 
     # ----------------------------------------------------------------------
-    #                      HOMOGRAPHY — FIXED FOR 1280×720
+    # HIGH-RES HOMOGRAPHY FIX
     # ----------------------------------------------------------------------
-    def process_raw_board(self, raw_board):
-        img = raw_board.copy()
+    def process_raw_board(self, raw):
+        img = raw.copy()
         H, W = img.shape[:2]
 
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -108,18 +100,13 @@ class BoardDetector:
 
         outer = max(cnts, key=cv2.contourArea)
 
-        # *** FIX #1 — MUCH SMALLER BLUR ***
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        #blur = cv2.GaussianBlur(gray, (3,3), 0)
-
-        # *** FIX #2 — STRONGER CANNY TO PRESERVE EDGES ***
         edges = cv2.Canny(gray, 30, 100)
 
         mask = np.zeros((H, W), np.uint8)
         cv2.drawContours(mask, [outer], -1, 255, -1)
         edges = cv2.bitwise_and(edges, edges, mask=mask)
 
-        # *** FIX #3 — LIGHT DILATION (NOT SMOOTHING AWAY EDGES) ***
         k = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
         edges = cv2.dilate(edges, k, 1)
 
@@ -140,10 +127,10 @@ class BoardDetector:
         diff = np.diff(pts, axis=1)
 
         pts = np.array([
-            pts[np.argmin(s)],       # TL
-            pts[np.argmin(diff)],    # TR
-            pts[np.argmax(s)],       # BR
-            pts[np.argmax(diff)]     # BL
+            pts[np.argmin(s)],      # TL
+            pts[np.argmin(diff)],   # TR
+            pts[np.argmax(s)],      # BR
+            pts[np.argmax(diff)],   # BL
         ], np.float32)
 
         w1 = np.linalg.norm(pts[0] - pts[1])
@@ -151,8 +138,10 @@ class BoardDetector:
         h1 = np.linalg.norm(pts[0] - pts[3])
         h2 = np.linalg.norm(pts[1] - pts[2])
 
-        W_out = int(max(w1, w2))
-        H_out = int(max(h1, h2))
+        # High-resolution output to preserve characters
+        SCALE = 2.8
+        W_out = int(max(w1, w2) * SCALE)
+        H_out = int(max(h1, h2) * SCALE)
 
         dst = np.array([
             [0,0],
@@ -162,9 +151,8 @@ class BoardDetector:
         ], np.float32)
 
         M = cv2.getPerspectiveTransform(pts, dst)
-        rectified = cv2.warpPerspective(img, M, (W_out, H_out))
+        rectified = cv2.warpPerspective(img, M, (W_out, H_out), flags=cv2.INTER_CUBIC)
 
-        # Trim edges
         trim = 6
         if rectified.shape[0] > 2*trim and rectified.shape[1] > 2*trim:
             rectified = rectified[trim:-trim, trim:-trim]
@@ -172,11 +160,8 @@ class BoardDetector:
         return rectified
 
     # ----------------------------------------------------------------------
-    #                           MAIN CALLBACK
-    # ----------------------------------------------------------------------
     def camera_callback(self, msg):
 
-        # Starting board
         if self.current_board == 0:
             out = String()
             out.data = f"{self.team_name},{self.team_pass},0,NA"
@@ -184,24 +169,18 @@ class BoardDetector:
             self.current_board = 1
             return
 
-        # Ending
         if self.current_board > 8:
             out = String()
             out.data = f"{self.team_name},{self.team_pass},-1,NA"
             self.pub_score.publish(out)
             return
 
-        # Cooldown
         if time.time() - self.last_board_time < 3.0:
             return
 
         frame = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
-        # YOLO inference
         results = self.model.predict(frame, verbose=False)
-
-        # publish visualization
-        self.publish_yolo_overlay(frame, results)
 
         for r in results:
             for box in r.boxes:
@@ -212,8 +191,7 @@ class BoardDetector:
                 bw = x2 - x1
                 bh = y2 - y1
 
-                # *** FIXED THRESHOLDS FOR 1280×720 ***
-                sizeable = bw > 170
+                sizeable = bw > 220
                 aspect_ok = (bw / max(bh,1)) > 1.25
                 confident = conf > 0.55
 
@@ -227,18 +205,15 @@ class BoardDetector:
                     continue
 
                 crop = frame[y1:y2, x1:x2]
-
                 if not self.board_captured(crop):
                     continue
 
                 roi = self.process_raw_board(crop)
                 rgb = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
 
-                # publish for GUI
                 self.pub_raw_board.publish(self.bridge.cv2_to_imgmsg(crop, "bgr8"))
                 self.pub_proc_board.publish(self.bridge.cv2_to_imgmsg(roi, "bgr8"))
 
-                # CNN
                 chars = self.cnn.predict_board(rgb)
                 words = "".join(chars).split()
                 if not words:
@@ -260,23 +235,6 @@ class BoardDetector:
                 self.last_board_time = time.time()
                 self.current_board += 1
                 return
-
-    # ----------------------------------------------------------------------
-    #                     YOLO VISUALIZATION FOR RVIZ
-    # ----------------------------------------------------------------------
-    def publish_yolo_overlay(self, frame, results):
-        img = frame.copy()
-
-        for r in results:
-            for box in r.boxes:
-                x1,y1,x2,y2 = box.xyxy[0].int().tolist()
-                conf = float(box.conf[0])
-
-                cv2.rectangle(img, (x1,y1), (x2,y2), (0,255,0), 2)
-                cv2.putText(img, f"{conf:.2f}", (x1,y1-5),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
-
-        self.pub_yolo.publish(self.bridge.cv2_to_imgmsg(img, "bgr8"))
 
 
 if __name__ == "__main__":

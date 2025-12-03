@@ -32,23 +32,31 @@ class BoardReader:
         """
         @brief Preprocess cropped board to remove noise.
 
-        @param board_path: 
-        @return Description of returned value
+        @param board: RGB board image
+        @return preprocessed grayscale board image
         """
         gray = cv2.cvtColor(board, cv2.COLOR_RGB2GRAY)
-        gray_resized = cv2.resize(gray, (self.TARGET_WIDTH, self.TARGET_HEIGHT), interpolation=cv2.INTER_CUBIC)
+        gray_resized = cv2.resize(
+            gray,
+            (self.TARGET_WIDTH, self.TARGET_HEIGHT),
+            interpolation=cv2.INTER_CUBIC
+        )
         gray_blur = cv2.medianBlur(gray_resized, 3)  # remove tiny noise
-        #gray_blur = cv2.GaussianBlur(gray_blur, (5, 5), 0)
+        # gray_blur = cv2.GaussianBlur(gray_blur, (5, 5), 0)
         return gray_blur
-        
+
     def extract_board_words(self, board):
         gray = self.preprocess_board(board)
         board_height, board_width = gray.shape
         half_height = board_height // 2
 
         # Adaptive threshold
-        binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                    cv2.THRESH_BINARY_INV, 15, 10)
+        binary = cv2.adaptiveThreshold(
+            gray, 255,
+            cv2.ADAPTIVE_THRESH_MEAN_C,
+            cv2.THRESH_BINARY_INV,
+            15, 10
+        )
 
         # Morphological opening
         kernel_open = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
@@ -59,14 +67,18 @@ class BoardReader:
         img_bottom = binary[half_height:, :]
 
         # Dilation
-        kernel_top = cv2.getStructuringElement(cv2.MORPH_RECT, (15,5))
-        kernel_bottom = cv2.getStructuringElement(cv2.MORPH_RECT, (35,5))
+        kernel_top = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 5))
+        kernel_bottom = cv2.getStructuringElement(cv2.MORPH_RECT, (35, 5))
         dilated_top = cv2.dilate(img_top, kernel_top, iterations=2)
         dilated_bottom = cv2.dilate(img_bottom, kernel_bottom, iterations=2)
 
         # Find contours
-        contours_top, _ = cv2.findContours(dilated_top, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        contours_bottom, _ = cv2.findContours(dilated_bottom, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours_top, _ = cv2.findContours(
+            dilated_top, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+        )
+        contours_bottom, _ = cv2.findContours(
+            dilated_bottom, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+        )
 
         # Shift bottom contours into full image coordinates
         for cnt in contours_bottom:
@@ -134,7 +146,7 @@ class BoardReader:
         if hasattr(self, 'pub_words_debug'):
             debug = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
             for (x, y, w, h) in word_boxes:
-                cv2.rectangle(debug, (x, y), (x+w, y+h), (0,255,0), 2)
+                cv2.rectangle(debug, (x, y), (x+w, y+h), (0, 255, 0), 2)
             try:
                 msg = self.bridge.cv2_to_imgmsg(debug, "bgr8")
                 self.pub_words_debug.publish(msg)
@@ -143,8 +155,7 @@ class BoardReader:
 
         return words
 
-
-    # Pad images 
+    # Pad images
     def pad_to_max(self, imgs, target_size):
         """
         @brief Pads a list of images such that all are of dimension IMG_SIZE X IMG_SIZE.
@@ -161,91 +172,90 @@ class BoardReader:
                 scale_factor = target_size / max(h, w)
                 new_h = int(h * scale_factor)
                 new_w = int(w * scale_factor)
-                
+
                 img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
                 h, w = img.shape
-                
+
             top = (target_size - h) // 2
             bottom = target_size - h - top
             left = (target_size - w) // 2
             right = target_size - w - left
-            
-            padded_img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[0,0,0])
+
+            padded_img = cv2.copyMakeBorder(
+                img, top, bottom, left, right,
+                cv2.BORDER_CONSTANT, value=[0, 0, 0]
+            )
             padded.append(padded_img)
         return padded
-    
-    # Character extraction 
-    def characterize_word(self, word_img):    
+
+    # Character extraction
+    def characterize_word(self, word_img):
         """
         @brief Extracts individual chars (including spaces) from an image of a word.
 
         @param word_img: Image of word to extract char from.
         @return List of characters (inc. spaces) found in word, in image format.
         """
-        # Use Adaptive Thresholding for better local contrast
-        thresh = cv2.adaptiveThreshold(word_img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
-        
-        # Apply morphological closing to connect broken character lines
+        # Adaptive Thresholding
+        thresh = cv2.adaptiveThreshold(
+            word_img, 255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY_INV, 11, 2
+        )
+
+        # Morphological closing to connect broken lines
         kernel_close = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
         thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel_close)
-        
-        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        contours, _ = cv2.findContours(
+            thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+        )
 
         char_images = []
         letter_boxes = []
         vis_img = cv2.cvtColor(word_img, cv2.COLOR_GRAY2BGR)
-        
-        # Estimate minimum character size based on the word image height
+
+        # Estimate minimum character size
         h_word, w_word = word_img.shape
-        MIN_CHAR_HEIGHT = h_word // 3 # Require minimum height to be 1/3 of the word image height
-        MIN_CHAR_WIDTH = 5           # Require minimum width (must be wider than noise specks)
-        
+        MIN_CHAR_HEIGHT = h_word // 3
+        MIN_CHAR_WIDTH = 5
+
         # Filter contours based on size before sorting
         valid_contours = []
         for ctr in contours:
             x, y, w, h = cv2.boundingRect(ctr)
-            # Filter based on size
             if h >= MIN_CHAR_HEIGHT and w >= MIN_CHAR_WIDTH:
                 valid_contours.append(ctr)
-        
+
         contours = sorted(valid_contours, key=lambda c: cv2.boundingRect(c)[0])
-        
+
         for ctr in contours:
             x, y, w, h = cv2.boundingRect(ctr)
-            
-            # Note: Size filtering is done above, but we extract here
             char_images.append(thresh[y:y+h, x:x+w])
             letter_boxes.append((x, y, w, h))
             cv2.rectangle(vis_img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
         # Detect spaces
         if letter_boxes:
-            # Check if any valid characters were actually extracted
             if not char_images:
                 return []
-                
+
             avg_char_width = np.mean([w for _, _, w, _ in letter_boxes])
             for i in range(len(letter_boxes)-1):
                 x1, y1, w1, h1 = letter_boxes[i]
                 x2, y2, w2, h2 = letter_boxes[i+1]
                 gap = x2 - (x1 + w1)
                 if gap > avg_char_width * 0.5:
-                    # Use the max height of the surrounding characters for the space
                     h_space = max(h1, h2) if len(letter_boxes) > 1 else h1
                     space_img = np.zeros((h_space, gap), dtype=word_img.dtype)
                     char_images.insert(i+1, space_img)
                     cv2.rectangle(vis_img, (x1 + w1, y1), (x2, y1 + h1), (0, 0, 255), 2)
 
-        # DEBUGGING: SHOW IMAGE
-        #plt.imshow(cv2.cvtColor(vis_img, cv2.COLOR_BGR2RGB))
-        #plt.axis('off')
-        #plt.show()
-
         # Publish to GUI
         if hasattr(self, 'pub_letters_debug'):
             dbg = cv2.cvtColor(word_img, cv2.COLOR_GRAY2BGR)
             for (x, y, w, h) in letter_boxes:
-                cv2.rectangle(dbg, (x, y), (x+w, y+h), (255,0,0), 2)
+                cv2.rectangle(dbg, (x, y), (x+w, y+h), (255, 0, 0), 2)
             try:
                 msg = self.bridge.cv2_to_imgmsg(dbg, "bgr8")
                 self.pub_letters_debug.publish(msg)
@@ -253,7 +263,7 @@ class BoardReader:
                 pass
 
         return self.pad_to_max(char_images, self.IMG_SIZE)
-    
+
     # --- Prediction ---
     def predict_board(self, img):
         """
@@ -269,7 +279,9 @@ class BoardReader:
             for char in chars:
                 char_img = cv2.resize(char, (self.IMG_SIZE, self.IMG_SIZE))
                 char_img_normal = char_img.astype("float32") / 255.0
-                char_img_input = char_img_normal.reshape(1, self.IMG_SIZE, self.IMG_SIZE, 1)
+                char_img_input = char_img_normal.reshape(
+                    1, self.IMG_SIZE, self.IMG_SIZE, 1
+                )
                 prediction = self.model.predict(char_img_input, verbose=0)
                 char_idx = np.argmax(prediction, axis=1)[0]
                 result.append(self.idx_to_char[char_idx])
@@ -277,10 +289,14 @@ class BoardReader:
                 result.append(" ")
         return result
 
+
 if __name__ == "__main__":
-     # Load image in RGB (as YOLO would output)
+    # Load image in RGB (as YOLO would output)
     img_path = "/home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/yolo_inference_images/img_14.png"
-    board = cv2.cvtColor(cv2.imread(img_path, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+    board = cv2.cvtColor(
+        cv2.imread(img_path, cv2.IMREAD_COLOR),
+        cv2.COLOR_BGR2RGB
+    )
 
     reader = BoardReader()
 
