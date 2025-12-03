@@ -24,6 +24,24 @@ class InferenceNode:
     def __init__(self):
         rospy.init_node('inference_node', anonymous=True)
 
+        # Wait for board_detector to be ready before doing anything
+        rospy.loginfo("Waiting for board_detector to be ready...")
+        self.board_detector_ready = False
+        rospy.Subscriber('/board_detector_ready', Bool, self.board_detector_ready_callback, queue_size=1)
+        
+        # Wait until board_detector signals ready (with timeout)
+        timeout = rospy.Duration(60.0)  # 60 second timeout
+        start_time = rospy.Time.now()
+        rate = rospy.Rate(10)
+        while not self.board_detector_ready and not rospy.is_shutdown():
+            if rospy.Time.now() - start_time > timeout:
+                rospy.logwarn("Timeout waiting for board_detector_ready, proceeding anyway...")
+                break
+            rate.sleep()
+        
+        if self.board_detector_ready:
+            rospy.loginfo("✓ Board detector is ready, starting inference node...")
+        
         # Parameters - Fixed topic names to match robot namespacing
         self.image_topic = rospy.get_param('~image_topic', '/B1/rrbot/camera1/image_raw')
         self.scan_topic = rospy.get_param('~scan_topic', '/B1/scan')
@@ -113,6 +131,12 @@ class InferenceNode:
         rospy.loginfo(f"  Right Scan: {self.right_scan_topic}")
         rospy.loginfo("Note: Will pause when manual teleop is active to avoid conflicts")
         rospy.loginfo("Note: Waiting for competition timer to start before moving...")
+    
+    def board_detector_ready_callback(self, msg):
+        """Callback when board_detector signals it's ready"""
+        if msg.data and not self.board_detector_ready:
+            self.board_detector_ready = True
+            rospy.loginfo("✓ Received board_detector_ready signal")
     
     def score_tracker_callback(self, msg):
         """Track when competition timer starts (location '0' message)"""

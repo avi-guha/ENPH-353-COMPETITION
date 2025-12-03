@@ -6,7 +6,7 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 import time
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 from board_reader import BoardReader
 
 
@@ -15,7 +15,19 @@ class BoardDetector:
     UPPER_BLUE_HSV = np.array([130, 255, 255])
 
     def __init__(self):
+        rospy.init_node('yolo_clueboard_node')
+        
+        # Ready flag to prevent callbacks before fully loaded
+        self.ready = False
+        
+        # Ready signal publisher (latched so late subscribers get it)
+        self.pub_ready = rospy.Publisher('/board_detector_ready', Bool, queue_size=1, latch=True)
+        self.pub_ready.publish(Bool(data=False))  # Signal not ready yet
+        
+        rospy.loginfo("Loading CNN model...")
         self.cnn = BoardReader()
+        rospy.loginfo("CNN model loaded.")
+        
         self.bridge = CvBridge()
 
         self.last_board_time = time.time()
@@ -37,8 +49,6 @@ class BoardDetector:
 
         self.team_name = "teamEMAG"
         self.team_pass = "secret3"
-
-        rospy.init_node('yolo_clueboard_node')
 
         # Debug visualization publishers
         self.pub_raw_board = rospy.Publisher('/clueboard/raw_board', Image, queue_size=1)
@@ -66,9 +76,19 @@ class BoardDetector:
         rospy.Subscriber(self.camera_topic_left,  Image, self.camera_callback, queue_size=1)
         rospy.Subscriber(self.camera_topic_right, Image, self.camera_callback, queue_size=1)
 
-        self.pub_score = rospy.Publisher('/score_tracker', String, queue_size=1)
+        # Latched so inference_node always receives the START message
+        self.pub_score = rospy.Publisher('/score_tracker', String, queue_size=1, latch=True)
 
-        rospy.loginfo("Board Detector initialized.")
+        # Allow publishers to connect
+        rospy.sleep(1.0)
+        
+        # Signal ready and send START message
+        self.ready = True
+        self.pub_ready.publish(Bool(data=True))
+        self.pub_score.publish(String(f"{self.team_name},{self.team_pass},0,NA"))
+        self.current_board = 1
+        
+        rospy.loginfo("Board Detector initialized and READY.")
 
     # Check if whole board captured
     def board_captured(self, raw_board):
@@ -141,10 +161,8 @@ class BoardDetector:
 
     # Camera callback for inference and reading
     def camera_callback(self, msg):
-        # Starting case
-        if self.current_board == 0:
-            self.pub_score.publish(String(f"{self.team_name},{self.team_pass},0,NA"))
-            self.current_board = 1
+        # Don't process until fully ready
+        if not self.ready:
             return
 
         # cooldown

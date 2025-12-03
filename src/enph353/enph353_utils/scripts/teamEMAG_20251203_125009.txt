@@ -1,0 +1,30 @@
+12:49:01.212: Clue SIZE: FLOCK OF
+12:49:01.212: Clue VICTIM: SINGING DODO
+12:49:01.212: Clue CRIME: DANCE MISHAP
+12:49:01.215: Clue TIME: YEAR OF PIG
+12:49:01.221: Clue PLACE: TEMPLE
+12:49:01.227: Clue MOTIVE: FAILED SONG
+12:49:01.235: Clue WEAPON: SILLY GOO
+12:49:01.243: Clue BANDIT: KUNG FU CAT
+12:50:09.593: Message received: teamEMAG,secret3,0,NA
+12:50:09.594: Timer started.
+12:50:09.601: Message received: teamEMAG,secret3,0,NA
+12:50:09.601: Timer started.
+12:50:22.378: Message received: teamEMAG,secret3,2,SINGINGDODO
+12:50:22.380: Team total: 6 pts
+12:50:22.382: Awarded: 6 pts
+12:50:26.783: Message received: teamEMAG,secret3,3,DANCEMISHAP
+12:50:26.784: Team total: 12 pts
+12:50:26.788: Awarded: 6 pts
+12:50:41.272: Message received: teamEMAG,secret3,4,YEAROFPIG
+12:50:41.273: Team total: 18 pts
+12:50:41.275: Awarded: 6 pts
+12:50:55.030: Message received: teamEMAG,secret3,5,TEMPLE
+12:50:55.030: Team total: 24 pts
+12:50:55.031: Awarded: 6 pts
+12:51:04.115: Message received: teamEMAG,secret3,6,FAILEDSONG
+12:51:04.116: Team total: 30 pts
+12:51:04.117: Awarded: 6 pts
+12:51:18.818: Message received: teamEMAG,secret3,7,SILLYGOO
+12:51:18.819: Team total: 38 pts
+12:51:18.821: Awarded: 8 pts
