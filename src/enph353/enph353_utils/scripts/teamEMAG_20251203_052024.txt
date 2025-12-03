@@ -1,0 +1,22 @@
+05:19:51.174: Clue SIZE: UNKNOWN
+05:19:51.174: Clue VICTIM: MAGIC MIKE
+05:19:51.175: Clue CRIME: DISAPPEAR
+05:19:51.176: Clue TIME: CIRCUS
+05:19:51.176: Clue PLACE: WORMHOLE
+05:19:51.176: Clue MOTIVE: STARDOM
+05:19:51.177: Clue WEAPON: QUANTUM WAND
+05:19:51.177: Clue BANDIT: CLOWN CLAUDE
+05:20:24.495: Message received: teamEMAG,secret3,0,NA
+05:20:24.496: Timer started.
+05:20:31.556: Message received: teamEMAG,secret3,1,UNKNOWN
+05:20:31.559: Team total: 6 pts
+05:20:31.562: Awarded: 6 pts
+05:20:37.737: Message received: teamEMAG,secret3,2,MAGICMIKE
+05:20:37.738: Team total: 12 pts
+05:20:37.739: Awarded: 6 pts
+05:20:40.331: Message received: teamEMAG,secret3,3,DISAPPEAR
+05:20:40.332: Team total: 18 pts
+05:20:40.337: Awarded: 6 pts
+05:20:51.927: Message received: teamEMAG,secret3,4,CIRCUS
+05:20:51.928: Team total: 24 pts
+05:20:51.929: Awarded: 6 pts
