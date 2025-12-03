@@ -3,7 +3,9 @@ import string
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model        
+import tensorflow as tf
+
 
 class BoardReader:
     """
@@ -24,8 +26,11 @@ class BoardReader:
 
     # Constructor
     def __init__(self):
-        model_path = "/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/clueboard_reader_CNN.h5"
-        self.model = load_model(model_path)
+        # Load TFLite model
+        self.interpreter = tf.lite.Interpreter(model_path="/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/cnn_reader_model.tflite")
+        self.interpreter.allocate_tensors()
+        self.input_details = self.interpreter.get_input_details()
+        self.output_details = self.interpreter.get_output_details()
 
     # Preprocessing
     def preprocess_board(self, board):
@@ -248,7 +253,12 @@ class BoardReader:
                 char_img = cv2.resize(char, (self.IMG_SIZE, self.IMG_SIZE))
                 char_img_normal = char_img.astype("float32") / 255.0
                 char_img_input = char_img_normal.reshape(1, self.IMG_SIZE, self.IMG_SIZE, 1)
-                prediction = self.model.predict(char_img_input, verbose=0)
+
+                # ----- RUN MODEL -----
+                self.interpreter.set_tensor(self.input_details[0]['index'], char_img_input)
+                self.interpreter.invoke()
+                prediction = self.interpreter.get_tensor(self.output_details[0]['index'])
+
                 char_idx = np.argmax(prediction, axis=1)[0]
                 result.append(self.idx_to_char[char_idx])
             if word_idx < len(words) - 1:
@@ -257,7 +267,7 @@ class BoardReader:
 
 if __name__ == "__main__":
      # Load image in RGB (as YOLO would output)
-    img_path = "/home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/yolo_inference_images/img_14.png"
+    img_path = "/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/training_data/crime_1/SIZE_7.png"
     board = cv2.cvtColor(cv2.imread(img_path, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
 
     reader = BoardReader()
