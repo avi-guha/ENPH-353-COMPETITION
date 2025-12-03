@@ -1,0 +1,33 @@
+05:48:53.805: Clue SIZE: 8PK6M6H
+05:48:53.805: Clue VICTIM: R3568JFI2ZO
+05:48:53.805: Clue CRIME: DBZL
+05:48:53.806: Clue TIME: MBR0WXTA5
+05:48:53.806: Clue PLACE: S9CIAAVH7LS
+05:48:53.806: Clue MOTIVE: HEVFW24WZ2W
+05:48:53.806: Clue WEAPON: 2F08JHUTK
+05:48:53.806: Clue BANDIT: 748T2GFRSB9L
+05:49:14.795: Message received: teamEMAG,secret3,0,NA
+05:49:14.796: Timer started.
+05:49:24.466: Message received: teamEMAG,secret3,2,R3568JFI2ZO
+05:49:24.467: Team total: 6 pts
+05:49:24.467: Awarded: 6 pts
+05:49:28.233: Message received: teamEMAG,secret3,3,DBZL
+05:49:28.234: Team total: 12 pts
+05:49:28.237: Awarded: 6 pts
+05:49:38.886: Message received: teamEMAG,secret3,4,MBR0WXTA5
+05:49:38.887: Team total: 18 pts
+05:49:38.888: Awarded: 6 pts
+05:49:51.636: Message received: teamEMAG,secret3,5,S9CIAAVH7LS
+05:49:51.637: Team total: 24 pts
+05:49:51.640: Awarded: 6 pts
+05:49:59.987: Message received: teamEMAG,secret3,6,HEVFW24WZ2W
+05:49:59.988: Team total: 30 pts
+05:49:59.988: Awarded: 6 pts
+05:50:11.099: Message received: teamEMAG,secret3,7,2F08JHUTK
+05:50:11.100: Team total: 38 pts
+05:50:11.101: Awarded: 8 pts
+05:50:34.683: Message received: teamEMAG,secret3,8,748T2GFRSB9L
+05:50:34.684: Team total: 46 pts
+05:50:34.686: Awarded: 8 pts
+05:50:35.184: Message received: teamEMAG,secret3,-1,NA
+05:50:35.184: Timer stopped: 68.05 sec sim time (real time: 80sec).

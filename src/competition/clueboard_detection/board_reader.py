@@ -272,28 +272,54 @@ class BoardReader:
     def predict_board(self, img):
         """
         @brief Returns the model's prediction of clueboard ('img') as a list of chars.
-
-        @param img: RGB format image of clueboard
-        @return List of characters (inc. spaces) found in clueboard.
         """
+        import gc
+        gc.collect()   # Ensure no lingering references from previous inference
+
         result = []
         words = self.extract_board_words(img)
+
         for word_idx, word in enumerate(words):
             chars = self.characterize_word(word)
+
             for char in chars:
+                # Preprocess to model input shape
                 char_img = cv2.resize(char, (self.IMG_SIZE, self.IMG_SIZE))
                 char_img_normal = char_img.astype("float32") / 255.0
-                char_img_input = char_img_normal.reshape(1, self.IMG_SIZE, self.IMG_SIZE, 1)
+                char_img_input = char_img_normal.reshape(
+                    1, self.IMG_SIZE, self.IMG_SIZE, 1
+                )
 
                 # ----- RUN MODEL -----
-                self.interpreter.set_tensor(self.input_details[0]['index'], char_img_input)
+                self.interpreter.set_tensor(
+                    self.input_details[0]['index'], char_img_input
+                )
                 self.interpreter.invoke()
-                prediction = self.interpreter.get_tensor(self.output_details[0]['index'])
 
-                char_idx = np.argmax(prediction, axis=1)[0]
+                # TFLite returns a view → MUST copy immediately
+                raw_pred = self.interpreter.get_tensor(
+                    self.output_details[0]['index']
+                )
+                prediction = raw_pred.copy()
+                del raw_pred  # <-- CRITICAL: prevents internal-data crash
+
+                # Argmax prediction
+                char_idx = int(np.argmax(prediction, axis=1)[0])
                 result.append(self.idx_to_char[char_idx])
+
+                # Cleanup locals so Python GC doesn't keep references alive
+                del prediction
+                del char_img_input
+                del char_img_normal
+                del char_img
+
+            # Add space between words
             if word_idx < len(words) - 1:
                 result.append(" ")
+
+        gc.collect()   # Extra safety for ROS callback environment
         return result
+
+
 
 

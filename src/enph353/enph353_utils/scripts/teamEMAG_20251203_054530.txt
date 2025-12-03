@@ -1,0 +1,32 @@
+05:45:09.056: Clue SIZE: KMK9VH4AG
+05:45:09.056: Clue VICTIM: LVL2CV0F6YDV
+05:45:09.056: Clue CRIME: H3ZH0K52FV37
+05:45:09.057: Clue TIME: 77B5NZ7W
+05:45:09.057: Clue PLACE: R3AEX4QZX
+05:45:09.057: Clue MOTIVE: KPUNN33NNS
+05:45:09.057: Clue WEAPON: QYA4
+05:45:09.058: Clue BANDIT: 3DLF
+05:45:30.160: Message received: teamEMAG,secret3,0,NA
+05:45:30.160: Timer started.
+05:45:39.901: Message received: teamEMAG,secret3,2,LVL2CV0F6YDV
+05:45:39.902: Team total: 6 pts
+05:45:39.904: Awarded: 6 pts
+05:45:43.767: Message received: teamEMAG,secret3,3,H3ZH0K52FV37
+05:45:43.768: Team total: 12 pts
+05:45:43.770: Awarded: 6 pts
+05:45:55.835: Message received: teamEMAG,secret3,4,77B5NZ7W
+05:45:55.836: Team total: 18 pts
+05:45:55.843: Awarded: 6 pts
+05:46:06.163: Message received: teamEMAG,secret3,5,
+05:46:06.164: Awarded: 0 pts
+05:46:15.397: Message received: teamEMAG,secret3,6,KPUNN33NNS
+05:46:15.398: Team total: 24 pts
+05:46:15.398: Awarded: 6 pts
+05:46:27.448: Message received: teamEMAG,secret3,7,QYA4
+05:46:27.449: Team total: 32 pts
+05:46:27.450: Awarded: 8 pts
+05:46:48.097: Message received: teamEMAG,secret3,8,3DLF
+05:46:48.098: Team total: 40 pts
+05:46:48.099: Awarded: 8 pts
+05:46:48.598: Message received: teamEMAG,secret3,-1,NA
+05:46:48.599: Timer stopped: 66.75 sec sim time (real time: 78sec).

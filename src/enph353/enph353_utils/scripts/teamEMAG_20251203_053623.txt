@@ -28,3 +28,8 @@
 05:37:19.005: Message received: teamEMAG,secret3,7,QUANTUMWAND
 05:37:19.006: Team total: 43 pts
 05:37:19.006: Awarded: 8 pts
+05:37:39.164: Message received: teamEMAG,secret3,8,CLOWNCLAUDE
+05:37:39.165: Team total: 51 pts
+05:37:39.167: Awarded: 8 pts
+05:37:39.665: Message received: teamEMAG,secret3,-1,NA
+05:37:39.666: Timer stopped: 65.92 sec sim time (real time: 76sec).
