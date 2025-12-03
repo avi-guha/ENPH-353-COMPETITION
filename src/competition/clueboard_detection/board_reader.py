@@ -298,7 +298,7 @@ class BoardReader:
                 # TFLite returns a view → MUST copy immediately
                 prediction = self.interpreter.get_tensor(
                     self.output_details[0]['index']
-                )
+                ).copy()  # Copy to avoid reference to internal data
                
                 # Argmax prediction
                 char_idx = int(np.argmax(prediction, axis=1)[0])

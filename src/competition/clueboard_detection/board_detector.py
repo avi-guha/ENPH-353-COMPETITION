@@ -70,6 +70,12 @@ class BoardDetector:
         rospy.Subscriber(self.camera_topic_left,  Image, self.camera_callback, queue_size=1)
         rospy.Subscriber(self.camera_topic_right, Image, self.camera_callback, queue_size=1)
 
+        # Send initial START message after everything is loaded
+        rospy.sleep(0.5)  # Give publisher time to connect
+        self.pub_score.publish(String(f"{self.team_name},{self.team_pass},0,NA"))
+        rospy.loginfo("Sent START message to score_tracker")
+        self.current_board = 1
+
         self.ready = True
         rospy.loginfo("SUPER-Optimized Board Detector initialized (READY).")
 
@@ -146,12 +152,6 @@ class BoardDetector:
     # Camera callback for inference and reading
     def camera_callback(self, msg):
         if not self.ready:
-            return
-        
-        # Starting case
-        if self.current_board == 0:
-            self.pub_score.publish(String(f"{self.team_name},{self.team_pass},0,NA"))
-            self.current_board = 1
             return
 
         # cooldown
