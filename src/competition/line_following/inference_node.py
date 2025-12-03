@@ -68,6 +68,7 @@ class InferenceNode:
         # Front lidar for obstacle detection (30 degree cone, 0.1m threshold)
         self.front_scan_data = None
         self.obstacle_detected = False
+        self.front_obstacle_pause_until = rospy.Time.now()  # Time until which to stay paused after obstacle clears
         rospy.Subscriber(self.front_scan_topic, LaserScan, self.front_scan_callback, queue_size=1)
         
         # Left and Right lidars for obstacle detection
@@ -118,6 +119,8 @@ class InferenceNode:
         ranges = list(msg.ranges)
         valid_ranges = [r for r in ranges if r > msg.range_min and r < msg.range_max and not np.isnan(r) and not np.isinf(r)]
         
+        was_obstacle_detected = self.obstacle_detected
+        
         if valid_ranges:
             min_dist = min(valid_ranges)
             # Detect obstacle within 0.20m (20cm) in the front cone - STOP robot
@@ -128,7 +131,14 @@ class InferenceNode:
             
             if self.obstacle_detected:
                 rospy.logwarn_throttle(0.5, f"⚠️ FRONT OBSTACLE at {min_dist:.3f}m - STOPPING!")
+            elif was_obstacle_detected and not self.obstacle_detected:
+                # Obstacle just cleared - set pause timer for 0.5 seconds
+                self.front_obstacle_pause_until = rospy.Time.now() + rospy.Duration(0.5)
+                rospy.loginfo("Front obstacle cleared - pausing for 0.5s before resuming")
         else:
+            if self.obstacle_detected:
+                # Was detecting obstacle, now no valid ranges - set pause timer
+                self.front_obstacle_pause_until = rospy.Time.now() + rospy.Duration(0.5)
             self.obstacle_detected = False
             rospy.logwarn_throttle(5.0, f"Front LIDAR: No valid ranges (all inf/nan or outside bounds)")
     
@@ -219,13 +229,16 @@ class InferenceNode:
         scan_tensor = torch.tensor(scan_ranges, dtype=torch.float32).unsqueeze(0).to(self.device)
         scan_tensor = scan_tensor / 30.0
 
-        # Front lidar obstacle detection - stop if obstacle detected
-        if self.obstacle_detected:
+        # Front lidar obstacle detection - stop if obstacle detected or in pause period
+        if self.obstacle_detected or rospy.Time.now() < self.front_obstacle_pause_until:
             twist = Twist()
             twist.linear.x = 0.0
             twist.angular.z = 0.0
             self.pub.publish(twist)
-            rospy.logwarn_throttle(0.5, f"🛑 STOP COMMAND SENT - Obstacle in front!")
+            if self.obstacle_detected:
+                rospy.logwarn_throttle(0.5, f"🛑 STOP COMMAND SENT - Obstacle in front!")
+            else:
+                rospy.loginfo_throttle(0.25, f"⏸️ PAUSED - Waiting after obstacle cleared")
             return
 
         # Inference
@@ -234,25 +247,25 @@ class InferenceNode:
             v = 0.73 * output[0][0].item()
             w = 1.44 * output[0][1].item()
 
-        # If max turning speed > 2.0 rad/s, set max velocity to 0.5 m/s
+        # If max turning speed > 2.0 rad/s, set max velocity to 0.85 m/s
         if abs(w) > 3.0:
             v = min(v, 0.85)
 
         # Front corner lidar obstacle avoidance - steer away from obstacles
         if self.left_obstacle_detected:
-            w -= 0.45  # Steer right (negative angular velocity)
+            w -= 0.55  # Steer right (negative angular velocity)
         if self.right_obstacle_detected:
-            w += 0.45  # Steer left (positive angular velocity)
+            w += 0.55  # Steer left (positive angular velocity)
 
         # Side lidar obstacle avoidance - steer away from obstacles
         if self.side_left_obstacle_detected:
-            w -= 0.7  # Steer right (negative angular velocity)
+            w -= 0.75  # Steer right (negative angular velocity)
         if self.side_right_obstacle_detected:
-            w += 0.7  # Steer left (positive angular velocity)
+            w += 0.75  # Steer left (positive angular velocity)
 
         twist = Twist()
         # twist.linear.x = v
-        twist.linear.x = 1.7
+        twist.linear.x = 1.6
         
         twist.angular.z = w
         self.pub.publish(twist)
