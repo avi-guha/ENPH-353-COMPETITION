@@ -24,7 +24,7 @@ class BoardReader:
 
     # Constructor
     def __init__(self):
-        model_path = "/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/clueboard_reader_CNN.h5"
+        model_path = "/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/clueboard_reader_CNN_ag.h5"
         self.model = load_model(model_path)
 
     # Preprocessing
