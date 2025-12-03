@@ -6,7 +6,7 @@ import torch
 import numpy as np
 from sensor_msgs.msg import Image, LaserScan
 from geometry_msgs.msg import Twist
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, String
 from cv_bridge import CvBridge, CvBridgeError
 import os
 import sys
@@ -60,6 +60,10 @@ class InferenceNode:
         self.last_pub_check_time = rospy.Time.now()
         self.pub_check_interval = 3.0  # Check every 3 seconds
         
+        # Track if competition timer has started
+        self.timer_started = False
+        rospy.Subscriber('/score_tracker', String, self.score_tracker_callback, queue_size=1)
+        
         # Counter for logging - must be initialized before callbacks are registered
         self.callback_count = 0
         
@@ -107,6 +111,16 @@ class InferenceNode:
         rospy.loginfo(f"  Left Scan: {self.left_scan_topic}")
         rospy.loginfo(f"  Right Scan: {self.right_scan_topic}")
         rospy.loginfo("Note: Will pause when manual teleop is active to avoid conflicts")
+        rospy.loginfo("Note: Waiting for competition timer to start before moving...")
+    
+    def score_tracker_callback(self, msg):
+        """Track when competition timer starts (location '0' message)"""
+        if not self.timer_started:
+            # Parse the message: "teamName,password,location,clue"
+            parts = msg.data.split(',')
+            if len(parts) >= 3 and parts[2] == '0':
+                self.timer_started = True
+                rospy.loginfo("🏁 Competition timer STARTED - Line following enabled!")
     
     def teleop_active_callback(self, msg):
         """Track when manual teleop controller is active"""
@@ -246,6 +260,11 @@ class InferenceNode:
         # Check publisher connection periodically
         self.check_publisher_connection()
         
+        # Don't move until competition timer has started
+        if not self.timer_started:
+            rospy.loginfo_throttle(5.0, "⏳ Waiting for competition timer to start...")
+            return
+        
         # Don't interfere if manual teleop is active
         if self.teleop_active:
             return
@@ -306,7 +325,7 @@ class InferenceNode:
         # Inference
         with torch.no_grad():
             output = self.model(image, scan_tensor)
-            v = 2.0
+            v = 1.7
             w = 1.44 * output[0][1].item()
 
         # If max turning speed > 2.0 rad/s, set max velocity to 0.85 m/s
