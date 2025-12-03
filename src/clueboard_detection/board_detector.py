@@ -6,7 +6,12 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 import time
+import sys
+import os
 from std_msgs.msg import String
+
+# Add the package directory to path for local imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from board_reader import BoardReader
 
 
