@@ -1,0 +1,13 @@
+train: /home/fizzer/ENPH-353-COMPETITION/npc_trainer/train/images
+val: /home/fizzer/ENPH-353-COMPETITION/npc_trainer/train/images
+test: /home/fizzer/ENPH-353-COMPETITION/npc_trainer/test/images
+
+nc: 2
+names: ['pedestrian', 'yoda']
+
+roboflow:
+  workspace: enph252ros
+  project: babeped-jo67m
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/enph252ros/babeped-jo67m/dataset/1

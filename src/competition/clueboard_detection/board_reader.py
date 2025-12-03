@@ -38,33 +38,27 @@ class BoardReader:
         gray = cv2.cvtColor(board, cv2.COLOR_RGB2GRAY)
         gray_resized = cv2.resize(gray, (self.TARGET_WIDTH, self.TARGET_HEIGHT), interpolation=cv2.INTER_CUBIC)
         gray_blur = cv2.medianBlur(gray_resized, 3)  # remove tiny noise
-        gray_blur = cv2.GaussianBlur(gray_blur, (5, 5), 0)
+        #gray_blur = cv2.GaussianBlur(gray_blur, (5, 5), 0)
         return gray_blur
-    
-    # Extract words 
+        
     def extract_board_words(self, board):
-        """
-        @brief Extracts individual words from a board image.
-
-        @param board: image of clueboard in RGB format.
-        @return List of words found in board; each item in list is a cropped/bounded image of word.
-        """
         gray = self.preprocess_board(board)
         board_height, board_width = gray.shape
         half_height = board_height // 2
 
         # Adaptive threshold
-        binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 15, 10)
+        binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                                    cv2.THRESH_BINARY_INV, 15, 10)
 
-        # Morphological opening to remove tiny specks
-        kernel_open = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
+        # Morphological opening
+        kernel_open = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
         binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel_open)
 
-        # Split top and bottom
+        # Split top/bottom
         img_top = binary[0:half_height, :]
         img_bottom = binary[half_height:, :]
 
-        # Dilation to join letters into words
+        # Dilation
         kernel_top = cv2.getStructuringElement(cv2.MORPH_RECT, (15,5))
         kernel_bottom = cv2.getStructuringElement(cv2.MORPH_RECT, (35,5))
         dilated_top = cv2.dilate(img_top, kernel_top, iterations=2)
@@ -74,64 +68,69 @@ class BoardReader:
         contours_top, _ = cv2.findContours(dilated_top, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         contours_bottom, _ = cv2.findContours(dilated_bottom, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        # Shift bottom contours
+        # Shift bottom contours into full image coordinates
         for cnt in contours_bottom:
-            for point in cnt:
-                point[0][1] += half_height
+            for pt in cnt:
+                pt[0][1] += half_height
 
+        # -------------------------------------------------------
+        # Identify the detective: tallest contour in top half
+        # -------------------------------------------------------
+        tallest_top = None
+        max_h = 0
+        for cnt in contours_top:
+            _, _, _, h = cv2.boundingRect(cnt)
+            if h > max_h:
+                max_h = h
+                tallest_top = cnt
+
+        # Combine all contours
         all_contours = contours_top + contours_bottom
 
-        # Below: filters to remove NOISE
-        # Filter contours by area and aspect ratio
+        # Area thresholds
         min_area = board_width * board_height * 0.005
         max_area = board_width * board_height * 0.5
+
         word_boxes = []
+
+        # -------------------------------------------------------
+        # Build word boxes, skipping only the detective
+        # -------------------------------------------------------
         for cnt in all_contours:
+
+            # Skip detective contour
+            if cnt is tallest_top:
+                continue
+
             x, y, w, h = cv2.boundingRect(cnt)
             area = w * h
             aspect_ratio = w / h
+
+            # Basic filters
             if area < min_area or area > max_area:
                 continue
             if aspect_ratio < 0.5 or aspect_ratio > 10:
                 continue
+
+            # Word size filtering
+            MIN_WORD_HEIGHT = 50
+            MAX_WORD_HEIGHT = 250
+            MIN_WORD_WIDTH = 30
+
+            if w < MIN_WORD_WIDTH:
+                continue
+            if h < MIN_WORD_HEIGHT or h > MAX_WORD_HEIGHT:
+                continue
+
             word_boxes.append((x, y, w, h))
 
-        # Define minimum dimensions for a word box to filter noise
-        MIN_WORD_WIDTH = 30
-        MIN_WORD_HEIGHT = 40
-        
-        filtered_boxes = []
-        for x, y, w, h in word_boxes:
-            
-            # Filter: Ignore boxes that are too small (noise)
-            if w < MIN_WORD_WIDTH or h < MIN_WORD_HEIGHT:
-                continue
-                
-            filtered_boxes.append((x, y, w, h))
-
-        word_boxes = filtered_boxes
-        
-        # Sort boxes by Y-coordinate (row) then X-coordinate (column) for correct reading order
-        # The detective figure should now be the first box if it's in the top-left corner
+        # Sort into reading order
         word_boxes = sorted(word_boxes, key=lambda b: (b[1], b[0]))
-        
-        # Skip the first box (assuming it is the large detective figure) 
-        if len(word_boxes) > 0:
-            word_boxes = word_boxes[1:]
 
         # Extract word images
         words = [gray[y:y+h, x:x+w] for x, y, w, h in word_boxes]
 
-        # DEBUGGING: SHOW IMAGE
-        display_img = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-        for x, y, w, h in word_boxes:
-            cv2.rectangle(display_img, (x, y), (x+w, y+h), (0, 255, 0), 2)
-
-        #plt.imshow(cv2.cvtColor(display_img, cv2.COLOR_BGR2RGB))
-        #plt.axis('off')
-        #plt.show()
-
-        # Publish to GUI
+        # Publish debug
         if hasattr(self, 'pub_words_debug'):
             debug = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
             for (x, y, w, h) in word_boxes:
@@ -143,6 +142,7 @@ class BoardReader:
                 pass
 
         return words
+
 
     # Pad images 
     def pad_to_max(self, imgs, target_size):
