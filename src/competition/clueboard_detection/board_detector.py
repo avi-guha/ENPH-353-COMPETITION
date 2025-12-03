@@ -148,12 +148,12 @@ class BoardDetector:
             return
 
         # cooldown
-        if time.time() - self.last_board_time < 3.0:
+        if time.time() - self.last_board_time < 1.5:
             return
 
         # Skip every other frame for compute
-        self.frame_skip ^= 1
-        if self.frame_skip == 1:
+        self.frame_skip = (self.frame_skip + 1) % 3
+        if self.frame_skip != 0:
             return
 
         # Only run YOLO if board NOT acquired 
@@ -163,7 +163,7 @@ class BoardDetector:
         frame = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
         # YOLO Inference (light mode) 
-        results = self.model.predict(frame, verbose=False, imgsz=416)
+        results = self.model.predict(frame, verbose=False, imgsz=320)
 
         for r in results:
             for box in r.boxes:
@@ -174,8 +174,8 @@ class BoardDetector:
                 bh = y2 - y1
 
                 # Cheap box filters
-                sizeable = bw > 240
-                aspect_ok = bw / bh > 1.2
+                sizeable = bw > 230
+                aspect_ok = bw / bh > 1.0
                 confident = conf > 0.65
 
                 #prev_ok  = self.board_map[self.current_board - 1][0]
