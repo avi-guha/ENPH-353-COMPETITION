@@ -89,9 +89,7 @@ class BoardReader:
             for pt in cnt:
                 pt[0][1] += half_height
 
-        # -------------------------------------------------------
-        # Identify the detective: tallest contour in top half
-        # -------------------------------------------------------
+   
         tallest_top = None
         max_h = 0
         for cnt in contours_top:
@@ -109,9 +107,6 @@ class BoardReader:
 
         word_boxes = []
 
-        # -------------------------------------------------------
-        # Build word boxes, skipping only the detective
-        # -------------------------------------------------------
         for cnt in all_contours:
 
             # Skip detective contour
