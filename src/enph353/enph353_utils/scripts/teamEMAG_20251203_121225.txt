@@ -1,0 +1,36 @@
+12:12:08.782: Clue SIZE: L2ITTP
+12:12:08.782: Clue VICTIM: QKLX8NJ
+12:12:08.782: Clue CRIME: S7WSQRET446
+12:12:08.784: Clue TIME: B510GSX098MD
+12:12:08.784: Clue PLACE: AXDO4JTW
+12:12:08.785: Clue MOTIVE: LLV3OK22DEN
+12:12:08.785: Clue WEAPON: GS8N32KGC1VQ
+12:12:08.785: Clue BANDIT: YET5XA9O93
+12:12:25.843: Message received: teamEMAG,secret3,0,NA
+12:12:25.844: Timer started.
+12:12:30.514: Message received: teamEMAG,secret3,1,L2ITTP
+12:12:30.515: Team total: 6 pts
+12:12:30.517: Awarded: 6 pts
+12:12:36.170: Message received: teamEMAG,secret3,2,QKLX8NJ
+12:12:36.171: Team total: 12 pts
+12:12:36.174: Awarded: 6 pts
+12:12:39.635: Message received: teamEMAG,secret3,3,S7WSQRET446
+12:12:39.635: Team total: 18 pts
+12:12:39.638: Awarded: 6 pts
+12:12:51.225: Message received: teamEMAG,secret3,4,B510GSX098MD
+12:12:51.226: Team total: 24 pts
+12:12:51.227: Awarded: 6 pts
+12:13:02.218: Message received: teamEMAG,secret3,5,AXDO4JTW
+12:13:02.219: Team total: 30 pts
+12:13:02.221: Awarded: 6 pts
+12:13:11.417: Message received: teamEMAG,secret3,6,LLV3OK22DEN
+12:13:11.417: Team total: 36 pts
+12:13:11.418: Awarded: 6 pts
+12:13:22.667: Message received: teamEMAG,secret3,7,GS8N32KGC1VQ
+12:13:22.668: Team total: 44 pts
+12:13:22.671: Awarded: 8 pts
+12:13:44.012: Message received: teamEMAG,secret3,8,YET5XA9O93
+12:13:44.012: Team total: 52 pts
+12:13:44.013: Awarded: 8 pts
+12:13:44.516: Message received: teamEMAG,secret3,-1,NA
+12:13:44.517: Timer stopped: 68.03 sec sim time (real time: 78sec).

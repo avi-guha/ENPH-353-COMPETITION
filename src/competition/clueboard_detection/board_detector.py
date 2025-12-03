@@ -15,6 +15,12 @@ class BoardDetector:
     UPPER_BLUE_HSV = np.array([130, 255, 255])
 
     def __init__(self):
+        rospy.init_node('yolo_clueboard_node')
+
+        # Ready flag so callback doesn't run early
+        self.ready = False
+
+        # CNN + Bridge
         self.cnn = BoardReader()
         self.bridge = CvBridge()
 
@@ -22,7 +28,6 @@ class BoardDetector:
         self.current_board = 0
         self.frame_skip = 0
 
-        # Detection sequence
         self.board_map = {
             0: [True,  "START"],
             1: [False, "SIZE"],
@@ -38,20 +43,16 @@ class BoardDetector:
         self.team_name = "teamEMAG"
         self.team_pass = "secret3"
 
-        rospy.init_node('yolo_clueboard_node')
-
-        # Debug visualization publishers
         self.pub_raw_board = rospy.Publisher('/clueboard/raw_board', Image, queue_size=1)
         self.pub_proc_board = rospy.Publisher('/clueboard/processed_board', Image, queue_size=1)
         self.pub_words_debug = rospy.Publisher('/clueboard/words_debug', Image, queue_size=1)
         self.pub_letters_debug = rospy.Publisher('/clueboard/letters_debug', Image, queue_size=1)
+        self.pub_score = rospy.Publisher('/score_tracker', String, queue_size=1)
 
-        # Provide debug publishers to CNN
         self.cnn.bridge = self.bridge
         self.cnn.pub_words_debug = self.pub_words_debug
         self.cnn.pub_letters_debug = self.pub_letters_debug
 
-        # Load YOLO
         model_path = rospy.get_param(
             "~model_path",
             "/home/fizzer/ENPH-353-COMPETITION/src/competition/clueboard_detection/runs/detect/clueboards_exp12/weights/best.pt"
@@ -59,16 +60,19 @@ class BoardDetector:
         self.model = YOLO(model_path)
         self.model.fuse = lambda *a, **k: self.model
 
-        # Camera topics
+        # Allow time for RViz / GUI subscribers
+        rospy.sleep(1.0)
+
         self.camera_topic_left  = rospy.get_param("~camera_topic_left",  "/B1/left_front_cam/left_front/image_raw")
         self.camera_topic_right = rospy.get_param("~camera_topic_right", "/B1/right_front_cam/right_front/image_raw")
 
+        rospy.loginfo("Subscribing to cameras...")
         rospy.Subscriber(self.camera_topic_left,  Image, self.camera_callback, queue_size=1)
         rospy.Subscriber(self.camera_topic_right, Image, self.camera_callback, queue_size=1)
 
-        self.pub_score = rospy.Publisher('/score_tracker', String, queue_size=1)
+        self.ready = True
+        rospy.loginfo("SUPER-Optimized Board Detector initialized (READY).")
 
-        rospy.loginfo("SUPER-Optimized Board Detector initialized.")
 
     # Check if whole board captured
     def board_captured(self, raw_board):
@@ -141,6 +145,9 @@ class BoardDetector:
 
     # Camera callback for inference and reading
     def camera_callback(self, msg):
+        if not self.ready:
+            return
+        
         # Starting case
         if self.current_board == 0:
             self.pub_score.publish(String(f"{self.team_name},{self.team_pass},0,NA"))

@@ -1,0 +1,18 @@
+12:01:13.849: Clue SIZE: RDKEJ
+12:01:13.849: Clue VICTIM: PCA3BN
+12:01:13.849: Clue CRIME: 9I30CC
+12:01:13.853: Clue TIME: SZHA
+12:01:13.861: Clue PLACE: OT5TYIE440R
+12:01:13.869: Clue MOTIVE: MF3UH55I
+12:01:13.877: Clue WEAPON: 0P535KXK7CH
+12:01:13.884: Clue BANDIT: 08TOHM5K0US
+12:01:56.821: Message received: teamEMAG,secret3,0,NA
+12:01:56.821: Timer started.
+12:02:02.634: Message received: teamEMAG,secret3,1,
+12:02:02.634: Awarded: 0 pts
+12:02:05.196: Message received: teamEMAG,secret3,2,PCA3BN
+12:02:05.200: Team total: 6 pts
+12:02:05.201: Awarded: 6 pts
+12:02:09.522: Message received: teamEMAG,secret3,3,9I30CC
+12:02:09.523: Team total: 12 pts
+12:02:09.524: Awarded: 6 pts

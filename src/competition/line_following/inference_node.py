@@ -11,6 +11,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import os
 import sys
 import message_filters
+import time
 
 # Add the script directory to Python path to import model
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -119,6 +120,7 @@ class InferenceNode:
             # Parse the message: "teamName,password,location,clue"
             parts = msg.data.split(',')
             if len(parts) >= 3 and parts[2] == '0':
+                time.sleep(0.5)
                 self.timer_started = True
                 rospy.loginfo("🏁 Competition timer STARTED - Line following enabled!")
     
