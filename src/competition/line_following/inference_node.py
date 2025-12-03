@@ -120,7 +120,6 @@ class InferenceNode:
             # Parse the message: "teamName,password,location,clue"
             parts = msg.data.split(',')
             if len(parts) >= 3 and parts[2] == '0':
-                time.sleep(0.5)
                 self.timer_started = True
                 rospy.loginfo("🏁 Competition timer STARTED - Line following enabled!")
     
