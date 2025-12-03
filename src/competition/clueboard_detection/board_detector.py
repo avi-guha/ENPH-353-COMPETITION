@@ -256,7 +256,6 @@ class BoardDetector:
                 return
 
 
-
 if __name__ == "__main__":
     try:
         detector = BoardDetector()
