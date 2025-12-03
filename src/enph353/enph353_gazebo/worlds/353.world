@@ -261,7 +261,7 @@
     <!-- Realtime factor capped at 0.5 for controlled simulation speed -->
     <physics type='ode'>
       <max_step_size>0.001</max_step_size>
-      <real_time_factor>0.5</real_time_factor>
+      <real_time_factor>0.3</real_time_factor>
       <real_time_update_rate>1000.0</real_time_update_rate>
     </physics> 
 
