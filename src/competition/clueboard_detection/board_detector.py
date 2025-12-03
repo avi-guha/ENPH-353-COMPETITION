@@ -212,13 +212,13 @@ class BoardDetector:
 
                 # Cheap box filters
                 sizeable = bw > 240
-                aspect_ok = bw / max(bh, 1) > 1.25
-                confident = conf > 0.55
+                aspect_ok = bw bh > 1.2
+                confident = conf > 0.65
 
-                prev_ok  = self.board_map[self.current_board - 1][0]
+                # prev_ok  = self.board_map[self.current_board - 1][0]
                 curr_not_done = not self.board_map[self.current_board][0]
 
-                if not (sizeable and aspect_ok and confident and prev_ok and curr_not_done):
+                if not (sizeable and aspect_ok and confident and curr_not_done): # remove prev_ok check
                     continue
 
                 crop = frame[y1:y2, x1:x2]
@@ -252,7 +252,7 @@ class BoardDetector:
                 self.board_map[self.current_board][0] = True
                 self.last_board_time = time.time()
                 self.current_board += 1
-
+                
                 return
 
 
