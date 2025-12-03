@@ -3,7 +3,6 @@
 import string
 import pandas as pd
 import cv2
-from sklearn.utils import shuffle
 import numpy as np
 import os
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -13,6 +12,8 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization
+from sklearn.utils import shuffle
+from tensorflow.keras.models import load_model
 
 print('Success')
 
@@ -198,6 +199,9 @@ for numbers_dir in numbers_dirs:
                 char_label = filename.split("_")[0]
                 char_img = cv2.imread(os.path.join(numbers_dir, filename), cv2.IMREAD_GRAYSCALE)
                 char_img = cv2.resize(char_img, (IMG_SIZE, IMG_SIZE))
+                # Invert colors: number images have white background/black text,
+                # but training_chars has black background/white text
+                char_img = 255 - char_img
                 char_img_normal = char_img.astype("float32") / 255.0
                 
                 X.append(char_img_normal)
@@ -216,9 +220,9 @@ y_total = keras.utils.to_categorical(y_int, num_classes=num_classes)
 X_total, y_total = shuffle(X, y_total, random_state=42)
 
 # Tune param as needed
-epochs = 32
+epochs = 12
 batch_size = 64
-learning_rate = 0.001
+learning_rate = 0.0001
 val_split=0.2 # % of data to be used as validation
 
 input_shape=(IMG_SIZE , IMG_SIZE, 1) # save input shape as var
@@ -226,6 +230,7 @@ input_shape=(IMG_SIZE , IMG_SIZE, 1) # save input shape as var
 input_shape = (90, 90, 1)
 num_classes = 37  # A-Z + 0-9 + space
 
+"""
 model = Sequential([
     Input(shape=input_shape),  # <- Keras 3 style, NO batch_shape
 
@@ -249,6 +254,9 @@ model = Sequential([
     Dropout(0.5),
     Dense(num_classes, activation='softmax')
 ])
+"""
+
+model = load_model('/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/clueboard_reader_CNN_agi.h5')
 
 model.summary()
 
@@ -264,6 +272,7 @@ history = model.fit(X_total,
                     verbose=1,
                     validation_split=val_split)
 
-save_path = "/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/clueboard_reader_CNN_ag.h5"
+save_path = "/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/clueboard_reader_CNN_agiv2.h5"
 model.save(save_path)
 print(f"Model saved to {save_path}")
+
