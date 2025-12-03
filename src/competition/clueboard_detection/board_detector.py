@@ -228,6 +228,7 @@ class BoardDetector:
 
                 # If BANDIT (board 8) reported, send end
                 if board_id == 8:
+                    time.sleep(0.5) 
                     self.pub_score.publish(String(f"{self.team_name},{self.team_pass},-1,NA"))
 
                 return
