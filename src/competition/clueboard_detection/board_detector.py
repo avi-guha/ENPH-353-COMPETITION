@@ -74,9 +74,7 @@ class BoardDetector:
         rospy.loginfo("SUPER-Optimized Board Detector initialized.")
 
 
-    # ----------------------------------------------------------
-    # CAMERA SWITCHER (simple + clean)
-    # ----------------------------------------------------------
+    # Camera usage switcher
     def update_expected_camera(self):
         # Board 1,3,5,7 → LEFT
         # Board 2,4,6,8 → RIGHT
@@ -87,18 +85,13 @@ class BoardDetector:
                 self.expected_cam = self.camera_topic_right
 
 
-    # ----------------------------------------------------------
-    # LIGHTWEIGHT BOARD-CAPTURE CHECK
-    # ----------------------------------------------------------
+    # Check if whole board captured
     def board_captured(self, raw_board):
         hsv = cv2.cvtColor(raw_board, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, self.LOWER_BLUE_HSV, self.UPPER_BLUE_HSV)
         return cv2.countNonZero(mask) > 2000
 
-
-    # ----------------------------------------------------------
-    # HIGH-RES Homography (unchanged)
-    # ----------------------------------------------------------
+    # Extract homography
     def process_raw_board(self, raw):
         img = raw.copy()
         H, W = img.shape[:2]
@@ -161,47 +154,43 @@ class BoardDetector:
         return rectified
 
 
-    # ----------------------------------------------------------
-    # MAIN CALLBACK — ultra light
-    # ----------------------------------------------------------
+    # Camera callback for inference and reading
     def camera_callback(self, msg):
 
-        # ====== Camera selection ======
+        # Camera selection 
         self.update_expected_camera()
         if msg._connection_header["topic"] != self.expected_cam:
             return
 
-        # ====== Initial START board ======
+        # Starting case
         if self.current_board == 0:
             self.pub_score.publish(String(f"{self.team_name},{self.team_pass},0,NA"))
             self.current_board = 1
             return
 
-        # ====== Final board ======
+        # Ending case
         if self.current_board > 8:
             self.pub_score.publish(String(f"{self.team_name},{self.team_pass},-1,NA"))
             return
 
-        # ====== Cooldown ======
+        # cooldown
         if time.time() - self.last_board_time < 3.0:
             return
 
-        # ====== Skip every other frame ======
+        # Skip every other frame for compute
         self.frame_skip ^= 1
         if self.frame_skip == 1:
             return
 
-        # ====== Only run YOLO if board NOT acquired ======
+        # Only run YOLO if board NOT acquired 
         if self.board_map[self.current_board][0]:
             return
 
-        # Only now convert image (expensive)
         frame = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
-        # ====== YOLO Inference (light mode) ======
+        # YOLO Inference (light mode) 
         results = self.model.predict(frame, verbose=False, imgsz=480)
 
-        # ====== Parse YOLO detections ======
         for r in results:
             for box in r.boxes:
 
@@ -212,27 +201,26 @@ class BoardDetector:
 
                 # Cheap box filters
                 sizeable = bw > 240
-                aspect_ok = bw bh > 1.2
+                aspect_ok = bw / bh > 1.2
                 confident = conf > 0.65
 
-                # prev_ok  = self.board_map[self.current_board - 1][0]
+                prev_ok  = self.board_map[self.current_board - 1][0]
                 curr_not_done = not self.board_map[self.current_board][0]
 
-                if not (sizeable and aspect_ok and confident and curr_not_done): # remove prev_ok check
+                if not (sizeable and aspect_ok and confident and curr_not_done and prev_ok): # remove prev_ok check
                     continue
 
                 crop = frame[y1:y2, x1:x2]
                 if not self.board_captured(crop):
                     continue
 
-                # ====== Process board ======
                 roi = self.process_raw_board(crop)
                 rgb = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
 
                 self.pub_raw_board.publish(self.bridge.cv2_to_imgmsg(crop, "bgr8"))
                 self.pub_proc_board.publish(self.bridge.cv2_to_imgmsg(roi, "bgr8"))
 
-                # ====== CNN reading ======
+                # CNN reading 
                 chars = self.cnn.predict_board(rgb)
                 words = "".join(chars).split()
                 if not words:
