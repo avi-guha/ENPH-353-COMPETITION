@@ -3,6 +3,7 @@
 import string
 import pandas as pd
 import cv2
+from sklearn.utils import shuffle
 import numpy as np
 import os
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
