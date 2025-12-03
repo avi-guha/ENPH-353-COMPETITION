@@ -192,7 +192,7 @@ class BoardDetector:
                 bh = y2 - y1
 
                 # Cheap box filters
-                sizeable = bw > 240
+                sizeable = bw > 235
                 aspect_ok = bw / bh > 1.2
                 confident = conf > 0.65
 

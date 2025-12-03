@@ -1,0 +1,38 @@
+13:56:55.193: Clue SIZE: XR59U715XEP
+13:56:55.193: Clue VICTIM: XZ1VTOK
+13:56:55.193: Clue CRIME: BTZWAA8SKEF
+13:56:55.201: Clue TIME: 58418N77KIZD
+13:56:55.201: Clue PLACE: AGGLWT
+13:56:55.202: Clue MOTIVE: F1GQRL
+13:56:55.202: Clue WEAPON: U9YBEUSLH5
+13:56:55.203: Clue BANDIT: AM0NQFX
+13:57:26.145: Message received: teamEMAG,secret3,0,NA
+13:57:26.152: Timer started.
+13:57:32.141: Message received: teamEMAG,secret3,1,XR59U715XEP
+13:57:32.142: Team total: 6 pts
+13:57:32.144: Awarded: 6 pts
+13:57:37.737: Message received: teamEMAG,secret3,2,XZ1VTOK
+13:57:37.738: Team total: 12 pts
+13:57:37.742: Awarded: 6 pts
+13:57:40.800: Message received: teamEMAG,secret3,3,BTZWAA8SKEF
+13:57:40.801: Team total: 18 pts
+13:57:40.801: Awarded: 6 pts
+13:57:49.905: Message received: teamEMAG,secret3,4,58418N77KIZD
+13:57:49.906: Team total: 24 pts
+13:57:49.907: Awarded: 6 pts
+13:57:59.210: Message received: teamEMAG,secret3,5,AGGLWT
+13:57:59.211: Team total: 30 pts
+13:57:59.212: Awarded: 6 pts
+13:58:04.871: Message received: teamEMAG,secret3,6,F1GQRL
+13:58:04.872: Team total: 36 pts
+13:58:04.878: Awarded: 6 pts
+13:58:13.515: Message received: teamEMAG,secret3,7,U9YBEUSLH5
+13:58:13.516: Team total: 44 pts
+13:58:13.524: Awarded: 8 pts
+13:58:27.589: Message received: teamEMAG,secret3,8,AM0NQFX
+13:58:27.590: Team total: 52 pts
+13:58:27.599: Awarded: 8 pts
+13:58:28.105: Message received: teamEMAG,secret3,-1,NA
+13:58:28.106: Timer stopped: 53.60 sec sim time (real time: 61sec).
+13:58:35.210: Bonus completed: +5 points
+13:58:35.211: Team total: 57 pts

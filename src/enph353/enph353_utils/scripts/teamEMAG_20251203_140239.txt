@@ -1,0 +1,38 @@
+14:02:14.453: Clue SIZE: 9YILH3R37Y
+14:02:14.453: Clue VICTIM: 8F5O0J
+14:02:14.453: Clue CRIME: X14GCC
+14:02:14.454: Clue TIME: 0E8Z35YWG
+14:02:14.454: Clue PLACE: LD1O
+14:02:14.455: Clue MOTIVE: W4U8TOO
+14:02:14.455: Clue WEAPON: 06V7SP
+14:02:14.456: Clue BANDIT: XP0E57T2
+14:02:39.719: Message received: teamEMAG,secret3,0,NA
+14:02:39.720: Timer started.
+14:02:45.839: Message received: teamEMAG,secret3,1,9YILH3R37Y
+14:02:45.840: Team total: 6 pts
+14:02:45.859: Awarded: 6 pts
+14:02:52.851: Message received: teamEMAG,secret3,2,8F5O0J
+14:02:52.852: Team total: 12 pts
+14:02:52.853: Awarded: 6 pts
+14:02:57.054: Message received: teamEMAG,secret3,3,X14GCC
+14:02:57.055: Team total: 18 pts
+14:02:57.059: Awarded: 6 pts
+14:03:08.452: Message received: teamEMAG,secret3,4,0E8Z35YWG
+14:03:08.453: Team total: 24 pts
+14:03:08.459: Awarded: 6 pts
+14:03:19.844: Message received: teamEMAG,secret3,5,LD1O
+14:03:19.845: Team total: 30 pts
+14:03:19.848: Awarded: 6 pts
+14:03:28.025: Message received: teamEMAG,secret3,6,W4U8TOO
+14:03:28.025: Team total: 36 pts
+14:03:28.026: Awarded: 6 pts
+14:03:40.685: Message received: teamEMAG,secret3,7,06V7SP
+14:03:40.686: Team total: 44 pts
+14:03:40.688: Awarded: 8 pts
+14:03:44.868: Bonus completed: +5 points
+14:03:44.874: Team total: 49 pts
+14:04:01.450: Message received: teamEMAG,secret3,8,XP0E57T2
+14:04:01.451: Team total: 57 pts
+14:04:01.451: Awarded: 8 pts
+14:04:01.950: Message received: teamEMAG,secret3,-1,NA
+14:04:01.951: Timer stopped: 70.62 sec sim time (real time: 82sec).

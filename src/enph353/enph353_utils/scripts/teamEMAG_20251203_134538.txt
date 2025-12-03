@@ -1,0 +1,35 @@
+13:44:10.163: Clue SIZE: FLOCK OF
+13:44:10.163: Clue VICTIM: SINGING DODO
+13:44:10.163: Clue CRIME: DANCE MISHAP
+13:44:10.172: Clue TIME: YEAR OF PIG
+13:44:10.205: Clue PLACE: TEMPLE
+13:44:10.210: Clue MOTIVE: FAILED SONG
+13:44:10.215: Clue WEAPON: SILLY GOO
+13:44:10.220: Clue BANDIT: KUNG FU CAT
+13:45:38.485: Message received: teamEMAG,secret3,0,NA
+13:45:38.486: Timer started.
+13:45:44.913: Message received: teamEMAG,secret3,1,FLOCKOF
+13:45:44.913: Team total: 6 pts
+13:45:44.914: Awarded: 6 pts
+13:45:51.936: Message received: teamEMAG,secret3,2,SINGINGDODO
+13:45:51.937: Team total: 12 pts
+13:45:51.944: Awarded: 6 pts
+13:45:56.608: Message received: teamEMAG,secret3,3,DANCEMISHPAP
+13:45:56.610: Awarded: 0 pts
+13:46:07.869: Message received: teamEMAG,secret3,4,YEAROFPIG
+13:46:07.870: Team total: 18 pts
+13:46:07.871: Awarded: 6 pts
+13:46:18.920: Message received: teamEMAG,secret3,5,TEMPLE
+13:46:18.921: Team total: 24 pts
+13:46:18.923: Awarded: 6 pts
+13:46:26.929: Message received: teamEMAG,secret3,6,FAILEDSONG
+13:46:26.930: Team total: 30 pts
+13:46:26.937: Awarded: 6 pts
+13:46:38.080: Message received: teamEMAG,secret3,7,SILLYGOO
+13:46:38.081: Team total: 38 pts
+13:46:38.087: Awarded: 8 pts
+13:46:58.890: Message received: teamEMAG,secret3,8,KUNGFUCAT
+13:46:58.891: Team total: 46 pts
+13:46:58.910: Awarded: 8 pts
+13:46:59.391: Message received: teamEMAG,secret3,-1,NA
+13:46:59.392: Timer stopped: 69.27 sec sim time (real time: 80sec).

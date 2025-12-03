@@ -1,0 +1,36 @@
+13:48:15.013: Clue SIZE: C1AQTKL4TM
+13:48:15.013: Clue VICTIM: Q0PGR
+13:48:15.014: Clue CRIME: X9CV7IRE8VKU
+13:48:15.019: Clue TIME: 14IUNB2MZP
+13:48:15.020: Clue PLACE: FKWL
+13:48:15.020: Clue MOTIVE: Z8SL2YI
+13:48:15.021: Clue WEAPON: JD8B
+13:48:15.021: Clue BANDIT: 0AZIF1P
+13:48:56.153: Message received: teamEMAG,secret3,0,NA
+13:48:56.154: Timer started.
+13:49:02.349: Message received: teamEMAG,secret3,1,C1AQTKL4TM
+13:49:02.349: Team total: 6 pts
+13:49:02.352: Awarded: 6 pts
+13:49:10.606: Message received: teamEMAG,secret3,2,Q0PGR
+13:49:10.607: Team total: 12 pts
+13:49:10.608: Awarded: 6 pts
+13:49:15.000: Message received: teamEMAG,secret3,3,X9CV7IRE8VKU
+13:49:15.001: Team total: 18 pts
+13:49:15.003: Awarded: 6 pts
+13:49:26.161: Message received: teamEMAG,secret3,4,14IUNB2MZP
+13:49:26.162: Team total: 24 pts
+13:49:26.166: Awarded: 6 pts
+13:49:38.217: Message received: teamEMAG,secret3,5,FKWL
+13:49:38.219: Team total: 30 pts
+13:49:38.220: Awarded: 6 pts
+13:49:46.921: Message received: teamEMAG,secret3,6,Z8SL2YI
+13:49:46.922: Team total: 36 pts
+13:49:46.928: Awarded: 6 pts
+13:50:00.563: Message received: teamEMAG,secret3,7,JD8B
+13:50:00.564: Team total: 44 pts
+13:50:00.565: Awarded: 8 pts
+13:50:21.080: Message received: teamEMAG,secret3,8,0AZIF1P
+13:50:21.081: Team total: 52 pts
+13:50:21.082: Awarded: 8 pts
+13:50:21.580: Message received: teamEMAG,secret3,-1,NA
+13:50:21.581: Timer stopped: 74.14 sec sim time (real time: 85sec).

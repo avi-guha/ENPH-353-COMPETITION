@@ -1,0 +1,33 @@
+13:50:47.310: Clue SIZE: 17F6G
+13:50:47.311: Clue VICTIM: OKA5RUFOU
+13:50:47.311: Clue CRIME: YVPPARXAT
+13:50:47.311: Clue TIME: 1R8LDB
+13:50:47.312: Clue PLACE: 6Z52YVTB
+13:50:47.312: Clue MOTIVE: LUEKM
+13:50:47.313: Clue WEAPON: K2SD0T6IGV
+13:50:47.313: Clue BANDIT: B3SL97
+13:51:18.280: Message received: teamEMAG,secret3,0,NA
+13:51:18.281: Timer started.
+13:51:24.431: Message received: teamEMAG,secret3,1,17F6G
+13:51:24.432: Team total: 6 pts
+13:51:24.433: Awarded: 6 pts
+13:51:36.364: Message received: teamEMAG,secret3,3,YVPPARXAT
+13:51:36.366: Team total: 12 pts
+13:51:36.367: Awarded: 6 pts
+13:51:47.711: Message received: teamEMAG,secret3,4,1R8LDB
+13:51:47.712: Team total: 18 pts
+13:51:47.722: Awarded: 6 pts
+13:52:00.336: Message received: teamEMAG,secret3,5,6Z52YVTB
+13:52:00.337: Team total: 24 pts
+13:52:00.344: Awarded: 6 pts
+13:52:07.492: Message received: teamEMAG,secret3,6,LUEKM
+13:52:07.493: Team total: 30 pts
+13:52:07.499: Awarded: 6 pts
+13:52:18.198: Message received: teamEMAG,secret3,7,K2SD0T6IGV
+13:52:18.199: Team total: 38 pts
+13:52:18.199: Awarded: 8 pts
+13:52:38.285: Message received: teamEMAG,secret3,8,B3SL97
+13:52:38.286: Team total: 46 pts
+13:52:38.289: Awarded: 8 pts
+13:52:38.786: Message received: teamEMAG,secret3,-1,NA
+13:52:38.787: Timer stopped: 70.38 sec sim time (real time: 80sec).

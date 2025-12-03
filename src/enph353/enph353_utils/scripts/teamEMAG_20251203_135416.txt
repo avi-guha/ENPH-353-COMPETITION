@@ -1,0 +1,22 @@
+13:53:45.946: Clue SIZE: 3DUO
+13:53:45.946: Clue VICTIM: ZIDV8CS2D7Q
+13:53:45.946: Clue CRIME: V6O5VOAU
+13:53:45.947: Clue TIME: AU5WKGR
+13:53:45.947: Clue PLACE: UKLX05255N
+13:53:45.948: Clue MOTIVE: SSIB3U
+13:53:45.948: Clue WEAPON: 8J8KT761
+13:53:45.949: Clue BANDIT: N23L8
+13:54:16.128: Message received: teamEMAG,secret3,0,NA
+13:54:16.128: Timer started.
+13:54:21.748: Message received: teamEMAG,secret3,1,3DUO
+13:54:21.749: Team total: 6 pts
+13:54:21.749: Awarded: 6 pts
+13:54:32.406: Message received: teamEMAG,secret3,3,V6O5VOAU
+13:54:32.408: Team total: 12 pts
+13:54:32.436: Awarded: 6 pts
+13:54:42.681: Message received: teamEMAG,secret3,4,AU5WKGR
+13:54:42.682: Team total: 18 pts
+13:54:42.689: Awarded: 6 pts
+13:54:52.538: Message received: teamEMAG,secret3,5,UKLX05255N
+13:54:52.539: Team total: 24 pts
+13:54:52.540: Awarded: 6 pts

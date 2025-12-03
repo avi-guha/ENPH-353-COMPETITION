@@ -1,0 +1,16 @@
+13:59:06.791: Clue SIZE: K747EM5XVV
+13:59:06.791: Clue VICTIM: W7RIHM7DLH08
+13:59:06.791: Clue CRIME: 2OZE2K8MB5OR
+13:59:06.792: Clue TIME: 0VR9
+13:59:06.792: Clue PLACE: PSMY9C00QP
+13:59:06.793: Clue MOTIVE: U15I4
+13:59:06.793: Clue WEAPON: G7ID2Q4MD
+13:59:06.794: Clue BANDIT: CEY6BL57XMC3
+13:59:31.454: Message received: teamEMAG,secret3,0,NA
+13:59:31.455: Timer started.
+13:59:37.486: Message received: teamEMAG,secret3,1,K747EM5XVV
+13:59:37.487: Team total: 6 pts
+13:59:37.488: Awarded: 6 pts
+13:59:47.760: Message received: teamEMAG,secret3,3,2OZE2K8MB5OR
+13:59:47.761: Team total: 12 pts
+13:59:47.763: Awarded: 6 pts
