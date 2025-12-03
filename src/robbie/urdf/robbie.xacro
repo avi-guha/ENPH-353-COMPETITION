@@ -229,12 +229,12 @@
 
   <gazebo reference="camera_link">
     <sensor type="camera" name="camera1">
-      <update_rate>30.0</update_rate>
+      <update_rate>15.0</update_rate>
       <camera name="head">
         <horizontal_fov>2.1</horizontal_fov> <!-- 110 degrees (increased from 100) -->
         <image>
-          <width>1500</width>
-          <height>1500</height>
+          <width>800</width>
+          <height>800</height>
           <format>R8G8B8</format>
         </image>
         <clip>
@@ -370,10 +370,10 @@
       <ray>
         <scan>
           <horizontal>
-            <samples>70</samples>
+            <samples>500</samples>
             <resolution>1</resolution>
-            <min_angle>-0.3054</min_angle>  <!-- -17.5 degrees -->
-            <max_angle>0.3054</max_angle>   <!-- +17.5 degrees (35 degree cone) -->
+            <min_angle>-0.4200</min_angle>  <!-- -27.5 degrees -->
+            <max_angle>0.4200</max_angle>   <!-- +27.5 degrees (55 degree plane) -->
           </horizontal>
         </scan>
         <range>
@@ -428,15 +428,15 @@
   <gazebo reference="left_lidar_link">
     <sensor type="ray" name="left_lidar_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>false</visualize>
+      <visualize>true</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
           <horizontal>
-            <samples>15</samples> <!-- 15 degrees scan -->
+            <samples>150</samples> <!-- 45 degrees scan, 5x resolution -->
             <resolution>1</resolution>
             <min_angle>0.2618</min_angle>   <!-- 15 degrees -->
-            <max_angle>0.5236</max_angle>   <!-- 30 degrees -->
+            <max_angle>1.0472</max_angle>   <!-- 60 degrees -->
           </horizontal>
         </scan>
         <range>
@@ -491,14 +491,14 @@
   <gazebo reference="right_lidar_link">
     <sensor type="ray" name="right_lidar_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>false</visualize>
+      <visualize>true</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
           <horizontal>
-            <samples>15</samples> <!-- 15 degrees scan -->
+            <samples>150</samples> <!-- 45 degrees scan, 5x resolution -->
             <resolution>1</resolution>
-            <min_angle>-0.5236</min_angle>  <!-- -30 degrees -->
+            <min_angle>-1.0472</min_angle>  <!-- -60 degrees -->
             <max_angle>-0.2618</max_angle>  <!-- -15 degrees -->
           </horizontal>
         </scan>
@@ -554,12 +554,12 @@
   <gazebo reference="side_left_lidar_link">
     <sensor type="ray" name="side_left_lidar_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>false</visualize>
+      <visualize>true</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
           <horizontal>
-            <samples>60</samples>
+            <samples>300</samples>
             <resolution>1</resolution>
             <min_angle>-0.523599</min_angle> <!-- -30 degrees -->
             <max_angle>0.523599</max_angle>  <!-- +30 degrees (60 degree total) -->
@@ -617,12 +617,12 @@
   <gazebo reference="side_right_lidar_link">
     <sensor type="ray" name="side_right_lidar_sensor">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>false</visualize>
+      <visualize>true</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
           <horizontal>
-            <samples>60</samples>
+            <samples>300</samples>
             <resolution>1</resolution>
             <min_angle>-0.523599</min_angle> <!-- -30 degrees -->
             <max_angle>0.523599</max_angle>  <!-- +30 degrees (60 degree total) -->
@@ -720,19 +720,19 @@
   <joint name="left_front_cam_joint" type="fixed">
     <parent link="camera_mount_crossbar"/>
     <child link="left_front_cam_link"/>
-    <!-- Attached to left end of crossbar, tilted outward -->
-    <origin xyz="0 0.05 0" rpy="0 0 0.3491"/>
+    <!-- Attached to left end of crossbar, tilted outward (10 degrees) -->
+    <origin xyz="0 0.05 0" rpy="0 0 0.1746"/>
   </joint>
 
   <gazebo reference="left_front_cam_link">
     <sensor type="camera" name="left_front_camera_sensor">
       <always_on>true</always_on>
-      <update_rate>30</update_rate>
+      <update_rate>10</update_rate>
       <camera>
         <horizontal_fov>1.396</horizontal_fov>
         <image>
-          <width>3840</width>
-          <height>2160</height>
+          <width>1920</width>
+          <height>1080</height>
           <format>R8G8B8</format>
         </image>
         <clip>
@@ -768,19 +768,19 @@
   <joint name="right_front_cam_joint" type="fixed">
     <parent link="camera_mount_crossbar"/>
     <child link="right_front_cam_link"/>
-    <!-- Attached to right end of crossbar, tilted outward -->
-    <origin xyz="0 -0.05 0" rpy="0 0 -0.3491"/>
+    <!-- Attached to right end of crossbar, tilted outward (10 degrees) -->
+    <origin xyz="0 -0.05 0" rpy="0 0 -0.1746"/>
   </joint>
 
   <gazebo reference="right_front_cam_link">
     <sensor type="camera" name="right_front_camera_sensor">
       <always_on>true</always_on>
-      <update_rate>30</update_rate>
+      <update_rate>10</update_rate>
       <camera>
         <horizontal_fov>1.396</horizontal_fov>
         <image>
-          <width>3840</width>
-          <height>2160</height>
+          <width>1920</width>
+          <height>1080</height>
           <format>R8G8B8</format>
         </image>
         <clip>
