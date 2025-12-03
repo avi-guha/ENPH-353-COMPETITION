@@ -20,8 +20,9 @@ class BoardDetector:
 
         self.last_board_time = time.time()
         self.current_board = 0
+        self.frame_skip = 0
 
-        # Board detection order
+        # Detection sequence
         self.board_map = {
             0: [True,  "START"],
             1: [False, "SIZE"],
@@ -39,18 +40,18 @@ class BoardDetector:
 
         rospy.init_node('yolo_clueboard_node')
 
-        # Debug publishers for CNN visualization
+        # Debug visualization publishers
         self.pub_raw_board = rospy.Publisher('/clueboard/raw_board', Image, queue_size=1)
         self.pub_proc_board = rospy.Publisher('/clueboard/processed_board', Image, queue_size=1)
         self.pub_words_debug = rospy.Publisher('/clueboard/words_debug', Image, queue_size=1)
         self.pub_letters_debug = rospy.Publisher('/clueboard/letters_debug', Image, queue_size=1)
 
-        # Give to CNN
+        # Provide debug publishers to CNN
         self.cnn.bridge = self.bridge
         self.cnn.pub_words_debug = self.pub_words_debug
         self.cnn.pub_letters_debug = self.pub_letters_debug
 
-        # YOLO model
+        # Load YOLO
         model_path = rospy.get_param(
             "~model_path",
             "/home/fizzer/ENPH-353-COMPETITION/src/competition/clueboard_detection/runs/detect/clueboards_exp12/weights/best.pt"
@@ -62,32 +63,42 @@ class BoardDetector:
         self.camera_topic_left  = rospy.get_param("~camera_topic_left",  "/B1/left_front_cam/left_front/image_raw")
         self.camera_topic_right = rospy.get_param("~camera_topic_right", "/B1/right_front_cam/right_front/image_raw")
 
+        # Expected camera at start:
+        self.expected_cam = self.camera_topic_left
+
         rospy.Subscriber(self.camera_topic_left,  Image, self.camera_callback, queue_size=1)
         rospy.Subscriber(self.camera_topic_right, Image, self.camera_callback, queue_size=1)
 
         self.pub_score = rospy.Publisher('/score_tracker', String, queue_size=1)
 
-        rospy.loginfo("Board Detector Initialized (no RVIZ visualization).")
+        rospy.loginfo("SUPER-Optimized Board Detector initialized.")
 
-    # ----------------------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # CAMERA SWITCHER (simple + clean)
+    # ----------------------------------------------------------
+    def update_expected_camera(self):
+        # Board 1,3,5,7 → LEFT
+        # Board 2,4,6,8 → RIGHT
+        if 1 <= self.current_board <= 8:
+            if self.current_board % 2 == 1:
+                self.expected_cam = self.camera_topic_left
+            else:
+                self.expected_cam = self.camera_topic_right
+
+
+    # ----------------------------------------------------------
+    # LIGHTWEIGHT BOARD-CAPTURE CHECK
+    # ----------------------------------------------------------
     def board_captured(self, raw_board):
         hsv = cv2.cvtColor(raw_board, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, self.LOWER_BLUE_HSV, self.UPPER_BLUE_HSV)
+        return cv2.countNonZero(mask) > 2000
 
-        cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if not cnts:
-            return False
 
-        largest = max(cnts, key=cv2.contourArea)
-        peri = cv2.arcLength(largest, True)
-        approx = cv2.approxPolyDP(largest, 0.04 * peri, True)
-        n = len(approx)
-
-        return (n == 4) or (3 <= n <= 5)
-
-    # ----------------------------------------------------------------------
-    # HIGH-RES HOMOGRAPHY FIX
-    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------
+    # HIGH-RES Homography (unchanged)
+    # ----------------------------------------------------------
     def process_raw_board(self, raw):
         img = raw.copy()
         H, W = img.shape[:2]
@@ -99,7 +110,6 @@ class BoardDetector:
             return img
 
         outer = max(cnts, key=cv2.contourArea)
-
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         edges = cv2.Canny(gray, 30, 100)
 
@@ -107,8 +117,7 @@ class BoardDetector:
         cv2.drawContours(mask, [outer], -1, 255, -1)
         edges = cv2.bitwise_and(edges, edges, mask=mask)
 
-        k = cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))
-        edges = cv2.dilate(edges, k, 1)
+        edges = cv2.dilate(edges, cv2.getStructuringElement(cv2.MORPH_RECT, (3,3)), 1)
 
         cnts2, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if not cnts2:
@@ -125,12 +134,11 @@ class BoardDetector:
         pts = approx.reshape(4,2).astype(np.float32)
         s = pts.sum(axis=1)
         diff = np.diff(pts, axis=1)
-
         pts = np.array([
-            pts[np.argmin(s)],      # TL
-            pts[np.argmin(diff)],   # TR
-            pts[np.argmax(s)],      # BR
-            pts[np.argmax(diff)],   # BL
+            pts[np.argmin(s)],     
+            pts[np.argmin(diff)],  
+            pts[np.argmax(s)],     
+            pts[np.argmax(diff)],  
         ], np.float32)
 
         w1 = np.linalg.norm(pts[0] - pts[1])
@@ -138,82 +146,93 @@ class BoardDetector:
         h1 = np.linalg.norm(pts[0] - pts[3])
         h2 = np.linalg.norm(pts[1] - pts[2])
 
-        # High-resolution output to preserve characters
         SCALE = 2.8
         W_out = int(max(w1, w2) * SCALE)
         H_out = int(max(h1, h2) * SCALE)
 
-        dst = np.array([
-            [0,0],
-            [W_out-1, 0],
-            [W_out-1, H_out-1],
-            [0, H_out-1]
-        ], np.float32)
-
+        dst = np.array([[0,0], [W_out-1,0], [W_out-1,H_out-1], [0,H_out-1]], np.float32)
         M = cv2.getPerspectiveTransform(pts, dst)
         rectified = cv2.warpPerspective(img, M, (W_out, H_out), flags=cv2.INTER_CUBIC)
 
-        trim = 6
-        if rectified.shape[0] > 2*trim and rectified.shape[1] > 2*trim:
-            rectified = rectified[trim:-trim, trim:-trim]
+        # Trim border
+        if rectified.shape[0] > 12 and rectified.shape[1] > 12:
+            rectified = rectified[6:-6, 6:-6]
 
         return rectified
 
-    # ----------------------------------------------------------------------
+
+    # ----------------------------------------------------------
+    # MAIN CALLBACK — ultra light
+    # ----------------------------------------------------------
     def camera_callback(self, msg):
 
+        # ====== Camera selection ======
+        self.update_expected_camera()
+        if msg._connection_header["topic"] != self.expected_cam:
+            return
+
+        # ====== Initial START board ======
         if self.current_board == 0:
-            out = String()
-            out.data = f"{self.team_name},{self.team_pass},0,NA"
-            self.pub_score.publish(out)
+            self.pub_score.publish(String(f"{self.team_name},{self.team_pass},0,NA"))
             self.current_board = 1
             return
 
+        # ====== Final board ======
         if self.current_board > 8:
-            out = String()
-            out.data = f"{self.team_name},{self.team_pass},-1,NA"
-            self.pub_score.publish(out)
+            self.pub_score.publish(String(f"{self.team_name},{self.team_pass},-1,NA"))
             return
 
+        # ====== Cooldown ======
         if time.time() - self.last_board_time < 3.0:
             return
 
+        # ====== Skip every other frame ======
+        self.frame_skip ^= 1
+        if self.frame_skip == 1:
+            return
+
+        # ====== Only run YOLO if board NOT acquired ======
+        if self.board_map[self.current_board][0]:
+            return
+
+        # Only now convert image (expensive)
         frame = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
-        results = self.model.predict(frame, verbose=False)
+        # ====== YOLO Inference (light mode) ======
+        results = self.model.predict(frame, verbose=False, imgsz=480)
 
+        # ====== Parse YOLO detections ======
         for r in results:
             for box in r.boxes:
 
                 x1, y1, x2, y2 = box.xyxy[0].int().tolist()
                 conf = float(box.conf[0])
-
                 bw = x2 - x1
                 bh = y2 - y1
 
-                sizeable = bw > 220
-                aspect_ok = (bw / max(bh,1)) > 1.25
+                # Cheap box filters
+                sizeable = bw > 240
+                aspect_ok = bw / max(bh, 1) > 1.25
                 confident = conf > 0.55
 
-                ordered = (
-                    (self.current_board - 1) in self.board_map and
-                    self.board_map[self.current_board - 1][0] and
-                    not self.board_map[self.current_board][0]
-                )
+                prev_ok  = self.board_map[self.current_board - 1][0]
+                curr_not_done = not self.board_map[self.current_board][0]
 
-                if not (sizeable and aspect_ok and confident and ordered):
+                if not (sizeable and aspect_ok and confident and prev_ok and curr_not_done):
                     continue
 
                 crop = frame[y1:y2, x1:x2]
                 if not self.board_captured(crop):
                     continue
 
+                # ====== Process board ======
                 roi = self.process_raw_board(crop)
                 rgb = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
 
                 self.pub_raw_board.publish(self.bridge.cv2_to_imgmsg(crop, "bgr8"))
                 self.pub_proc_board.publish(self.bridge.cv2_to_imgmsg(roi, "bgr8"))
 
+                # ====== CNN reading ======
                 chars = self.cnn.predict_board(rgb)
                 words = "".join(chars).split()
                 if not words:
@@ -223,18 +242,19 @@ class BoardDetector:
                 expected = self.board_map[self.current_board][1]
 
                 if label != expected:
-                    rospy.logwarn(f"Label mismatch CNN={label} expected={expected}")
+                    rospy.logwarn(f"CNN mismatch: {label} != {expected}")
                     return
 
                 rest = "".join(w.replace(" ", "") for w in words[1:])
-                out = String()
-                out.data = f"{self.team_name},{self.team_pass},{self.current_board},{rest}"
-                self.pub_score.publish(out)
+                self.pub_score.publish(String(f"{self.team_name},{self.team_pass},{self.current_board},{rest}"))
 
+                # Mark board done
                 self.board_map[self.current_board][0] = True
                 self.last_board_time = time.time()
                 self.current_board += 1
+
                 return
+
 
 
 if __name__ == "__main__":
