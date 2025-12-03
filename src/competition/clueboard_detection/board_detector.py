@@ -8,27 +8,30 @@ import numpy as np
 import time
 from std_msgs.msg import String
 from board_reader import BoardReader
-from PIL import Image as PImage
+
 
 class BoardDetector:
     LOWER_BLUE_HSV = np.array([100, 50, 20])
     UPPER_BLUE_HSV = np.array([130, 255, 255])
 
-    # Constructor
     def __init__(self):
         self.cnn = BoardReader()
-
         self.bridge = CvBridge()
 
-        self.curr_time = time.time()
+        # Timing
         self.last_board_time = time.time()
+        self.last_callback_time = 0.0
+        self.last_yolo_time = 0.0
+
+        # CPU throttle
+        self.callback_interval = 0.05   # process at most ~20 Hz
+        self.yolo_interval = 0.8        # YOLO at most ~1.25 Hz
 
         self.current_board = 0
 
-        # Hashmap / dict containing all IDs of clueboards in course with corresponding bool, and Label.
-        # Bool (item 0 in list of value) marks if this clueboard has been reported to /score_tracker yet.
+        # Board sequence tracking
         self.board_map = {
-            0: [True, "START"], #assume LF has begun already
+            0: [True, "START"],
             1: [False, "SIZE"],
             2: [False, "VICTIM"],
             3: [False, "CRIME"],
@@ -44,278 +47,268 @@ class BoardDetector:
 
         rospy.init_node('yolo_clueboard_node')
 
-        # init publishers for GUI
+        # Publishers
         self.pub_raw_board = rospy.Publisher('/clueboard/raw_board', Image, queue_size=1)
         self.pub_proc_board = rospy.Publisher('/clueboard/processed_board', Image, queue_size=1)
         self.pub_words_debug = rospy.Publisher('/clueboard/words_debug', Image, queue_size=1)
         self.pub_letters_debug = rospy.Publisher('/clueboard/letters_debug', Image, queue_size=1)
+        self.pub_score = rospy.Publisher('/score_tracker', String, queue_size=1)
 
-        # publishers for debug images
-        self.pub_words_debug = rospy.Publisher('/clueboard/words_debug', Image, queue_size=1)
-        self.pub_letters_debug = rospy.Publisher('/clueboard/letters_debug', Image, queue_size=1)
+        # NEW: YOLO visualization publisher
+        self.pub_yolo_vis = rospy.Publisher('/yolo_clueboard/image', Image, queue_size=1)
 
-        # Give BoardReader access to publishers
+        # Connect BoardReader
         self.cnn.bridge = self.bridge
         self.cnn.pub_words_debug = self.pub_words_debug
         self.cnn.pub_letters_debug = self.pub_letters_debug
-        
-        model_path = rospy.get_param("~model_path", 
-        "/home/fizzer/ENPH-353-COMPETITION/src/competition/clueboard_detection/runs/detect/clueboards_exp12/weights/best.pt")
+
+        model_path = rospy.get_param(
+            "~model_path",
+            "/home/fizzer/ENPH-353-COMPETITION/src/competition/clueboard_detection/runs/detect/clueboards_exp12/weights/best.pt"
+        )
+
         self.model = YOLO(model_path)
-        self.model.fuse = lambda *args, **kwargs: self.model
+        # keep your no-op fuse
+        self.model.fuse = lambda *a, **k: self.model
 
-        self.camera_topic_left = rospy.get_param("~camera_topic_left", "/B1/left_front_cam/left_front/image_raw")
-        self.camera_topic_right = rospy.get_param("~camera_topic_right", "/B1/right_front_cam/right_front/image_raw")
+        self.camera_topic_left = rospy.get_param(
+            "~camera_topic_left",
+            "/B1/left_front_cam/left_front/image_raw"
+        )
+        self.camera_topic_right = rospy.get_param(
+            "~camera_topic_right",
+            "/B1/right_front_cam/right_front/image_raw"
+        )
 
-        rospy.Subscriber(self.camera_topic_left, Image, self.camera_callback, queue_size=1)
-        rospy.Subscriber(self.camera_topic_right, Image, self.camera_callback, queue_size=1)
+        rospy.Subscriber(self.camera_topic_left, Image, self.camera_callback_left, queue_size=1)
+        rospy.Subscriber(self.camera_topic_right, Image, self.camera_callback_right, queue_size=1)
 
-        self.pub_score = rospy.Publisher('/score_tracker', String, queue_size=1)
+        rospy.loginfo("Board Detector Initialized (with YOLO visualization).")
 
-        self.pub_yolo = rospy.Publisher('/yolo_clueboard/image', Image, queue_size=1)
+    # ------------------ CPU helpers ------------------
+    def should_process_callback(self):
+        t = time.time()
+        if t - self.last_callback_time < self.callback_interval:
+            return False
+        self.last_callback_time = t
+        return True
 
-        rospy.loginfo("Board Detector Initialized!")                        
+    def should_run_yolo(self):
+        t = time.time()
+        if t - self.last_yolo_time < self.yolo_interval:
+            return False
+        self.last_yolo_time = t
+        return True
 
-    # Board validation
+    # ---------------- YOLO Visualization ----------------
+    def publish_yolo_vis(self, frame, results):
+        vis = frame.copy()
+
+        for r in results:
+            for box in r.boxes:
+                x1, y1, x2, y2 = box.xyxy[0].int().tolist()
+                conf = float(box.conf[0])
+                cls = int(box.cls[0])
+                label = r.names[cls] if hasattr(r, "names") else f"id:{cls}"
+
+                cv2.rectangle(vis, (x1, y1), (x2, y2), (0,255,0), 2)
+                cv2.putText(vis,
+                            f"{label} {conf:.2f}",
+                            (x1, y1-8),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.6,
+                            (0,255,0),
+                            2)
+
+        self.pub_yolo_vis.publish(self.bridge.cv2_to_imgmsg(vis, "bgr8"))
+
+    # ---------------- Board validation ----------------
     def board_captured(self, raw_board):
-        """
-        @brief Determine if the entire clueboard is captured in image.
-        @param raw_board the bounded image return from YOLO reference.
-        @return True if the whole board is captured in the image; false if only a segment of it is captured.
-        """
-        # Isolate blue border using HSV 
         hsv_image = cv2.cvtColor(raw_board, cv2.COLOR_BGR2HSV)
         blue_mask = cv2.inRange(hsv_image, self.LOWER_BLUE_HSV, self.UPPER_BLUE_HSV)
 
-        # Find the largest continuous blue region (the border itself)
         contours, _ = cv2.findContours(blue_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        
         if not contours:
             return False
 
-        largest_contour = max(contours, key=cv2.contourArea)
-        perimeter = cv2.arcLength(largest_contour, True)
-        
-        # The epsilon parameter defines the maximum distance between the original contour and the approximated polygon
-        epsilon = 0.04 * perimeter 
-        
-        # Approximate the contour with fewer vertices
-        approx_poly = cv2.approxPolyDP(largest_contour, epsilon, True)
-        num_corners = len(approx_poly)
-        
-        # If it has exactly 4 corners, it is a perfect quadrilateral.
-        if num_corners == 4:
-            return True
-        
-        # You can adjust this range based on testing. 4 is the most definitive value.
-        return 3 <= num_corners <= 5
+        largest = max(contours, key=cv2.contourArea)
+        peri = cv2.arcLength(largest, True)
+        approx = cv2.approxPolyDP(largest, 0.04 * peri, True)
+        n = len(approx)
 
+        return (n == 4) or (3 <= n <= 5)
+
+    # ---------------- Crop/warp board ----------------
     def process_raw_board(self, raw_board):
-        """
-        Geometric homography-based solution.
-        Extracts the INNER GREY QUAD (not the blue border).
-        No thresholds. No band cropping. No empty outputs.
-        Produces a perfect, borderless rectangular board interior.
-        """
         img = raw_board.copy()
         H, W = img.shape[:2]
 
-        # Detect blue border
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        blue = cv2.inRange(hsv, (90,60,20), (130,255,255))
-
+        blue = cv2.inRange(hsv, (90, 60, 20), (130, 255, 255))
         cnts, _ = cv2.findContours(blue, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if not cnts:
-            return img  # fallback
-
+            return img
         outer = max(cnts, key=cv2.contourArea)
 
-        # Create mask inside blue border
-        border_mask = np.zeros((H,W), np.uint8)
-        cv2.drawContours(border_mask, [outer], -1, 255, -1)
-
-        # Blur to remove letter strokes
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (11,11), 0)
-
-        # edges inside the border only
         edges = cv2.Canny(blur, 10, 40)
-        edges = cv2.bitwise_and(edges, edges, mask=border_mask)
 
-        # Dilate to close grey-panel perimeter
+        mask = np.zeros((H,W), np.uint8)
+        cv2.drawContours(mask, [outer], -1, 255, -1)
+        edges = cv2.bitwise_and(edges, edges, mask=mask)
+
         k = cv2.getStructuringElement(cv2.MORPH_RECT, (9,9))
-        edges = cv2.dilate(edges, k, iterations=2)
+        edges = cv2.dilate(edges, k, 2)
 
         cnts2, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if not cnts2:
             return img
-
         inner = max(cnts2, key=cv2.contourArea)
 
-        # Approx inner border to 4 points
         peri = cv2.arcLength(inner, True)
         approx = cv2.approxPolyDP(inner, 0.03 * peri, True)
 
         if len(approx) != 4:
-            # fallback: if weird contour, crop boundingRect
             x,y,w,h = cv2.boundingRect(inner)
             return img[y:y+h, x:x+w]
 
-        pts_src = approx.reshape(4,2)
+        pts = approx.reshape(4,2).astype(np.float32)
+        s = pts.sum(axis=1)
+        diff = np.diff(pts, axis=1)
+        pts = np.array([
+            pts[np.argmin(s)],
+            pts[np.argmin(diff)],
+            pts[np.argmax(s)],
+            pts[np.argmax(diff)]
+        ], np.float32)
 
-        # order the points TL, TR, BR, BL
-        def order_pts(pts):
-            s = pts.sum(axis=1)
-            diff = np.diff(pts, axis=1)
-            return np.array([
-                pts[np.argmin(s)],      # TL
-                pts[np.argmin(diff)],   # TR
-                pts[np.argmax(s)],      # BR
-                pts[np.argmax(diff)]    # BL
-            ])
+        w1 = np.linalg.norm(pts[0]-pts[1])
+        w2 = np.linalg.norm(pts[3]-pts[2])
+        h1 = np.linalg.norm(pts[0]-pts[3])
+        h2 = np.linalg.norm(pts[1]-pts[2])
 
-        pts_src = order_pts(pts_src).astype(np.float32)
+        W_out = int(max(w1,w2))
+        H_out = int(max(h1,h2))
 
-        # Define output size
-        # estimate width / height from distances
-        w1 = np.linalg.norm(pts_src[0] - pts_src[1])
-        w2 = np.linalg.norm(pts_src[3] - pts_src[2])
-        h1 = np.linalg.norm(pts_src[0] - pts_src[3])
-        h2 = np.linalg.norm(pts_src[1] - pts_src[2])
+        dst = np.array([[0,0],[W_out-1,0],[W_out-1,H_out-1],[0,H_out-1]], np.float32)
 
-        W_out = int(max(w1, w2))
-        H_out = int(max(h1, h2))
+        M = cv2.getPerspectiveTransform(pts, dst)
+        rectified = cv2.warpPerspective(img, M, (W_out,H_out))
 
-        pts_dst = np.array([
-            [0, 0],
-            [W_out-1, 0],
-            [W_out-1, H_out-1],
-            [0, H_out-1]
-        ], dtype=np.float32)
-
-        # Homography
-        M = cv2.getPerspectiveTransform(pts_src, pts_dst)
-        rectified = cv2.warpPerspective(img, M, (W_out, H_out))
-        
-        # Trim pixels from edges
-        trim = 8 
-
-        Hf, Wf = rectified.shape[:2]
-
-        if Hf > 2*trim and Wf > 2*trim:
-            rectified = rectified[trim:Hf-trim, trim:Wf-trim]
+        trim = 8
+        if rectified.shape[0] > 2*trim and rectified.shape[1] > 2*trim:
+            rectified = rectified[trim:-trim, trim:-trim]
 
         return rectified
 
+    # --------------- Shared left/right camera logic ---------------
+    def handle_camera(self, msg, forbidden):
+        # START case
+        if self.current_board == 0:
+            out = String()
+            out.data = f"{self.team_name},{self.team_pass},0,NA"
+            self.pub_score.publish(out)
+            self.current_board = 1
+            return
 
-    def camera_callback(self, msg):
-        """
-        @brief Callback function on L/R camera topics, triggered when new image received. Handles board detection logic.
-        @param msg the callback Image
-        """
-        # early exit if current_board is out of range
+        # DONE case
         if self.current_board > 8:
-            msg = String()
-            msg.data = f"{self.team_name},{self.team_pass},-1,NA"
-            self.pub_score.publish(msg)
-        elif self.current_board == 0:
-            msg = String()
-            msg.data = f"{self.team_name},{self.team_pass},0,NA"
-            self.pub_score.publish(msg)
-            self.current_board += 1
-        if self.current_board not in self.board_map:
+            out = String()
+            out.data = f"{self.team_name},{self.team_pass},-1,NA"
+            self.pub_score.publish(out)
             return
 
-        # enforce cooldown BEFORE running YOLO to prevent double triggers
-        if (time.time() - self.last_board_time) < 3.0: 
+        # CPU throttles
+        if not self.should_process_callback():
             return
 
-        frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        if self.current_board in forbidden:
+            return
 
-        # YOLO inference
+        if time.time() - self.last_board_time < 3.0:
+            return
+
+        if not self.should_run_yolo():
+            return
+
+        frame = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+        H, W = frame.shape[:2]
+
+        # YOLO FULL-RES
         results = self.model.predict(frame, verbose=False)
 
+        # Publish YOLO visualization to RViz
+        self.publish_yolo_vis(frame, results)
+
+        # Interpret YOLO results
         for r in results:
-            boxes = r.boxes
-            for box in boxes:
+            for box in r.boxes:
                 x1, y1, x2, y2 = box.xyxy[0].int().tolist()
-                confidence = box.conf[0].item()
+                conf = float(box.conf[0])
 
-                # ensure all conditions met before proceeding to read board
-                sizeable  = (x2-x1) > 420
-                aspectratio = (x2-x1) / (y2-y1) > 1.35
-                confident = confidence > 0.91
+                bw = x2 - x1
+                bh = y2 - y1
 
-                # validate order of board detection, ensure this baord isnt seen yet
+                sizeable = bw > max(120, 0.25*W)
+                aspectratio = bw / max(bh, 1) > 1.35
+                confident = conf > 0.70
+
                 ordered = (
                     self.current_board-1 in self.board_map and
-                    self.board_map[self.current_board-1][0] and 
+                    self.board_map[self.current_board-1][0] and
                     not self.board_map[self.current_board][0]
                 )
 
-                if sizeable and aspectratio and confident and ordered:
-                    frame_extract = frame[y1:y2, x1:x2]
+                if not (sizeable and aspectratio and confident and ordered):
+                    continue
 
-                    # check if whole board captured
-                    if(self.board_captured(frame_extract)):
-                        rospy.loginfo(">0.9 confidence and full board found.")
+                frame_extract = frame[y1:y2, x1:x2]
 
-                        # process to gray region (you already planned this)
-                        roi = self.process_raw_board(frame_extract)
+                if not self.board_captured(frame_extract):
+                    continue
 
-                        # convert to rgb for cnn
-                        rgb_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
+                rospy.loginfo(f"Board {self.current_board} found at high confidence.")
 
-                        # publish for GUI
-                        self.pub_raw_board.publish(self.bridge.cv2_to_imgmsg(frame_extract, "bgr8"))
-                        self.pub_proc_board.publish(self.bridge.cv2_to_imgmsg(roi, "bgr8"))
+                roi = self.process_raw_board(frame_extract)
+                rgb_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
 
-                        # feed into cnn, extract predicted LABEL for board                        
-                        pred_chars = self.cnn.predict_board(rgb_roi)
-                        words = "".join(pred_chars).split()
+                self.pub_raw_board.publish(self.bridge.cv2_to_imgmsg(frame_extract, "bgr8"))
+                self.pub_proc_board.publish(self.bridge.cv2_to_imgmsg(roi, "bgr8"))
 
-                        predicted_label = words[0]
+                pred_chars = self.cnn.predict_board(rgb_roi)
+                words = "".join(pred_chars).split()
+                if not words:
+                    return
 
-                        # validate that expected label matches CNN label  
-                        expected_label = self.board_map[self.current_board][1]
+                predicted_label = words[0]
+                expected_label = self.board_map[self.current_board][1]
 
-                        if predicted_label != expected_label:
-                            rospy.logwarn(f"Ignoring board: CNN label '{predicted_label}' "
-                                          f"does not match expected '{expected_label}'")
-                            return
-                                    
-                        #only read rest of board if passed check
-                        predicted_text = [w.replace(" ", "") for w in words[1:]]
+                if predicted_label != expected_label:
+                    rospy.logwarn(f"Label mismatch: CNN '{predicted_label}' != expected '{expected_label}'")
+                    return
 
-                        # debug
-                        """
-                        rospy.loginfo(f"---BOARD FOUND! ID: {self.current_board}, LABEL: {predicted_label}")
-                        rospy.loginfo(f"---BOARD TEXT: {predicted_text}")
-                        rospy.loginfo("------------------------------------------")
-                        """
+                clue = "".join(w.replace(" ", "") for w in words[1:])
+                out = String()
+                out.data = f"{self.team_name},{self.team_pass},{self.current_board},{clue}"
+                self.pub_score.publish(out)
 
-                        # report clue to /score_tracker -> WITH NO SPACES! 
-                        clue_text = "".join(predicted_text)
+                self.board_map[self.current_board][0] = True
+                self.last_board_time = time.time()
+                self.current_board += 1
 
-                        msg_out = String()
-                        msg_out.data = f"{self.team_name},{self.team_pass},{self.current_board},{clue_text}"
+                return
 
-                        self.pub_score.publish(msg_out)
-                        
-                        # mark board as reported
-                        self.board_map[self.current_board][0] = True
-                        self.last_board_time = time.time()
+    def camera_callback_left(self, msg):
+        self.handle_camera(msg, forbidden=[2,4,6,8])
 
-                        self.current_board += 1
-                        
-                        # return immediately to avoid multiple detections per callback
-                        return
+    def camera_callback_right(self, msg):
+        self.handle_camera(msg, forbidden=[1,3,5,7])
 
 
 if __name__ == "__main__":
     try:
-        detector = BoardDetector()  # Initialize your detector
-        rospy.loginfo("BoardDetector node is running...")
-        rospy.spin()  # Keep Python from exiting until the node is stopped
+        BoardDetector()
+        rospy.spin()
     except rospy.ROSInterruptException:
-        rospy.loginfo("Shutting down BoardDetector node.")
+        pass
