@@ -19,10 +19,11 @@
         type="score_tracker.py"
         name="score_tracker"
         output="screen"
+        cwd="node"
     />
 
     <!-- GUI Node -->
-    <node pkg="your_package"
+    <node pkg="competition"
         type="gui.py"
         name="competition_gui"
         output="screen"/>
