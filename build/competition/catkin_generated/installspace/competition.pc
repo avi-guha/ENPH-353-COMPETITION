@@ -1,0 +1,8 @@
+prefix=/home/fizzer/ENPH-353-COMPETITION/install
+
+Name: competition
+Description: Description of competition
+Version: 1.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
