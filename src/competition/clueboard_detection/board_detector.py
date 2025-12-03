@@ -22,6 +22,8 @@ class BoardDetector:
         self.current_board = 0
         self.frame_skip = 0
 
+        self.started = False
+
         # Detection sequence
         self.board_map = {
             0: [True,  "START"],
@@ -138,13 +140,13 @@ class BoardDetector:
 
         return rectified
     
-
     # Camera callback for inference and reading
     def camera_callback(self, msg):
         # Starting case
-        if self.current_board == 0:
+        if self.current_board == 0 and not self.started:
             self.pub_score.publish(String(f"{self.team_name},{self.team_pass},0,NA"))
             self.current_board = 1
+            self.started = True
             return
 
         # cooldown
