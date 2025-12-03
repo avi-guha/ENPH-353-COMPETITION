@@ -265,7 +265,7 @@ class InferenceNode:
 
         twist = Twist()
         # twist.linear.x = v
-        twist.linear.x = 1.6
+        twist.linear.x = 1.7
         
         twist.angular.z = w
         self.pub.publish(twist)
