@@ -1,0 +1,25 @@
+22:30:33.258: Clue SIZE: YO15
+22:30:33.258: Clue VICTIM: L6CQIBJNXZGQ
+22:30:33.258: Clue CRIME: LBKZB1AZX9
+22:30:33.259: Clue TIME: PDDPLG60AZJ5
+22:30:33.259: Clue PLACE: 97SG2JA6BM
+22:30:33.259: Clue MOTIVE: PXDLPDGEESY8
+22:30:33.259: Clue WEAPON: FKNEAT
+22:30:33.259: Clue BANDIT: 0LQJ92VA
+22:30:48.559: Message received: teamEMAG,secret3,0,NA
+22:30:48.560: Timer started.
+22:31:02.406: Message received: teamEMAG,secret3,1,YOCS
+22:31:02.407: Awarded: 0 pts
+22:31:10.580: Message received: teamEMAG,secret3,2,LCCQIBJNXZGQ
+22:31:10.583: Awarded: 0 pts
+22:31:14.010: Message received: teamEMAG,secret3,3,LBKZBCAZX9
+22:31:14.011: Awarded: 0 pts
+22:31:25.023: Message received: teamEMAG,secret3,4,PDDPLGGOAZJS
+22:31:25.024: Awarded: 0 pts
+22:31:36.191: Message received: teamEMAG,secret3,5,9TSGEJACBM
+22:31:36.191: Awarded: 0 pts
+22:31:44.023: Message received: teamEMAG,secret3,6,PXDLPDGEESYS
+22:31:44.023: Awarded: 0 pts
+22:31:55.275: Message received: teamEMAG,secret3,7,FKNEAT
+22:31:55.276: Team total: 8 pts
+22:31:55.277: Awarded: 8 pts

@@ -1,0 +1,38 @@
+22:23:43.927: Clue SIZE: XBSIGCGE
+22:23:43.927: Clue VICTIM: CNIOTYCTDHQ
+22:23:43.927: Clue CRIME: HFFPURVFPTVB
+22:23:43.929: Clue TIME: LUOTFJPCCEW
+22:23:43.929: Clue PLACE: YRFTSBVMLR
+22:23:43.930: Clue MOTIVE: ZBSZFGRETR
+22:23:43.930: Clue WEAPON: MXWYQTY
+22:23:43.930: Clue BANDIT: KMISOJXQMFU
+22:24:01.179: Message received: teamEMAG,secret3,0,NA
+22:24:01.180: Timer started.
+22:24:20.774: Message received: teamEMAG,secret3,1,XBSIGCGE
+22:24:20.775: Team total: 6 pts
+22:24:20.775: Awarded: 6 pts
+22:24:28.236: Message received: teamEMAG,secret3,2,CNIOTYCTDHQ
+22:24:28.237: Team total: 12 pts
+22:24:28.242: Awarded: 6 pts
+22:24:32.995: Message received: teamEMAG,secret3,3,HFFPURVFPTVB
+22:24:32.996: Team total: 18 pts
+22:24:33.000: Awarded: 6 pts
+22:24:43.569: Message received: teamEMAG,secret3,4,LUOTFJPCCEW
+22:24:43.570: Team total: 24 pts
+22:24:43.572: Awarded: 6 pts
+22:24:56.683: Message received: teamEMAG,secret3,5,YRFTSBVMLR
+22:24:56.684: Team total: 30 pts
+22:24:56.684: Awarded: 6 pts
+22:25:03.256: Message received: teamEMAG,secret3,6,ZBSZFGRETR
+22:25:03.256: Team total: 36 pts
+22:25:03.257: Awarded: 6 pts
+22:25:13.274: Message received: teamEMAG,secret3,7,MXWYQTY
+22:25:13.275: Team total: 44 pts
+22:25:13.276: Awarded: 8 pts
+22:25:21.424: Bonus completed: +5 points
+22:25:21.424: Team total: 49 pts
+22:25:33.517: Message received: teamEMAG,secret3,8,KMISOJXQMFU
+22:25:33.518: Team total: 57 pts
+22:25:33.519: Awarded: 8 pts
+22:25:34.518: Message received: teamEMAG,secret3,-1,NA
+22:25:34.518: Timer stopped: 83.64 sec sim time (real time: 93sec).

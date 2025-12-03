@@ -1,0 +1,35 @@
+22:18:31.118: Clue SIZE: FVJR
+22:18:31.118: Clue VICTIM: WSTUFJBNH
+22:18:31.118: Clue CRIME: BILBSX
+22:18:31.121: Clue TIME: TRKBOWRRCAK
+22:18:31.121: Clue PLACE: ZIPXJXWDV
+22:18:31.121: Clue MOTIVE: GPDCMCLG
+22:18:31.121: Clue WEAPON: SIWWMSKK
+22:18:31.122: Clue BANDIT: TNOWOLOFV
+22:18:47.883: Message received: teamEMAG,secret3,0,NA
+22:18:47.884: Timer started.
+22:19:03.979: Message received: teamEMAG,secret3,1,FVJR
+22:19:03.980: Team total: 6 pts
+22:19:03.982: Awarded: 6 pts
+22:19:13.483: Message received: teamEMAG,secret3,2,WSTUFJBNH
+22:19:13.484: Team total: 12 pts
+22:19:13.486: Awarded: 6 pts
+22:19:16.004: Message received: teamEMAG,secret3,3,BILBSX
+22:19:16.005: Team total: 18 pts
+22:19:16.007: Awarded: 6 pts
+22:19:27.220: Message received: teamEMAG,secret3,4,TRKBOWRRCAK
+22:19:27.221: Team total: 24 pts
+22:19:27.221: Awarded: 6 pts
+22:19:39.953: Message received: teamEMAG,secret3,5,ZIPXJXWDV
+22:19:39.954: Team total: 30 pts
+22:19:39.954: Awarded: 6 pts
+22:19:46.323: Message received: teamEMAG,secret3,6,GPDCMCLG
+22:19:46.324: Team total: 36 pts
+22:19:46.325: Awarded: 6 pts
+22:19:49.519: Bonus completed: +5 points
+22:19:49.519: Team total: 41 pts
+22:19:56.853: Message received: teamEMAG,secret3,7,SIWWMSKK
+22:19:56.853: Team total: 49 pts
+22:19:56.855: Awarded: 8 pts
+22:20:16.645: Message received: teamEMAG,secret3,-1,NA
+22:20:16.646: Timer stopped: 80.18 sec sim time (real time: 88sec).
