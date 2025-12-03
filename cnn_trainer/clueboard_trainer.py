@@ -160,7 +160,7 @@ def characterize_word(word_img):
 
 
 # TRAINING:
-classes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 " # class 36 is just a space, ' '
+classes = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" # class 36 is just a space, ' '
 char_to_idx = {c: i for i, c in enumerate(classes)}
 print(char_to_idx)
 
@@ -182,6 +182,26 @@ for filename in os.listdir(data_dir):
 
         X.append(char_img_normal)
         y.append(char_label)
+
+# Load images from training_numbers and training_numbers_data_gen directories
+# These contain digit images with format: digit_number.png or digit_number_aug_index.png
+numbers_dirs = [
+    os.path.expanduser('~/ENPH-353-COMPETITION/cnn_trainer/training_numbers/'),
+    os.path.expanduser('~/ENPH-353-COMPETITION/cnn_trainer/training_numbers_data_gen/')
+]
+
+for numbers_dir in numbers_dirs:
+    if os.path.exists(numbers_dir):
+        for filename in os.listdir(numbers_dir):
+            if filename.endswith(".png"):
+                # Label is the first part before underscore (e.g., "0" from "0_1.png" or "0_1_aug_0.png")
+                char_label = filename.split("_")[0]
+                char_img = cv2.imread(os.path.join(numbers_dir, filename), cv2.IMREAD_GRAYSCALE)
+                char_img = cv2.resize(char_img, (IMG_SIZE, IMG_SIZE))
+                char_img_normal = char_img.astype("float32") / 255.0
+                
+                X.append(char_img_normal)
+                y.append(char_label)
 
 X = np.array(X)
 
@@ -244,6 +264,6 @@ history = model.fit(X_total,
                     verbose=1,
                     validation_split=val_split)
 
-save_path = "/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/clueboard_reader_CNN.h5"
+save_path = "/home/fizzer/ENPH-353-COMPETITION/cnn_trainer/clueboard_reader_CNN_ag.h5"
 model.save(save_path)
 print(f"Model saved to {save_path}")
