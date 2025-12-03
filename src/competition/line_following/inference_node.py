@@ -74,6 +74,10 @@ class InferenceNode:
         # Left and Right lidars for obstacle detection
         self.left_obstacle_detected = False
         self.right_obstacle_detected = False
+        self.left_hard_stop = False   # Hard stop if object at 0.075m
+        self.right_hard_stop = False  # Hard stop if object at 0.075m
+        self.left_hard_stop_pause_until = rospy.Time.now()   # Pause timer after left hard stop clears
+        self.right_hard_stop_pause_until = rospy.Time.now()  # Pause timer after right hard stop clears
         self.side_left_obstacle_detected = False
         self.side_right_obstacle_detected = False
         rospy.Subscriber(self.left_scan_topic, LaserScan, self.left_scan_callback, queue_size=1)
@@ -123,8 +127,8 @@ class InferenceNode:
         
         if valid_ranges:
             min_dist = min(valid_ranges)
-            # Detect obstacle within 0.20m (20cm) in the front cone - STOP robot
-            self.obstacle_detected = min_dist < 0.20
+            # Detect obstacle within 0.175m (17.5cm) in the front cone - STOP robot
+            self.obstacle_detected = min_dist < 0.175
             
             # Debug logging (throttled)
             rospy.loginfo_throttle(2.0, f"Front LIDAR: min={min_dist:.3f}m, valid={len(valid_ranges)}/{len(ranges)}, obstacle={self.obstacle_detected}")
@@ -143,21 +147,63 @@ class InferenceNode:
             rospy.logwarn_throttle(5.0, f"Front LIDAR: No valid ranges (all inf/nan or outside bounds)")
     
     def left_scan_callback(self, msg):
-        """Process left lidar scan - steer right if obstacle detected"""
+        """Process left lidar scan - steer right if obstacle detected, hard stop at 0.075m"""
         ranges = [r for r in msg.ranges if r > msg.range_min and r < msg.range_max]
-        if ranges and min(ranges) < 0.20:
-            self.left_obstacle_detected = True
-            rospy.logwarn_throttle(0.5, f"⚠️ LEFT FRONT OBSTACLE at {min(ranges):.3f}m! Steering right.")
+        was_hard_stop = self.left_hard_stop
+        if ranges:
+            min_dist = min(ranges)
+            # Hard stop if obstacle within 0.075m (7.5cm)
+            if min_dist < 0.075:
+                self.left_hard_stop = True
+                self.left_obstacle_detected = True
+                rospy.logwarn_throttle(0.5, f"🛑 LEFT HARD STOP at {min_dist:.3f}m!")
+            elif min_dist < 0.20:
+                # Was hard stop, now cleared - set pause timer
+                if was_hard_stop:
+                    self.left_hard_stop_pause_until = rospy.Time.now() + rospy.Duration(0.5)
+                self.left_hard_stop = False
+                self.left_obstacle_detected = True
+                rospy.logwarn_throttle(0.5, f"⚠️ LEFT FRONT OBSTACLE at {min_dist:.3f}m! Steering right.")
+            else:
+                # Was hard stop, now cleared - set pause timer
+                if was_hard_stop:
+                    self.left_hard_stop_pause_until = rospy.Time.now() + rospy.Duration(0.5)
+                self.left_hard_stop = False
+                self.left_obstacle_detected = False
         else:
+            if was_hard_stop:
+                self.left_hard_stop_pause_until = rospy.Time.now() + rospy.Duration(0.5)
+            self.left_hard_stop = False
             self.left_obstacle_detected = False
 
     def right_scan_callback(self, msg):
-        """Process right lidar scan - steer left if obstacle detected"""
+        """Process right lidar scan - steer left if obstacle detected, hard stop at 0.075m"""
         ranges = [r for r in msg.ranges if r > msg.range_min and r < msg.range_max]
-        if ranges and min(ranges) < 0.20:
-            self.right_obstacle_detected = True
-            rospy.logwarn_throttle(0.5, f"⚠️ RIGHT FRONT OBSTACLE at {min(ranges):.3f}m! Steering left.")
+        was_hard_stop = self.right_hard_stop
+        if ranges:
+            min_dist = min(ranges)
+            # Hard stop if obstacle within 0.075m (7.5cm)
+            if min_dist < 0.075:
+                self.right_hard_stop = True
+                self.right_obstacle_detected = True
+                rospy.logwarn_throttle(0.5, f"🛑 RIGHT HARD STOP at {min_dist:.3f}m!")
+            elif min_dist < 0.20:
+                # Was hard stop, now cleared - set pause timer
+                if was_hard_stop:
+                    self.right_hard_stop_pause_until = rospy.Time.now() + rospy.Duration(0.5)
+                self.right_hard_stop = False
+                self.right_obstacle_detected = True
+                rospy.logwarn_throttle(0.5, f"⚠️ RIGHT FRONT OBSTACLE at {min_dist:.3f}m! Steering left.")
+            else:
+                # Was hard stop, now cleared - set pause timer
+                if was_hard_stop:
+                    self.right_hard_stop_pause_until = rospy.Time.now() + rospy.Duration(0.5)
+                self.right_hard_stop = False
+                self.right_obstacle_detected = False
         else:
+            if was_hard_stop:
+                self.right_hard_stop_pause_until = rospy.Time.now() + rospy.Duration(0.5)
+            self.right_hard_stop = False
             self.right_obstacle_detected = False
 
     def side_left_scan_callback(self, msg):
@@ -229,6 +275,22 @@ class InferenceNode:
         scan_tensor = torch.tensor(scan_ranges, dtype=torch.float32).unsqueeze(0).to(self.device)
         scan_tensor = scan_tensor / 30.0
 
+        # Left/Right front lidar hard stop - emergency stop at 0.075m or in pause period
+        left_paused = rospy.Time.now() < self.left_hard_stop_pause_until
+        right_paused = rospy.Time.now() < self.right_hard_stop_pause_until
+        if self.left_hard_stop or self.right_hard_stop or left_paused or right_paused:
+            twist = Twist()
+            twist.linear.x = 0.0
+            twist.angular.z = 0.0
+            self.pub.publish(twist)
+            if self.left_hard_stop or self.right_hard_stop:
+                side = "LEFT" if self.left_hard_stop else "RIGHT"
+                rospy.logwarn_throttle(0.5, f"🛑 HARD STOP - {side} obstacle too close!")
+            else:
+                side = "LEFT" if left_paused else "RIGHT"
+                rospy.loginfo_throttle(0.25, f"⏸️ PAUSED - Waiting after {side} hard stop cleared")
+            return
+
         # Front lidar obstacle detection - stop if obstacle detected or in pause period
         if self.obstacle_detected or rospy.Time.now() < self.front_obstacle_pause_until:
             twist = Twist()
@@ -244,12 +306,12 @@ class InferenceNode:
         # Inference
         with torch.no_grad():
             output = self.model(image, scan_tensor)
-            v = 0.73 * output[0][0].item()
+            v = 2.0
             w = 1.44 * output[0][1].item()
 
         # If max turning speed > 2.0 rad/s, set max velocity to 0.85 m/s
         if abs(w) > 3.0:
-            v = min(v, 0.85)
+            v = min(v, 0.95)
 
         # Front corner lidar obstacle avoidance - steer away from obstacles
         if self.left_obstacle_detected:
@@ -260,12 +322,14 @@ class InferenceNode:
         # Side lidar obstacle avoidance - steer away from obstacles
         if self.side_left_obstacle_detected:
             w -= 0.75  # Steer right (negative angular velocity)
+            
         if self.side_right_obstacle_detected:
             w += 0.75  # Steer left (positive angular velocity)
+            
 
         twist = Twist()
         # twist.linear.x = v
-        twist.linear.x = 1.7
+        twist.linear.x = v
         
         twist.angular.z = w
         self.pub.publish(twist)
