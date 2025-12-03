@@ -59,7 +59,7 @@ class BoardDetector:
         # Load YOLO
         model_path = rospy.get_param(
             "~model_path",
-            "/home/fizzer/ENPH-353-COMPETITION/src/competition/clueboard_detection/runs/detect/clueboards_exp12/weights/best.pt"
+            "/home/fizzer/ENPH-353-COMPETITION/src/clueboard_detection/runs/detect/clueboards_exp12/weights/best.pt"
         )
         self.model = YOLO(model_path)
         self.model.fuse = lambda *a, **k: self.model
