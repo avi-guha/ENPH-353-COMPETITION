@@ -22,7 +22,8 @@ $ tree -L 1
 └── validation_data_img_gen
 ```
 
-Trained, best model saved as `clueboard_reader_CNN.h5`.
+Trained, best model saved as `clueboard_reader_model.tflite`.
+
 
 
 
